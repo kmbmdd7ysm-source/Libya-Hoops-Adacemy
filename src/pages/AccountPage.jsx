@@ -11,7 +11,7 @@ import AddressesSection from '../components/account/AddressesSection';
 import CurrencySelector from '../components/common/CurrencySelector';
 import Avatar from '../components/common/Avatar';
 import { errorText } from '../utils/errors';
-import { validateProfileImage } from '../utils/profileImage';
+import { createProfileImageDataUrl, validateProfileImage } from '../utils/profileImage';
 import { getMyOrders } from '../services/orders';
 import { safeInternalReturnPath } from '../utils/safeReturnPath';
 import OrderCard from '../components/account/OrderCard';
@@ -53,6 +53,7 @@ export default function AccountPage() {
     [fullName, setFullName] = useState(''),
     [confirmPassword, setConfirmPassword] = useState(''),
     [photoPreview, setPhotoPreview] = useState(''),
+    [accountEmail, setAccountEmail] = useState(auth.user?.email || ''),
     [show, setShow] = useState(false),
     [busy, setBusy] = useState(false),
     [msg, setMsg] = useState(''),
@@ -65,6 +66,12 @@ export default function AccountPage() {
       preferredSize: data?.profile?.preferred_size || '',
       preferredColors: data?.profile?.preferred_colors || [],
       marketingConsent: Boolean(data?.profile?.marketing_consent),
+      phone: auth.user?.user_metadata?.phone || '',
+      avatarUrl:
+        auth.user?.user_metadata?.avatar_url ||
+        data?.profile?.avatar_url ||
+        data?.profile?.avatarUrl ||
+        '',
     }));
   const nameRef = useRef(null),
     emailRef = useRef(null),
@@ -85,6 +92,20 @@ export default function AccountPage() {
       : 'overview';
     setSection(nextSection);
   }, [params]);
+  useEffect(() => {
+    if (!auth.user) return;
+    setAccountEmail(auth.user.email || '');
+    setProfile((current) => ({
+      ...current,
+      phone: auth.user.user_metadata?.phone || current.phone || '',
+      avatarUrl:
+        auth.user.user_metadata?.avatar_url ||
+        data?.profile?.avatar_url ||
+        data?.profile?.avatarUrl ||
+        current.avatarUrl ||
+        '',
+    }));
+  }, [auth.user?.id, auth.user?.user_metadata, data?.profile]);
   const selectSection = (nextSection) => {
     setSection(nextSection);
     const nextParams = new URLSearchParams(params);
@@ -398,7 +419,24 @@ export default function AccountPage() {
         lastName: clean(profile.lastName),
         displayName: clean(profile.displayName),
       });
-      setMsg(pick({ en: 'Profile saved.', ar: 'تم حفظ الملف الشخصي.' }));
+      const metadataResult = await auth.updateMetadata({
+        phone: clean(profile.phone),
+        avatar_url: profile.avatarUrl || null,
+      });
+      if (metadataResult?.error) throw metadataResult.error;
+      const normalizedAccountEmail = accountEmail.trim().toLowerCase();
+      if (normalizedAccountEmail && normalizedAccountEmail !== auth.user.email) {
+        const emailResult = await auth.updateEmail(normalizedAccountEmail);
+        if (emailResult?.error) throw emailResult.error;
+        setMsg(
+          pick({
+            en: 'Profile saved. Check both email inboxes to confirm the new address.',
+            ar: 'تم حفظ الملف الشخصي. راجع البريدين لتأكيد العنوان الجديد.',
+          }),
+        );
+      } else {
+        setMsg(pick({ en: 'Profile saved.', ar: 'تم حفظ الملف الشخصي.' }));
+      }
     } catch (x) {
       setMsg(errorText(x, lang));
       focusField(x.fieldRef);
@@ -412,13 +450,49 @@ export default function AccountPage() {
       <section className="section account-page">
         <div className="container">
           <div className="account-heading">
-            <Avatar
-              name={
-                profile.displayName || `${profile.firstName} ${profile.lastName}` || auth.user.email
-              }
-              src={data?.profile?.avatar_url || data?.profile?.avatarUrl || ''}
-              size="large"
-            />
+            <label className="account-avatar-editor">
+              <Avatar
+                name={
+                  profile.displayName ||
+                  `${profile.firstName} ${profile.lastName}` ||
+                  auth.user.email
+                }
+                src={profile.avatarUrl}
+                size="large"
+              />
+              <span>{pick({ en: 'Change photo', ar: 'تغيير الصورة' })}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                aria-label={pick({ en: 'Choose profile photo', ar: 'اختر صورة شخصية' })}
+                onChange={async (event) => {
+                  const file = event.target.files?.[0];
+                  if (!file) return;
+                  setBusy(true);
+                  try {
+                    const validation = await validateProfileImage(file);
+                    if (!validation.valid) throw new Error('invalid_profile_image');
+                    const avatarUrl = await createProfileImageDataUrl(file);
+                    const result = await auth.updateMetadata({ avatar_url: avatarUrl });
+                    if (result?.error) throw result.error;
+                    setProfile((current) => ({ ...current, avatarUrl }));
+                    setMsg(pick({ en: 'Profile photo updated.', ar: 'تم تحديث الصورة الشخصية.' }));
+                  } catch (error) {
+                    setMsg(
+                      error?.message === 'invalid_profile_image'
+                        ? pick({
+                            en: 'Choose a valid JPG, PNG, WebP, HEIC, or HEIF image under 8 MB.',
+                            ar: 'اختر صورة صالحة أقل من 8 ميجابايت.',
+                          })
+                        : errorText(error, lang),
+                    );
+                  } finally {
+                    setBusy(false);
+                    event.target.value = '';
+                  }
+                }}
+              />
+            </label>
             <div>
               <p className="section-label">LHA ACCOUNT</p>
               <h1>{pick({ en: 'Your account', ar: 'حسابك' })}</h1>
@@ -534,6 +608,51 @@ export default function AccountPage() {
               )}
               {section === 'profile' && (
                 <form onSubmit={save} className="account-form">
+                  <div className="account-identity-card">
+                    <label>
+                      {pick({ en: 'Account email', ar: 'البريد الإلكتروني للحساب' })}
+                      <input
+                        type="email"
+                        value={accountEmail}
+                        onChange={(event) => setAccountEmail(event.target.value)}
+                        dir="ltr"
+                        autoComplete="email"
+                      />
+                    </label>
+                    <div className="verification-row">
+                      <strong>
+                        {auth.user.email_confirmed_at || auth.user.confirmed_at
+                          ? pick({ en: 'Email verified', ar: 'البريد الإلكتروني موثّق' })
+                          : pick({ en: 'Email not verified', ar: 'البريد الإلكتروني غير موثّق' })}
+                      </strong>
+                      {!auth.user.email_confirmed_at && !auth.user.confirmed_at && (
+                        <button
+                          type="button"
+                          className="btn-secondary"
+                          disabled={busy || !auth.cloudConfigured}
+                          onClick={async () => {
+                            setBusy(true);
+                            try {
+                              const result = await auth.resendVerification(auth.user.email);
+                              if (result?.error) throw result.error;
+                              setMsg(
+                                pick({
+                                  en: 'Verification email sent. Check your inbox and spam folder.',
+                                  ar: 'تم إرسال رسالة التحقق. راجع صندوق الوارد والرسائل غير المرغوب فيها.',
+                                }),
+                              );
+                            } catch (error) {
+                              setMsg(errorText(error, lang));
+                            } finally {
+                              setBusy(false);
+                            }
+                          }}
+                        >
+                          {pick({ en: 'Verify email', ar: 'توثيق البريد' })}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <label>
                     {pick({ en: 'First name', ar: 'الاسم الأول' })}
                     <input
@@ -555,6 +674,33 @@ export default function AccountPage() {
                       onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
                     />
                   </label>
+                  <label>
+                    {pick({ en: 'Phone number', ar: 'رقم الهاتف' })}
+                    <input
+                      type="tel"
+                      dir="ltr"
+                      autoComplete="tel"
+                      value={profile.phone}
+                      onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                    />
+                  </label>
+                  {profile.avatarUrl && (
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={async () => {
+                        const result = await auth.updateMetadata({ avatar_url: null });
+                        if (result?.error) {
+                          setMsg(errorText(result.error, lang));
+                          return;
+                        }
+                        setProfile((current) => ({ ...current, avatarUrl: '' }));
+                        setMsg(pick({ en: 'Profile photo removed.', ar: 'تمت إزالة الصورة.' }));
+                      }}
+                    >
+                      {pick({ en: 'Remove profile photo', ar: 'إزالة الصورة الشخصية' })}
+                    </button>
+                  )}
                   <button className="btn-primary" disabled={busy}>
                     {pick({ en: 'Save profile', ar: 'حفظ الملف الشخصي' })}
                   </button>

@@ -46,8 +46,10 @@ export function CommerceProvider({ children }) {
   const [currency, setCurrencyState] = useState(() => readCurrencyPreference(null));
   const [countryCode, setCountryState] = useState(() => readCountryPreference(null));
   const [preferenceStatus, setPreferenceStatus] = useState('local');
-  const [usdToLydRate, setUsdToLydRate] = useState(null);
-  const [rateStatus, setRateStatus] = useState('loading');
+  // A safe public fallback is available immediately so selecting LYD can never
+  // merely relabel an unconverted USD amount while the cloud setting loads.
+  const [usdToLydRate, setUsdToLydRate] = useState(SAFE_USD_TO_LYD_FALLBACK);
+  const [rateStatus, setRateStatus] = useState('fallback');
   const channel = useRef(null);
   const cloudTimer = useRef();
   const generation = useRef(0);

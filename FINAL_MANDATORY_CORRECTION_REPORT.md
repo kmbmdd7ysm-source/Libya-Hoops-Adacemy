@@ -39,3 +39,12 @@ The report has now been corrected to match the actual implementation and formatt
 ## Browser limitation
 
 The repository contains Playwright coverage for the corrected user flows. In this execution environment, localhost browser navigation remains blocked by administrator policy. No claim of a successful local Playwright browser run is made.
+
+## July 2026 account, currency, and order-notification hardening
+
+- Display-currency conversion now has the approved 9 LYD per USD fallback immediately available, so selecting LYD cannot relabel an unconverted USD amount while the trusted cloud rate loads.
+- Legacy local order snapshots that stored USD numbers under an LYD label are repaired deterministically from the saved Libya shipping-rate snapshot; correctly converted orders are left unchanged.
+- Order/contact/newsletter delivery now uses a same-origin Vercel server function that forwards to the authoritative Formspree endpoint, with direct Formspree fallback and retries for local preview or transient platform failures.
+- Signed-in account profiles now support changing/removing the profile photo, editing the account email and phone number, displaying verification status, and resending the Supabase verification email when the address is unverified.
+- Profile photos are validated, resized, and compressed before storage in authenticated user metadata to prevent oversized session payloads.
+- Verification completed with formatting, ESLint, TypeScript, 37 test files / 230 tests, commerce/data/brand/media/SEO/cloud validation, and a production build with 54 static pages.

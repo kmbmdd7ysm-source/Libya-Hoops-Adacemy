@@ -37,6 +37,14 @@ export function normalizeOrder(order = {}) {
     displayCurrency !== currency && canonicalShippingTotal > 0 && originalShippingAmount > 0
       ? originalShippingAmount / canonicalShippingTotal
       : 1;
+  const needsLegacyDisplayRepair = (displayValue, canonicalValue) =>
+    displayCurrency !== currency &&
+    inferredDisplayRate > 1.01 &&
+    Math.abs(safeNumber(displayValue) - safeNumber(canonicalValue)) < 0.01;
+  const repairedDisplayValue = (displayValue, canonicalValue) =>
+    needsLegacyDisplayRepair(displayValue, canonicalValue)
+      ? safeNumber(canonicalValue) * inferredDisplayRate
+      : safeNumber(displayValue);
   const items = Array.isArray(order.items)
     ? order.items.map((item) => ({
         id: item.id || item.productId || item.product_id || null,
@@ -53,18 +61,23 @@ export function normalizeOrder(order = {}) {
         unitPrice: Math.max(0, safeNumber(item.unitPrice ?? item.unit_price ?? item.price)),
         displayUnitPrice: Math.max(
           0,
-          safeNumber(
+          repairedDisplayValue(
             item.displayUnitPrice ??
               item.display_unit_price ??
               safeNumber(item.unitPrice ?? item.unit_price ?? item.price) * inferredDisplayRate,
+            item.unitPrice ?? item.unit_price ?? item.price,
           ),
         ),
         displayLineTotal: Math.max(
           0,
-          safeNumber(
+          repairedDisplayValue(
             item.displayLineTotal ??
               item.display_line_total ??
               safeNumber(item.lineTotal ?? item.line_total) * inferredDisplayRate,
+            item.lineTotal ??
+              item.line_total ??
+              safeNumber(item.unitPrice ?? item.unit_price ?? item.price) *
+                Math.max(1, Math.trunc(safeNumber(item.quantity) || 1)),
           ),
         ),
         lineTotal: Math.max(
@@ -94,19 +107,21 @@ export function normalizeOrder(order = {}) {
     subtotal: Math.max(0, safeNumber(order.subtotal)),
     displaySubtotal: Math.max(
       0,
-      safeNumber(
+      repairedDisplayValue(
         order.displaySubtotal ??
           order.display_subtotal ??
           safeNumber(order.subtotal) * inferredDisplayRate,
+        order.subtotal,
       ),
     ),
     shippingTotal: canonicalShippingTotal,
     displayShippingTotal: Math.max(
       0,
-      safeNumber(
+      repairedDisplayValue(
         order.displayShippingTotal ??
           order.display_shipping_total ??
           canonicalShippingTotal * inferredDisplayRate,
+        canonicalShippingTotal,
       ),
     ),
     taxTotal: Math.max(0, safeNumber(order.taxTotal ?? order.tax_total)),
@@ -114,8 +129,9 @@ export function normalizeOrder(order = {}) {
     total: Math.max(0, safeNumber(order.total)),
     displayTotal: Math.max(
       0,
-      safeNumber(
+      repairedDisplayValue(
         order.displayTotal ?? order.display_total ?? safeNumber(order.total) * inferredDisplayRate,
+        order.total,
       ),
     ),
     paymentMethod: clean(order.paymentMethod || order.payment_method || 'cash_on_delivery'),

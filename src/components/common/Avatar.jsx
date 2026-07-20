@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export function getInitials(name = '') {
@@ -12,6 +12,7 @@ export function getInitials(name = '') {
 export default function Avatar({ name, src, size = 'medium', className = '' }) {
   const { pick } = useLanguage();
   const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [src]);
   const initials = useMemo(() => getInitials(name), [name]);
   const label = pick({
     en: `${name || 'User'} profile photo`,

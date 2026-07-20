@@ -16,6 +16,8 @@ const writeJson = (key, value) => localStorage.setItem(key, JSON.stringify(value
 const localUser = (record) => ({
   id: record.id,
   email: record.email,
+  email_confirmed_at: record.emailConfirmedAt || null,
+  confirmed_at: record.emailConfirmedAt || null,
   user_metadata: record.metadata || {},
   app_metadata: { provider: 'local' },
 });
@@ -134,6 +136,25 @@ export function AuthProvider({ children }) {
             })
           : { data: {}, error: null };
       },
+      updateMetadata: async (metadata = {}) => {
+        const s = await client();
+        if (s) return s.auth.updateUser({ data: metadata });
+        if (!user?.email) return { data: null, error: new Error('Sign in first.') };
+        const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
+        let updatedRecord = null;
+        const updated = accounts.map((item) => {
+          if (item.email !== user.email) return item;
+          updatedRecord = { ...item, metadata: { ...(item.metadata || {}), ...metadata } };
+          return updatedRecord;
+        });
+        writeJson(LOCAL_ACCOUNTS_KEY, updated);
+        const nextUser = localUser(updatedRecord || { email: user.email, metadata });
+        const nextSession = { ...(session || {}), user: nextUser };
+        writeJson(LOCAL_SESSION_KEY, nextSession);
+        setUser(nextUser);
+        setSession(nextSession);
+        return { data: { user: nextUser }, error: null };
+      },
       reset: async (email) => {
         const s = await client();
         if (s)
@@ -165,7 +186,25 @@ export function AuthProvider({ children }) {
       updateEmail: async (email) => {
         const s = await client();
         if (s) return s.auth.updateUser({ email });
-        return { data: { user }, error: new Error('Email changes require cloud accounts.') };
+        if (!user?.email) return { data: null, error: new Error('Sign in first.') };
+        const normalized = String(email).trim().toLowerCase();
+        const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
+        if (accounts.some((item) => item.email === normalized && item.email !== user.email)) {
+          return { data: null, error: new Error('An account with this email already exists.') };
+        }
+        let updatedRecord = null;
+        const updated = accounts.map((item) => {
+          if (item.email !== user.email) return item;
+          updatedRecord = { ...item, email: normalized, emailConfirmedAt: null };
+          return updatedRecord;
+        });
+        writeJson(LOCAL_ACCOUNTS_KEY, updated);
+        const nextUser = localUser(updatedRecord);
+        const nextSession = { ...(session || {}), user: nextUser };
+        writeJson(LOCAL_SESSION_KEY, nextSession);
+        setUser(nextUser);
+        setSession(nextSession);
+        return { data: { user: nextUser }, error: null };
       },
       signOut: async (scope) => {
         const s = await client();

@@ -46,3 +46,36 @@
     flex-direction: column;
   }
 }
+
+.account-avatar-editor {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+.account-avatar-editor input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.account-avatar-editor:focus-within .avatar,
+.account-avatar-editor:hover .avatar {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+.account-identity-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border, #d8d8d8);
+}
+.verification-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
