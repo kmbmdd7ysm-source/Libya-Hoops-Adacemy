@@ -38,11 +38,15 @@ async function postThroughSite(body) {
     credentials: 'same-origin',
     cache: 'no-store',
   });
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
+  const contentType = response.headers.get('content-type') || '';
+  const data = contentType.includes('application/json')
+    ? await response.json().catch(() => null)
+    : null;
+  if (!response.ok || data?.ok !== true) {
+    const detail = data ? JSON.stringify(data) : await response.text().catch(() => '');
     throw new Error(`order_notification_proxy_failed:${response.status}:${detail.slice(0, 200)}`);
   }
-  return response;
+  return data;
 }
 
 async function postDirect(body) {

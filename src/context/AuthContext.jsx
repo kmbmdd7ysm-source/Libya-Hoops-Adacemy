@@ -134,7 +134,10 @@ export function AuthProvider({ children }) {
               email,
               options: { emailRedirectTo: `${location.origin}/account` },
             })
-          : { data: {}, error: null };
+          : {
+              data: null,
+              error: new Error('Email verification requires Supabase configuration on Vercel.'),
+            };
       },
       updateMetadata: async (metadata = {}) => {
         const s = await client();

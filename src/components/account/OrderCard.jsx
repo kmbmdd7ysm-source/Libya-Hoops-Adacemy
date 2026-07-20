@@ -1,11 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { useCommerce } from '../../context/CommerceContext';
 import { presentOrderStatus } from '../../services/orderStatus';
 
 export default function OrderCard({ order, compact = false }) {
   const { pick, lang } = useLanguage();
-  const { format } = useCommerce();
   const orderStatus = presentOrderStatus('order', order.orderStatus, lang);
   const paymentStatus = presentOrderStatus('payment', order.paymentStatus, lang);
   return (
@@ -44,7 +42,9 @@ export default function OrderCard({ order, compact = false }) {
         </div>
         <div>
           <dt>{pick({ en: 'Total', ar: 'الإجمالي' })}</dt>
-          <dd>{format(order.total, lang, order.currency || 'USD')}</dd>
+          <dd>
+            {order.total.toFixed(2)} {order.displayCurrency}
+          </dd>
         </div>
       </dl>
       {!compact && (

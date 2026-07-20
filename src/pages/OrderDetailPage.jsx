@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useCommerce } from '../context/CommerceContext';
+import { convertPrice, formatMoney } from '../services/money';
 import { getOrderDetails } from '../services/orders';
 import { presentOrderStatus } from '../services/orderStatus';
 import Seo from '../components/common/Seo';
@@ -12,8 +13,8 @@ export default function OrderDetailPage() {
   const { orderNumber = '' } = useParams();
   const location = useLocation();
   const auth = useAuth();
+  const { currency, usdToLydRate } = useCommerce();
   const { pick, lang } = useLanguage();
-  const { format } = useCommerce();
   const [email, setEmail] = useState(
     location.state?.verifiedEmail ||
       sessionStorage.getItem(`lha-order-verification:${orderNumber}`) ||
@@ -33,6 +34,12 @@ export default function OrderDetailPage() {
   const fulfillment = order
     ? presentOrderStatus('fulfillment', order.fulfillmentStatus, lang)
     : null;
+  const displayAmount = (amount) =>
+    formatMoney(
+      convertPrice(Number(amount) || 0, order?.currency || 'USD', currency, usdToLydRate),
+      currency,
+      lang,
+    );
   return (
     <>
       <Seo
@@ -160,24 +167,24 @@ export default function OrderDetailPage() {
                       )}
                     </div>
                     <span>
-                      {item.quantity} × {format(item.unitPrice, lang, order.currency || 'USD')}
+                      {item.quantity} × {displayAmount(item.unitPrice)}
                     </span>
-                    <strong>{format(item.lineTotal, lang, order.currency || 'USD')}</strong>
+                    <strong>{displayAmount(item.lineTotal)}</strong>
                   </li>
                 ))}
               </ul>
               <dl className="order-totals">
                 <div>
                   <dt>{pick({ en: 'Subtotal', ar: 'المجموع الفرعي' })}</dt>
-                  <dd>{format(order.subtotal, lang, order.currency || 'USD')}</dd>
+                  <dd>{displayAmount(order.subtotal)}</dd>
                 </div>
                 <div>
                   <dt>{pick({ en: 'Shipping', ar: 'الشحن' })}</dt>
-                  <dd>{format(order.shippingTotal, lang, order.currency || 'USD')}</dd>
+                  <dd>{displayAmount(order.shippingTotal)}</dd>
                 </div>
                 <div>
                   <dt>{pick({ en: 'Total', ar: 'الإجمالي' })}</dt>
-                  <dd>{format(order.total, lang, order.currency || 'USD')}</dd>
+                  <dd>{displayAmount(order.total)}</dd>
                 </div>
               </dl>
             </article>
