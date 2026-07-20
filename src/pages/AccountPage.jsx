@@ -25,6 +25,22 @@ const ACCOUNT_SECTIONS = [
   'preferences',
   'security',
 ];
+
+const avatarStorageKey = (userId) => `lha-avatar:${userId || 'guest'}`;
+const readStoredAvatar = (userId) => {
+  try {
+    return localStorage.getItem(avatarStorageKey(userId)) || '';
+  } catch {
+    return '';
+  }
+};
+const writeStoredAvatar = (userId, value) => {
+  try {
+    if (value) localStorage.setItem(avatarStorageKey(userId), value);
+    else localStorage.removeItem(avatarStorageKey(userId));
+  } catch {}
+};
+
 const clean = (s) =>
   String(s || '')
     .replace(/[<>]/g, '')
@@ -71,6 +87,7 @@ export default function AccountPage() {
         auth.user?.user_metadata?.avatar_url ||
         data?.profile?.avatar_url ||
         data?.profile?.avatarUrl ||
+        readStoredAvatar(auth.user?.id) ||
         '',
     }));
   const nameRef = useRef(null),
@@ -102,6 +119,7 @@ export default function AccountPage() {
         auth.user.user_metadata?.avatar_url ||
         data?.profile?.avatar_url ||
         data?.profile?.avatarUrl ||
+        readStoredAvatar(auth.user?.id) ||
         current.avatarUrl ||
         '',
     }));
@@ -472,11 +490,22 @@ export default function AccountPage() {
                   try {
                     const validation = await validateProfileImage(file);
                     if (!validation.valid) throw new Error('invalid_profile_image');
-                    const avatarUrl = await createProfileImageDataUrl(file);
-                    const result = await auth.updateMetadata({ avatar_url: avatarUrl });
-                    if (result?.error) throw result.error;
+                    const avatarUrl = await createProfileImageDataUrl(file, 160, 0.62);
                     setProfile((current) => ({ ...current, avatarUrl }));
-                    setMsg(pick({ en: 'Profile photo updated.', ar: 'تم تحديث الصورة الشخصية.' }));
+                    writeStoredAvatar(auth.user?.id, avatarUrl);
+                    const result = await auth.updateMetadata({ avatar_url: avatarUrl });
+                    if (result?.error) {
+                      setMsg(
+                        pick({
+                          en: 'Profile photo updated on this device. Cloud synchronization is temporarily unavailable.',
+                          ar: 'تم تحديث الصورة على هذا الجهاز. المزامنة السحابية غير متاحة مؤقتاً.',
+                        }),
+                      );
+                    } else {
+                      setMsg(
+                        pick({ en: 'Profile photo updated.', ar: 'تم تحديث الصورة الشخصية.' }),
+                      );
+                    }
                   } catch (error) {
                     setMsg(
                       error?.message === 'invalid_profile_image'
@@ -629,7 +658,7 @@ export default function AccountPage() {
                         <button
                           type="button"
                           className="btn-secondary"
-                          disabled={busy || !auth.cloudConfigured}
+                          disabled={busy}
                           onClick={async () => {
                             setBusy(true);
                             try {
@@ -694,6 +723,7 @@ export default function AccountPage() {
                           setMsg(errorText(result.error, lang));
                           return;
                         }
+                        writeStoredAvatar(auth.user?.id, '');
                         setProfile((current) => ({ ...current, avatarUrl: '' }));
                         setMsg(pick({ en: 'Profile photo removed.', ar: 'تمت إزالة الصورة.' }));
                       }}
