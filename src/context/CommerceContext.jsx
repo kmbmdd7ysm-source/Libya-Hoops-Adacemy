@@ -28,6 +28,7 @@ import { useAuth } from './AuthContext';
 
 const CommerceContext = createContext(null);
 const CLOUD_DEBOUNCE_MS = 800;
+const SAFE_USD_TO_LYD_FALLBACK = 9;
 
 function validProfileCurrency(profile) {
   const value = profile?.preferred_currency || profile?.preferredCurrency;
@@ -64,8 +65,8 @@ export function CommerceProvider({ children }) {
       })
       .catch(() => {
         if (!active) return;
-        setUsdToLydRate(null);
-        setRateStatus('error');
+        setUsdToLydRate(SAFE_USD_TO_LYD_FALLBACK);
+        setRateStatus('fallback');
       });
     return () => {
       active = false;
@@ -213,7 +214,7 @@ export function CommerceProvider({ children }) {
       config: commerceConfig,
       usdToLydRate,
       rateStatus,
-      rateReady: rateStatus === 'ready',
+      rateReady: rateStatus === 'ready' || rateStatus === 'fallback',
     }),
     [
       currency,

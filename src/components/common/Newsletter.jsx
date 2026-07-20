@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { trackEvent } from '../../utils/analytics';
+import { sendFormspree } from '../../services/formspree';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -10,8 +11,6 @@ export default function Newsletter({ compact = false }) {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
   const [error, setError] = useState('');
-
-  const endpoint = import.meta.env.VITE_NEWSLETTER_ENDPOINT?.trim();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -26,14 +25,10 @@ export default function Newsletter({ compact = false }) {
     }
     setStatus('sending');
     try {
-      if (endpoint) {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ email, source: 'newsletter' }),
-        });
-        if (!res.ok) throw new Error('failed');
-      }
+      await sendFormspree(
+        { email, source: 'newsletter', consent: true, submittedAt: new Date().toISOString() },
+        'LHA newsletter subscription',
+      );
       setStatus('success');
       trackEvent('newsletter_success', { source: compact ? 'footer' : 'section' });
     } catch {

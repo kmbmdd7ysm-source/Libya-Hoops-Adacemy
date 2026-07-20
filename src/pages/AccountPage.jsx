@@ -177,7 +177,9 @@ export default function AccountPage() {
             mode === 'reset'
               ? 'Check your email for a secure reset link.'
               : mode === 'signup'
-                ? 'Check your email to verify your account.'
+                ? auth.cloudConfigured
+                  ? 'Check your email to verify your account.'
+                  : 'Account created successfully on this device.'
                 : mode === 'reset-password'
                   ? 'Password updated.'
                   : 'Signed in successfully.',
@@ -185,7 +187,9 @@ export default function AccountPage() {
             mode === 'reset'
               ? 'راجع بريدك الإلكتروني لرابط إعادة التعيين الآمن.'
               : mode === 'signup'
-                ? 'راجع بريدك لتأكيد الحساب.'
+                ? auth.cloudConfigured
+                  ? 'راجع بريدك لتأكيد الحساب.'
+                  : 'تم إنشاء الحساب بنجاح على هذا الجهاز.'
                 : mode === 'reset-password'
                   ? 'تم تحديث كلمة المرور.'
                   : 'تم تسجيل الدخول بنجاح.',

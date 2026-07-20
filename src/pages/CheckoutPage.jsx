@@ -21,6 +21,7 @@ import Seo from '../components/common/Seo';
 import PageHero from '../components/common/PageHero';
 import SmartImage from '../components/common/SmartImage';
 import EmptyState from '../components/common/EmptyState';
+import { sendFormspree } from '../services/formspree';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const configured = isPaymentsConfigured();
@@ -287,6 +288,30 @@ export default function CheckoutPage() {
           { idempotencyKey: idempotencyRef.current },
         );
         const confirmedNumber = result?.order?.orderNumber || orderNumber;
+        try {
+          await sendFormspree(
+            {
+              orderNumber: confirmedNumber,
+              paymentMethod: 'Cash on Delivery',
+              paymentStatus: 'Pending',
+              customerName: payload.customer.name,
+              customerEmail: payload.customer.email,
+              customerPhone: payload.customer.phone,
+              shippingAddress: payload.shipping,
+              items: payload.items,
+              subtotal,
+              shippingTotal: shippingEstimate,
+              total,
+              currency: SITE.currency,
+              displayCurrency: currency,
+              language: lang,
+              createdAt: new Date().toISOString(),
+            },
+            `New LHA order ${confirmedNumber}`,
+          );
+        } catch (notificationError) {
+          console.warn('Order saved but email notification failed', notificationError);
+        }
         setOrderConfirmed(confirmedNumber);
         clearCart();
         sessionStorage.removeItem('lha-checkout-idempotency');

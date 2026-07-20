@@ -7,9 +7,9 @@ import PageHero from '../components/common/PageHero';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import { enabledPrograms } from '../data/programs';
 import { upcomingEvents } from '../data/events';
+import { sendFormspree } from '../services/formspree';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ENDPOINT = import.meta.env.VITE_FORM_ENDPOINT?.trim() || '';
 const TYPE_KEYS = [
   'general',
   'program',
@@ -63,18 +63,9 @@ export default function ContactPage() {
     if (!validate()) return;
     setStatus('sending');
     const payload = { ...form, language: lang, submittedAt: new Date().toISOString() };
-    if (!ENDPOINT) {
-      // No endpoint configured yet — acknowledge without pretending it was sent to a server.
-      setStatus('success');
-      return;
-    }
     try {
-      const res = await fetch(ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      setStatus(res.ok ? 'success' : 'error');
+      await sendFormspree(payload, `LHA contact: ${form.subject || form.inquiryType}`);
+      setStatus('success');
     } catch {
       setStatus('error');
     }
