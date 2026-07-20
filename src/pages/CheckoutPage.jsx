@@ -291,6 +291,8 @@ export default function CheckoutPage() {
         try {
           await sendFormspree(
             {
+              formType: 'order',
+              email: payload.customer.email,
               orderNumber: confirmedNumber,
               paymentMethod: 'Cash on Delivery',
               paymentStatus: 'Pending',

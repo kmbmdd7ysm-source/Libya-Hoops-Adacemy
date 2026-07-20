@@ -1,0 +1,7 @@
+Browser target: http://127.0.0.1:35327 (local dynamic port)
+Server readiness check passed.
+Browser execution unavailable or failed: page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:35327/
+Call log:
+  - navigating to "http://127.0.0.1:35327/", waiting until "domcontentloaded"
+
+    at /mnt/data/lha_work/lha_final_hardening/scripts/run-browser-tests.mjs:95:16

@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { SITE } from '../config';
@@ -460,266 +461,280 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {/* Mobile filters drawer */}
-      <div
-        className={`filters-drawer${mobileOpen ? ' open' : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t.common.filters}
-        hidden={!mobileOpen}
-      >
-        <div
-          className="filters-drawer-backdrop"
-          onClick={() => (window.history.state?.lhaSheet ? window.history.back() : closeSheets())}
-        />
-        <div ref={filterPanelRef} className="filters-drawer-panel mobile-filter-sheet">
-          <div className="filters-drawer-head">
-            {mobileGroup && (
-              <button
-                type="button"
-                className="sheet-back"
-                onClick={() => setMobileGroup('')}
-                aria-label={pick({ en: 'Back', ar: 'رجوع' })}
-              >
-                <Icon name="back" />
-              </button>
-            )}
-            <h2>
-              {mobileGroup
-                ? {
-                    size: t.shop.sizeFilter,
-                    color: t.shop.colorFilter,
-                    price: t.shop.priceRange,
-                    availability: t.shop.availability,
-                  }[mobileGroup]
-                : t.common.filters}
-            </h2>
-            <button
-              type="button"
-              className="icon-btn"
-              onClick={() => {
-                window.history.state?.lhaSheet ? window.history.back() : closeSheets();
-              }}
-              aria-label={t.common.close}
-            >
-              <Icon name="close" />
-            </button>
-          </div>
-          {!mobileGroup && (
-            <div className="filter-group-list">
-              {[
-                ...(filters.category === 'accessories'
-                  ? []
-                  : [['size', t.shop.sizeFilter, filters.sizes.join(', ')]]),
-                [
-                  'color',
-                  t.shop.colorFilter,
-                  filters.colors
-                    .map((key) => pick(allColors.find((c) => c.key === key)?.name))
-                    .filter(Boolean)
-                    .join(', '),
-                ],
-                [
-                  'price',
-                  t.shop.priceRange,
-                  filters.priceMin || filters.priceMax
-                    ? `${filters.priceMin || '0'}–${filters.priceMax || '∞'}`
-                    : '',
-                ],
-                [
-                  'availability',
-                  t.shop.availability,
-                  [
-                    filters.inStock && t.shop.inStock,
-                    filters.newOnly && t.shop.newOnly,
-                    filters.bestOnly && t.shop.bestOnly,
-                  ]
-                    .filter(Boolean)
-                    .join(', '),
-                ],
-              ].map(([key, label, summary]) => (
-                <button key={key} type="button" onClick={() => setMobileGroup(key)}>
-                  <span>
-                    <strong>{label}</strong>
-                    {summary && <small>{summary}</small>}
-                  </span>
-                  <Icon name="chevron" className="chevron-side" />
-                </button>
-              ))}
-            </div>
-          )}
-          {mobileGroup === 'size' && (
-            <div className="sheet-option-grid">
-              {allSizes.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={mobilePreviewFilters.sizes.includes(value) ? 'selected' : ''}
-                  aria-pressed={mobilePreviewFilters.sizes.includes(value)}
-                  onClick={() => {
-                    const next = new Set(mobilePreviewFilters.sizes);
-                    next.has(value) ? next.delete(value) : next.add(value);
-                    setMobileDraft((draft) => ({ ...draft, sizes: [...next] }));
-                  }}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
-          )}
-          {mobileGroup === 'color' && (
-            <div className="sheet-color-list">
-              {allColors.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  className={mobilePreviewFilters.colors.includes(item.key) ? 'selected' : ''}
-                  aria-pressed={mobilePreviewFilters.colors.includes(item.key)}
-                  onClick={() => {
-                    const next = new Set(mobilePreviewFilters.colors);
-                    next.has(item.key) ? next.delete(item.key) : next.add(item.key);
-                    setMobileDraft((draft) => ({ ...draft, colors: [...next] }));
-                  }}
-                >
-                  <span className="swatch-dot" style={{ background: item.hex }} />
-                  {pick(item.name)}
-                </button>
-              ))}
-            </div>
-          )}
-          {mobileGroup === 'price' && (
-            <div className="sheet-radio-list">
-              {[
-                ['', '', pick({ en: 'All prices', ar: 'كل الأسعار' })],
-                ['0', '25', '$0–$25'],
-                ['25', '50', '$25–$50'],
-                ['50', '100', '$50–$100'],
-                ['100', '', '$100+'],
-              ].map(([min, max, label]) => (
-                <button
-                  key={`${min}-${max}`}
-                  type="button"
-                  className={
-                    mobilePreviewFilters.priceMin === min && mobilePreviewFilters.priceMax === max
-                      ? 'selected'
-                      : ''
-                  }
-                  onClick={() =>
-                    setMobileDraft((draft) => ({ ...draft, priceMin: min, priceMax: max }))
-                  }
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-          {mobileGroup === 'availability' && (
-            <div className="sheet-toggle-list">
-              {[
-                ['inStock', t.shop.inStock],
-                ['newOnly', t.shop.newOnly],
-                ['bestOnly', t.shop.bestOnly],
-              ].map(([key, label]) => (
-                <label key={key}>
-                  <span>{label}</span>
-                  <input
-                    type="checkbox"
-                    checked={mobilePreviewFilters[key]}
-                    onChange={(event) =>
-                      setMobileDraft((draft) => ({ ...draft, [key]: event.target.checked }))
-                    }
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-          <div className="filter-sheet-actions">
-            <button
-              type="button"
-              className="filters-clear"
+      {/* Mobile filters drawer is portalled to body so transformed page ancestors cannot hide it. */}
+      {mobileOpen &&
+        createPortal(
+          <div
+            className={`filters-drawer${mobileOpen ? ' open' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t.common.filters}
+            hidden={!mobileOpen}
+          >
+            <div
+              className="filters-drawer-backdrop"
               onClick={() =>
-                setMobileDraft({
-                  sizes: [],
-                  colors: [],
-                  priceMin: '',
-                  priceMax: '',
-                  inStock: false,
-                  newOnly: false,
-                  bestOnly: false,
-                })
+                window.history.state?.lhaSheet ? window.history.back() : closeSheets()
               }
-            >
-              {t.common.clearAll}
-            </button>
-            <button
-              type="button"
-              className="btn-primary block"
-              onClick={() => {
-                if (mobileDraft) onChange(mobileDraft);
-                window.history.state?.lhaSheet ? window.history.back() : closeSheets();
-              }}
-            >
-              {mobilePreviewCount} {mobilePreviewCount === 1 ? t.common.result : t.common.results}
-            </button>
-          </div>
-        </div>
-      </div>
-      <div
-        className={`filters-drawer sort-sheet${sortOpen ? ' open' : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t.shop.sortBy}
-        hidden={!sortOpen}
-      >
-        <div
-          className="filters-drawer-backdrop"
-          onClick={() => (window.history.state?.lhaSheet ? window.history.back() : closeSheets())}
-        />
-        <div ref={sortPanelRef} className="filters-drawer-panel mobile-filter-sheet">
-          <div className="filters-drawer-head">
-            <h2>{t.shop.sortBy}</h2>
-            <button
-              type="button"
-              className="icon-btn"
-              onClick={() => {
-                window.history.state?.lhaSheet ? window.history.back() : closeSheets();
-              }}
-              aria-label={t.common.close}
-            >
-              <Icon name="close" />
-            </button>
-          </div>
-          <div className="sheet-radio-list" role="radiogroup">
-            {SORT_OPTIONS.map((value) => {
-              const labels = {
-                featured: t.shop.sortFeatured,
-                newest: t.shop.sortNewest,
-                'price-asc': t.shop.sortPriceAsc,
-                'price-desc': t.shop.sortPriceDesc,
-                'name-asc': t.shop.sortNameAsc,
-                'name-desc': t.shop.sortNameDesc,
-              };
-              return (
+            />
+            <div ref={filterPanelRef} className="filters-drawer-panel mobile-filter-sheet">
+              <div className="filters-drawer-head">
+                {mobileGroup && (
+                  <button
+                    type="button"
+                    className="sheet-back"
+                    onClick={() => setMobileGroup('')}
+                    aria-label={pick({ en: 'Back', ar: 'رجوع' })}
+                  >
+                    <Icon name="back" />
+                  </button>
+                )}
+                <h2>
+                  {mobileGroup
+                    ? {
+                        size: t.shop.sizeFilter,
+                        color: t.shop.colorFilter,
+                        price: t.shop.priceRange,
+                        availability: t.shop.availability,
+                      }[mobileGroup]
+                    : t.common.filters}
+                </h2>
                 <button
-                  key={value}
                   type="button"
-                  role="radio"
-                  aria-checked={sort === value}
-                  className={sort === value ? 'selected' : ''}
+                  className="icon-btn"
                   onClick={() => {
-                    updateParams((p) =>
-                      value === 'featured' ? p.delete('sort') : p.set('sort', value),
-                    );
+                    window.history.state?.lhaSheet ? window.history.back() : closeSheets();
+                  }}
+                  aria-label={t.common.close}
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+              {!mobileGroup && (
+                <div className="filter-group-list">
+                  {[
+                    ...(filters.category === 'accessories'
+                      ? []
+                      : [['size', t.shop.sizeFilter, filters.sizes.join(', ')]]),
+                    [
+                      'color',
+                      t.shop.colorFilter,
+                      filters.colors
+                        .map((key) => pick(allColors.find((c) => c.key === key)?.name))
+                        .filter(Boolean)
+                        .join(', '),
+                    ],
+                    [
+                      'price',
+                      t.shop.priceRange,
+                      filters.priceMin || filters.priceMax
+                        ? `${filters.priceMin || '0'}–${filters.priceMax || '∞'}`
+                        : '',
+                    ],
+                    [
+                      'availability',
+                      t.shop.availability,
+                      [
+                        filters.inStock && t.shop.inStock,
+                        filters.newOnly && t.shop.newOnly,
+                        filters.bestOnly && t.shop.bestOnly,
+                      ]
+                        .filter(Boolean)
+                        .join(', '),
+                    ],
+                  ].map(([key, label, summary]) => (
+                    <button key={key} type="button" onClick={() => setMobileGroup(key)}>
+                      <span>
+                        <strong>{label}</strong>
+                        {summary && <small>{summary}</small>}
+                      </span>
+                      <Icon name="chevron" className="chevron-side" />
+                    </button>
+                  ))}
+                </div>
+              )}
+              {mobileGroup === 'size' && (
+                <div className="sheet-option-grid">
+                  {allSizes.map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={mobilePreviewFilters.sizes.includes(value) ? 'selected' : ''}
+                      aria-pressed={mobilePreviewFilters.sizes.includes(value)}
+                      onClick={() => {
+                        const next = new Set(mobilePreviewFilters.sizes);
+                        next.has(value) ? next.delete(value) : next.add(value);
+                        setMobileDraft((draft) => ({ ...draft, sizes: [...next] }));
+                      }}
+                    >
+                      {value}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {mobileGroup === 'color' && (
+                <div className="sheet-color-list">
+                  {allColors.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={mobilePreviewFilters.colors.includes(item.key) ? 'selected' : ''}
+                      aria-pressed={mobilePreviewFilters.colors.includes(item.key)}
+                      onClick={() => {
+                        const next = new Set(mobilePreviewFilters.colors);
+                        next.has(item.key) ? next.delete(item.key) : next.add(item.key);
+                        setMobileDraft((draft) => ({ ...draft, colors: [...next] }));
+                      }}
+                    >
+                      <span className="swatch-dot" style={{ background: item.hex }} />
+                      {pick(item.name)}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {mobileGroup === 'price' && (
+                <div className="sheet-radio-list">
+                  {[
+                    ['', '', pick({ en: 'All prices', ar: 'كل الأسعار' })],
+                    ['0', '25', '$0–$25'],
+                    ['25', '50', '$25–$50'],
+                    ['50', '100', '$50–$100'],
+                    ['100', '', '$100+'],
+                  ].map(([min, max, label]) => (
+                    <button
+                      key={`${min}-${max}`}
+                      type="button"
+                      className={
+                        mobilePreviewFilters.priceMin === min &&
+                        mobilePreviewFilters.priceMax === max
+                          ? 'selected'
+                          : ''
+                      }
+                      onClick={() =>
+                        setMobileDraft((draft) => ({ ...draft, priceMin: min, priceMax: max }))
+                      }
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {mobileGroup === 'availability' && (
+                <div className="sheet-toggle-list">
+                  {[
+                    ['inStock', t.shop.inStock],
+                    ['newOnly', t.shop.newOnly],
+                    ['bestOnly', t.shop.bestOnly],
+                  ].map(([key, label]) => (
+                    <label key={key}>
+                      <span>{label}</span>
+                      <input
+                        type="checkbox"
+                        checked={mobilePreviewFilters[key]}
+                        onChange={(event) =>
+                          setMobileDraft((draft) => ({ ...draft, [key]: event.target.checked }))
+                        }
+                      />
+                    </label>
+                  ))}
+                </div>
+              )}
+              <div className="filter-sheet-actions">
+                <button
+                  type="button"
+                  className="filters-clear"
+                  onClick={() =>
+                    setMobileDraft({
+                      sizes: [],
+                      colors: [],
+                      priceMin: '',
+                      priceMax: '',
+                      inStock: false,
+                      newOnly: false,
+                      bestOnly: false,
+                    })
+                  }
+                >
+                  {t.common.clearAll}
+                </button>
+                <button
+                  type="button"
+                  className="btn-primary block"
+                  onClick={() => {
+                    if (mobileDraft) onChange(mobileDraft);
                     window.history.state?.lhaSheet ? window.history.back() : closeSheets();
                   }}
                 >
-                  {labels[value]}
+                  {mobilePreviewCount}{' '}
+                  {mobilePreviewCount === 1 ? t.common.result : t.common.results}
                 </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+      {sortOpen &&
+        createPortal(
+          <div
+            className={`filters-drawer sort-sheet${sortOpen ? ' open' : ''}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t.shop.sortBy}
+            hidden={!sortOpen}
+          >
+            <div
+              className="filters-drawer-backdrop"
+              onClick={() =>
+                window.history.state?.lhaSheet ? window.history.back() : closeSheets()
+              }
+            />
+            <div ref={sortPanelRef} className="filters-drawer-panel mobile-filter-sheet">
+              <div className="filters-drawer-head">
+                <h2>{t.shop.sortBy}</h2>
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={() => {
+                    window.history.state?.lhaSheet ? window.history.back() : closeSheets();
+                  }}
+                  aria-label={t.common.close}
+                >
+                  <Icon name="close" />
+                </button>
+              </div>
+              <div className="sheet-radio-list" role="radiogroup">
+                {SORT_OPTIONS.map((value) => {
+                  const labels = {
+                    featured: t.shop.sortFeatured,
+                    newest: t.shop.sortNewest,
+                    'price-asc': t.shop.sortPriceAsc,
+                    'price-desc': t.shop.sortPriceDesc,
+                    'name-asc': t.shop.sortNameAsc,
+                    'name-desc': t.shop.sortNameDesc,
+                  };
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      role="radio"
+                      aria-checked={sort === value}
+                      className={sort === value ? 'selected' : ''}
+                      onClick={() => {
+                        updateParams((p) =>
+                          value === 'featured' ? p.delete('sort') : p.set('sort', value),
+                        );
+                        window.history.state?.lhaSheet ? window.history.back() : closeSheets();
+                      }}
+                    >
+                      {labels[value]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

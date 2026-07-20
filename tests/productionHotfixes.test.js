@@ -43,3 +43,30 @@ describe('production deployment hotfixes', () => {
     expect(css).toContain("html[dir='rtl'] #root");
   });
 });
+
+it('portals mobile filter and sort sheets to document.body and removes off-screen transforms', () => {
+  const shop = read('src/pages/ShopPage.jsx');
+  const css = read('src/styles/global.css');
+  expect(shop).toContain("import { createPortal } from 'react-dom'");
+  expect(shop.match(/createPortal\(/g)?.length).toBe(2);
+  expect(shop).toContain('document.body');
+  expect(css).toContain('z-index: 2147483000 !important');
+  expect(css).toContain('transform: none !important');
+});
+
+it('sends order notifications with a reply address and bounded retries', () => {
+  const service = read('src/services/formspree.js');
+  const checkout = read('src/pages/CheckoutPage.jsx');
+  expect(service).toContain('_replyto: customerEmail');
+  expect(service).toContain('for (let attempt = 0; attempt < 3; attempt += 1)');
+  expect(service).toContain('keepalive: true');
+  expect(checkout).toContain("formType: 'order'");
+  expect(checkout).toContain('email: payload.customer.email');
+});
+
+it('hard-locks English and Arabic layouts to the viewport without horizontal page movement', () => {
+  const css = read('src/styles/global.css');
+  expect(css).toContain('overscroll-behavior-x: none');
+  expect(css).toContain("html[dir='rtl'] .site-shell");
+  expect(css).toContain('overflow-x: hidden !important');
+});
