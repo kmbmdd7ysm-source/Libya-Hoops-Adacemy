@@ -6641,3 +6641,119 @@ body[dir='rtl'] {
   max-width: 100% !important;
   transform: none;
 }
+
+/* ==========================================================================\n   FINAL MOBILE VIEWPORT STABILITY\n   Prevent document-level horizontal drift without disabling intentional\n   category, filter, compare, and tab scrollers.\n   ========================================================================== */
+html,
+body {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overscroll-behavior-inline: none;
+}
+
+body,
+#root,
+.site-shell,
+#main-content {
+  position: relative;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+#root,
+.site-shell,
+#main-content {
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  #root,
+  .site-shell,
+  #main-content {
+    overflow-x: hidden;
+  }
+}
+
+/* Media and form controls must never establish a wider intrinsic viewport. */
+img,
+picture,
+video,
+canvas,
+svg,
+iframe,
+input,
+select,
+textarea,
+button {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+/* Grid/flex descendants are a frequent source of intermittent iOS overflow. */
+#main-content :where(section, article, aside, nav, header, footer, div, form, fieldset) {
+  min-inline-size: 0;
+}
+
+@media (max-width: 999px) {
+  html,
+  body,
+  #root,
+  .site-shell,
+  #main-content {
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+    margin-inline: 0 !important;
+  }
+
+  body,
+  #root,
+  .site-shell,
+  #main-content {
+    touch-action: pan-y pinch-zoom;
+  }
+
+  /* These are the only controls intentionally allowed to pan horizontally. */
+  :where(
+    .shop-category-scroll,
+    .shop-subcategory-scroll,
+    .mobile-filter-pills,
+    .account-tabs,
+    .compare-scroll
+  ) {
+    max-inline-size: 100%;
+    overscroll-behavior-inline: contain;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fixed overlays must use the layout viewport, not content width. */
+  :where(
+    .mobile-menu-overlay,
+    .search-screen,
+    .cart-drawer-overlay,
+    .filters-drawer,
+    .modal-backdrop,
+    .media-lightbox
+  ) {
+    inset-inline: 0 !important;
+    inline-size: 100% !important;
+    max-inline-size: 100% !important;
+  }
+
+  /* Long user/order content wraps rather than widening the page. */
+  :where(.order-number, .order-card, .order-detail, .account-page, .contact-section) {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
+
+/* RTL changes reading direction only; viewport geometry remains anchored. */
+#root[dir='rtl'],
+#root[dir='rtl'] .site-shell,
+#root[dir='rtl'] #main-content {
+  inset-inline: 0 !important;
+  translate: none !important;
+  inline-size: 100% !important;
+  max-inline-size: 100% !important;
+}

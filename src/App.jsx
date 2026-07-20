@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer';
 import CookieBanner from './components/layout/CookieBanner';
 import CartDrawer from './components/layout/CartDrawer';
 import ScrollToTop from './components/layout/ScrollToTop';
+import ViewportGuard from './components/layout/ViewportGuard';
 import LoadingScreen from './components/common/LoadingScreen';
 import { usePageTracking } from './hooks/usePageTracking';
 import RouteExperience from './components/experience/RouteExperience';
@@ -43,6 +44,7 @@ export default function App() {
   usePageTracking();
   return (
     <>
+      <ViewportGuard />
       <ScrollToTop />
       <Header />
       <main id="main-content">

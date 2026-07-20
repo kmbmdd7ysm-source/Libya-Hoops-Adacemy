@@ -8,7 +8,7 @@ const routes = [
   '/shop/accessories',
   '/products/core-logo-tee',
   '/products/academy-backpack',
-  '/training/complete-ball-handling',
+  '/online-training/complete-ball-handling',
   '/cart',
   '/favorites',
   '/compare',
@@ -136,5 +136,53 @@ test('contact page has no horizontal overflow at critical mobile widths in both 
       );
       expect(result.offenders, JSON.stringify(result, null, 2)).toEqual([]);
     }
+  }
+});
+
+test('document remains horizontally anchored through route, language and overlay transitions', async ({
+  page,
+}) => {
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/shop');
+    await dismissCookie(page);
+
+    const assertAnchored = async (stage) => {
+      const state = await page.evaluate(() => ({
+        windowX: window.scrollX,
+        htmlX: document.documentElement.scrollLeft,
+        bodyX: document.body.scrollLeft,
+        htmlWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(state.windowX, `${stage}: ${JSON.stringify(state)}`).toBe(0);
+      expect(state.htmlX, `${stage}: ${JSON.stringify(state)}`).toBe(0);
+      expect(state.bodyX, `${stage}: ${JSON.stringify(state)}`).toBe(0);
+      expect(state.htmlWidth, `${stage}: ${JSON.stringify(state)}`).toBeLessThanOrEqual(
+        state.clientWidth + 1,
+      );
+    };
+
+    await assertAnchored('initial');
+    await page.locator('.mobile-filter-pills button').first().click();
+    await expect(page.locator('.filters-drawer-panel')).toBeVisible();
+    await assertAnchored('filter open');
+    await page.keyboard.press('Escape');
+    await assertAnchored('filter closed');
+
+    await page.locator('.mobile-more-action').click();
+    await expect(page.locator('#mobile-menu')).toHaveClass(/open/);
+    await assertAnchored('menu open');
+    await page.getByRole('button', { name: /close menu|إغلاق القائمة/i }).click();
+
+    await page.goto('/account');
+    await assertAnchored('route change');
+    await page.evaluate(() => {
+      document.documentElement.scrollLeft = 50;
+      document.body.scrollLeft = 50;
+      window.dispatchEvent(new Event('orientationchange'));
+    });
+    await page.waitForTimeout(50);
+    await assertAnchored('orientation recovery');
   }
 });
