@@ -1,0 +1,46 @@
+import Icon from '../icons/Icon';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+import SmartImage from '../common/SmartImage';
+import Price from '../common/Price';
+import Badge from '../common/Badge';
+
+export default function TrainingCard({ program }) {
+  const { t, pick } = useLanguage();
+  const to = `/online-training/${program.slug}`;
+  return (
+    <article className="training-card">
+      <Link to={to} className="training-card-media" aria-label={pick(program.title)}>
+        <SmartImage
+          src={program.coverImage}
+          alt={pick(program.title)}
+          className="training-card-img"
+        />
+        <span className="training-card-play" aria-hidden="true">
+          <Icon name="play" size={20} />
+        </span>
+        <div className="training-card-badges">
+          {!program.available && <Badge tone="limited">{t.training.comingSoon}</Badge>}
+        </div>
+      </Link>
+      <div className="training-card-body">
+        <h3 className="training-card-title">
+          <Link to={to}>{pick(program.title)}</Link>
+        </h3>
+        <ul className="training-card-meta">
+          <li>{pick(program.level)}</li>
+          <li>{pick(program.duration)}</li>
+          <li>
+            {program.sessions} {t.training.sessions}
+          </li>
+        </ul>
+        <div className="training-card-foot">
+          <Price amount={program.price} compareAt={program.compareAt} size="sm" />
+          <Link to={to} className="training-card-link">
+            {t.common.viewDetails} <Icon name="arrow" size={18} />
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
