@@ -59,9 +59,12 @@ it('sends order notifications with a reply address and bounded retries', () => {
   const checkout = read('src/pages/CheckoutPage.jsx');
   expect(service).toContain('_replyto: customerEmail');
   expect(service).toContain('for (let attempt = 0; attempt < 3; attempt += 1)');
-  expect(service).toContain('keepalive: true');
+  expect(service).toContain('application/x-www-form-urlencoded');
+  expect(service).toContain('toFormBody(body)');
   expect(checkout).toContain("formType: 'order'");
   expect(checkout).toContain('email: payload.customer.email');
+  expect(checkout).toContain('message: orderMessage');
+  expect(checkout).toContain('displayTotal');
 });
 
 it('hard-locks English and Arabic layouts to the viewport without horizontal page movement', () => {

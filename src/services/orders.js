@@ -23,6 +23,20 @@ function storageAvailable() {
 }
 
 export function normalizeOrder(order = {}) {
+  const currency = clean(order.currency || order.canonicalCurrency || 'USD').toUpperCase();
+  const displayCurrency = clean(order.displayCurrency || order.currency || 'USD').toUpperCase();
+  const canonicalShippingTotal = Math.max(
+    0,
+    safeNumber(order.shippingTotal ?? order.shipping_total),
+  );
+  const originalShippingAmount = Math.max(
+    0,
+    safeNumber(order.shippingRate?.originalAmount ?? order.shipping_rate?.original_amount),
+  );
+  const inferredDisplayRate =
+    displayCurrency !== currency && canonicalShippingTotal > 0 && originalShippingAmount > 0
+      ? originalShippingAmount / canonicalShippingTotal
+      : 1;
   const items = Array.isArray(order.items)
     ? order.items.map((item) => ({
         id: item.id || item.productId || item.product_id || null,
@@ -37,6 +51,22 @@ export function normalizeOrder(order = {}) {
         variant: item.variant || item.variant_snapshot || null,
         quantity: Math.max(1, Math.trunc(safeNumber(item.quantity) || 1)),
         unitPrice: Math.max(0, safeNumber(item.unitPrice ?? item.unit_price ?? item.price)),
+        displayUnitPrice: Math.max(
+          0,
+          safeNumber(
+            item.displayUnitPrice ??
+              item.display_unit_price ??
+              safeNumber(item.unitPrice ?? item.unit_price ?? item.price) * inferredDisplayRate,
+          ),
+        ),
+        displayLineTotal: Math.max(
+          0,
+          safeNumber(
+            item.displayLineTotal ??
+              item.display_line_total ??
+              safeNumber(item.lineTotal ?? item.line_total) * inferredDisplayRate,
+          ),
+        ),
         lineTotal: Math.max(
           0,
           safeNumber(
@@ -59,13 +89,35 @@ export function normalizeOrder(order = {}) {
     ),
     createdAt: order.createdAt || order.created_at || new Date().toISOString(),
     updatedAt: order.updatedAt || order.updated_at || new Date().toISOString(),
-    currency: clean(order.currency || order.canonicalCurrency || 'USD').toUpperCase(),
-    displayCurrency: clean(order.displayCurrency || order.currency || 'USD').toUpperCase(),
+    currency,
+    displayCurrency,
     subtotal: Math.max(0, safeNumber(order.subtotal)),
-    shippingTotal: Math.max(0, safeNumber(order.shippingTotal ?? order.shipping_total)),
+    displaySubtotal: Math.max(
+      0,
+      safeNumber(
+        order.displaySubtotal ??
+          order.display_subtotal ??
+          safeNumber(order.subtotal) * inferredDisplayRate,
+      ),
+    ),
+    shippingTotal: canonicalShippingTotal,
+    displayShippingTotal: Math.max(
+      0,
+      safeNumber(
+        order.displayShippingTotal ??
+          order.display_shipping_total ??
+          canonicalShippingTotal * inferredDisplayRate,
+      ),
+    ),
     taxTotal: Math.max(0, safeNumber(order.taxTotal ?? order.tax_total)),
     discountTotal: Math.max(0, safeNumber(order.discountTotal ?? order.discount_total)),
     total: Math.max(0, safeNumber(order.total)),
+    displayTotal: Math.max(
+      0,
+      safeNumber(
+        order.displayTotal ?? order.display_total ?? safeNumber(order.total) * inferredDisplayRate,
+      ),
+    ),
     paymentMethod: clean(order.paymentMethod || order.payment_method || 'cash_on_delivery'),
     paymentStatus: clean(order.paymentStatus || order.payment_status || 'pending').toLowerCase(),
     orderStatus: clean(order.orderStatus || order.order_status || 'received').toLowerCase(),
@@ -74,6 +126,7 @@ export function normalizeOrder(order = {}) {
     ).toLowerCase(),
     customer: order.customer || {},
     shipping: order.shipping || order.shipping_summary || null,
+    shippingRate: order.shippingRate || order.shipping_rate || null,
     items,
     source: order.source || 'local',
     syncState: order.syncState || 'local-only',

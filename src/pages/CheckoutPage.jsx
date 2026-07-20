@@ -29,7 +29,8 @@ const configured = isPaymentsConfigured();
 export default function CheckoutPage() {
   const { t, pick, lang } = useLanguage();
   const { items, subtotal, digitalOnly, hasPhysical, clearCart } = useCart();
-  const { currency, countryCode, setCountryCode, format, usdToLydRate, rateReady } = useCommerce();
+  const { currency, countryCode, setCountryCode, format, convert, usdToLydRate, rateReady } =
+    useCommerce();
   const auth = useAuth();
   const _navigate = useNavigate();
 
@@ -257,12 +258,24 @@ export default function CheckoutPage() {
           return;
         }
         const orderNumber = `LHA-${Date.now().toString(36).toUpperCase()}-${idempotencyRef.current.slice(0, 6).toUpperCase()}`;
+        const displaySubtotal = convert(subtotal) ?? subtotal;
+        const displayShippingTotal = convert(shippingEstimate) ?? shippingEstimate;
+        const displayTotal = convert(total) ?? total;
+        const displayItems = payload.items.map((item) => ({
+          ...item,
+          displayUnitPrice: convert(item.unitPrice) ?? item.unitPrice,
+          displayLineTotal: convert(item.lineTotal) ?? item.lineTotal,
+        }));
         const result = await createOrder(
           {
             ...payload,
+            items: displayItems,
             email: form.email,
             userId: auth.user?.id || null,
             total,
+            displaySubtotal,
+            displayShippingTotal,
+            displayTotal,
             canonicalCurrency: SITE.currency,
             displayCurrency: currency,
             paymentMethod: 'cash_on_delivery',
@@ -288,10 +301,38 @@ export default function CheckoutPage() {
           { idempotencyKey: idempotencyRef.current },
         );
         const confirmedNumber = result?.order?.orderNumber || orderNumber;
+        const orderMessage = [
+          `Order number: ${confirmedNumber}`,
+          `Customer: ${payload.customer.name}`,
+          `Email: ${payload.customer.email}`,
+          `Phone: ${payload.customer.phone || 'Not provided'}`,
+          `Payment: Cash on Delivery`,
+          `Address: ${[
+            payload.shipping?.address,
+            payload.shipping?.apartment,
+            payload.shipping?.city,
+            payload.shipping?.state,
+            payload.shipping?.postal,
+            payload.shipping?.country,
+          ]
+            .filter(Boolean)
+            .join(', ')}`,
+          '',
+          'Items:',
+          ...displayItems.map(
+            (item) =>
+              `${item.quantity} × ${item.name} — ${item.displayLineTotal.toFixed(2)} ${currency}`,
+          ),
+          '',
+          `Subtotal: ${displaySubtotal.toFixed(2)} ${currency}`,
+          `Shipping: ${displayShippingTotal.toFixed(2)} ${currency}`,
+          `Total: ${displayTotal.toFixed(2)} ${currency}`,
+        ].join('\n');
         try {
           await sendFormspree(
             {
               formType: 'order',
+              message: orderMessage,
               email: payload.customer.email,
               orderNumber: confirmedNumber,
               paymentMethod: 'Cash on Delivery',
@@ -300,19 +341,28 @@ export default function CheckoutPage() {
               customerEmail: payload.customer.email,
               customerPhone: payload.customer.phone,
               shippingAddress: payload.shipping,
-              items: payload.items,
-              subtotal,
-              shippingTotal: shippingEstimate,
-              total,
-              currency: SITE.currency,
-              displayCurrency: currency,
+              items: displayItems,
+              subtotal: displaySubtotal,
+              shippingTotal: displayShippingTotal,
+              total: displayTotal,
+              currency,
+              canonicalSubtotal: subtotal,
+              canonicalShippingTotal: shippingEstimate,
+              canonicalTotal: total,
+              canonicalCurrency: SITE.currency,
               language: lang,
               createdAt: new Date().toISOString(),
             },
             `New LHA order ${confirmedNumber}`,
           );
         } catch (notificationError) {
-          console.warn('Order saved but email notification failed', notificationError);
+          console.error('Order email notification failed', notificationError);
+          setFailed(
+            lang === 'ar'
+              ? `تم حفظ الطلب ${confirmedNumber}، لكن تعذر إرسال تفاصيله إلى المتجر. اضغط تنفيذ الطلب مرة أخرى لإعادة الإرسال.`
+              : `Order ${confirmedNumber} was saved, but its details could not be emailed to the store. Press Place Order again to retry delivery.`,
+          );
+          return;
         }
         setOrderConfirmed(confirmedNumber);
         clearCart();

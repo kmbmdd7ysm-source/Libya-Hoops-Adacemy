@@ -17,6 +17,8 @@ export function LanguageProvider({ children }) {
     localStorage.setItem(STORAGE_KEYS.language, lang);
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('root')?.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
     const skip = document.getElementById('skip-link');
     if (skip) skip.textContent = translations[lang].a11y.skip;
   }, [lang]);

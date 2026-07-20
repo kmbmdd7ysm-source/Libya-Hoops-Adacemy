@@ -158,10 +158,11 @@ export default function OrderDetailPage() {
                       )}
                     </div>
                     <span>
-                      {item.quantity} × {item.unitPrice.toFixed(2)} {order.displayCurrency}
+                      {item.quantity} × {(item.displayUnitPrice ?? item.unitPrice).toFixed(2)}{' '}
+                      {order.displayCurrency}
                     </span>
                     <strong>
-                      {item.lineTotal.toFixed(2)} {order.displayCurrency}
+                      {(item.displayLineTotal ?? item.lineTotal).toFixed(2)} {order.displayCurrency}
                     </strong>
                   </li>
                 ))}
@@ -170,19 +171,20 @@ export default function OrderDetailPage() {
                 <div>
                   <dt>{pick({ en: 'Subtotal', ar: 'المجموع الفرعي' })}</dt>
                   <dd>
-                    {order.subtotal.toFixed(2)} {order.displayCurrency}
+                    {(order.displaySubtotal ?? order.subtotal).toFixed(2)} {order.displayCurrency}
                   </dd>
                 </div>
                 <div>
                   <dt>{pick({ en: 'Shipping', ar: 'الشحن' })}</dt>
                   <dd>
-                    {order.shippingTotal.toFixed(2)} {order.displayCurrency}
+                    {(order.displayShippingTotal ?? order.shippingTotal).toFixed(2)}{' '}
+                    {order.displayCurrency}
                   </dd>
                 </div>
                 <div>
                   <dt>{pick({ en: 'Total', ar: 'الإجمالي' })}</dt>
                   <dd>
-                    {order.total.toFixed(2)} {order.displayCurrency}
+                    {(order.displayTotal ?? order.total).toFixed(2)} {order.displayCurrency}
                   </dd>
                 </div>
               </dl>

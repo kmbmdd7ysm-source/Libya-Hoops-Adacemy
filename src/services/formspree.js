@@ -25,6 +25,12 @@ const normalizePayload = (payload, subject) => {
   return normalized;
 };
 
+const toFormBody = (payload) => {
+  const params = new URLSearchParams();
+  Object.entries(payload).forEach(([key, value]) => params.set(key, value));
+  return params;
+};
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function sendFormspree(payload, subject = 'Libya Hoops Academy website message') {
@@ -36,13 +42,12 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
           Accept: 'application/json',
         },
-        body: JSON.stringify(body),
+        body: toFormBody(body),
         credentials: 'omit',
         cache: 'no-store',
-        keepalive: true,
       });
 
       if (!response.ok) {

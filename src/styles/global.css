@@ -6597,3 +6597,47 @@ html[dir='rtl'] .site-header {
     overscroll-behavior-x: contain;
   }
 }
+
+/* Final RTL viewport fix: keep Safari's viewport LTR while the application content remains RTL. */
+html {
+  direction: ltr !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+body[dir='rtl'] {
+  direction: ltr !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+#root[dir='rtl'] {
+  direction: rtl;
+  position: relative;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+#root[dir='rtl'] .site-shell,
+#root[dir='rtl'] main,
+#root[dir='rtl'] .hero,
+#root[dir='rtl'] .hero-media,
+#root[dir='rtl'] .page-hero,
+#root[dir='rtl'] .site-header,
+#root[dir='rtl'] .announcement-bar {
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none;
+}
