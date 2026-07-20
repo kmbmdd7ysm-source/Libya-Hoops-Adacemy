@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Libya Hoops Academy (LHA) — basketball academy and lifestyle-commerce platform.",
+  "description": "Libya Hoops Academy (LHA) \u2014 basketball academy and lifestyle-commerce platform.",
   "scripts": {
     "dev": "vite",
     "validate:data": "node scripts/validate-data.mjs",
@@ -71,7 +71,8 @@
     "vitest": "^4.1.10"
   },
   "engines": {
-    "node": ">=18.18.0",
-    "npm": ">=9.0.0"
-  }
+    "node": "22.x",
+    "npm": "10.x"
+  },
+  "packageManager": "npm@10.9.2"
 }
