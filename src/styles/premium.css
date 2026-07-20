@@ -1818,3 +1818,86 @@ main,
     align-items: flex-start;
   }
 }
+
+/* Final mobile account navigation and touch-state correction.
+   Keep the account section tabs as an isolated horizontal scrollport so labels
+   never shrink into each other or widen the page. */
+@media (max-width: 768px) {
+  .account-layout {
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .account-nav {
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    touch-action: pan-x pan-y;
+    scroll-snap-type: inline proximity;
+  }
+
+  .account-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .account-nav button {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: max-content;
+    max-width: none;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    scroll-snap-align: start;
+    padding-inline: 18px;
+  }
+
+  .account-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* iOS Safari can preserve :hover/:active paint after a tap. On coarse touch
+   pointers the menu trigger and logo must remain visually neutral after taps. */
+@media (hover: none) and (pointer: coarse) {
+  .header-actions .mobile-more-action,
+  .header-actions .mobile-more-action:hover,
+  .header-actions .mobile-more-action:active,
+  .header-actions .mobile-more-action:focus,
+  .header-actions .mobile-more-action[aria-expanded='true'],
+  .mobile-menu-head .brand,
+  .mobile-menu-head .brand:hover,
+  .mobile-menu-head .brand:active,
+  .mobile-menu-head .brand:focus {
+    background: transparent !important;
+    color: inherit !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    transform: none !important;
+    filter: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .header-actions .mobile-more-action::before,
+  .header-actions .mobile-more-action::after,
+  .mobile-menu-head .brand::before,
+  .mobile-menu-head .brand::after {
+    display: none !important;
+    content: none !important;
+  }
+}
