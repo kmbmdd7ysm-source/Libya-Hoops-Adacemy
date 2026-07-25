@@ -7,7 +7,7 @@ export const categories = [
   {
     slug: 'clothing',
     name: { en: 'Clothing', ar: 'الملابس' },
-    image: '/images/categories/clothing.jpg',
+    image: '/images/categories/clothing-hero-player.jpeg',
     subcategories: [
       {
         slug: 't-shirts',
