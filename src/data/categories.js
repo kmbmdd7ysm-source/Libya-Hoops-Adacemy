@@ -50,7 +50,7 @@ export const categories = [
   {
     slug: 'accessories',
     name: { en: 'Accessories', ar: 'الإكسسوارات' },
-    image: '/images/categories/accessories.jpg',
+    image: '/images/categories/accessories-hero-player.jpeg',
     subcategories: [
       { slug: 'bags', name: { en: 'Bags', ar: 'حقائب' }, image: '/images/categories/bags.jpg' },
       { slug: 'other', name: { en: 'Other', ar: 'أخرى' }, image: '/images/categories/other.jpg' },

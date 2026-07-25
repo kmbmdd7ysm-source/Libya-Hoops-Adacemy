@@ -18,6 +18,8 @@ const C = {
   white: { key: 'white', name: { en: 'White', ar: 'أبيض' }, hex: '#f5f5f5' },
   grey: { key: 'grey', name: { en: 'Grey', ar: 'رمادي' }, hex: '#9a9a9a' },
   red: { key: 'red', name: { en: 'Red', ar: 'أحمر' }, hex: '#e4002b' },
+  beige: { key: 'beige', name: { en: 'Beige', ar: 'بيج' }, hex: '#d8d0c2' },
+  camo: { key: 'camo', name: { en: 'Grey Camo', ar: 'تمويه رمادي' }, hex: '#6f7175' },
 };
 
 // Factory: fills defaults + builds variants/inventory from sizes × colours.
@@ -280,6 +282,69 @@ export const products = [
     related: ['p019', 'p020', 'p023'],
   }),
 
+
+  product({
+    id: 'p027',
+    slug: 'lha-elite-basketball-backpack',
+    sku: 'LHA-BAG-ELITE',
+    name: { en: 'LHA Elite Basketball Backpack', ar: 'حقيبة ظهر LHA إيليت لكرة السلة' },
+    description: {
+      en: 'Premium basketball backpack with a structured base, multiple zip compartments, side bottle pocket and bold ELITE branding.',
+      ar: 'حقيبة ظهر فاخرة لكرة السلة بقاعدة ثابتة، وجيوب متعددة بسحّاب، وجيب جانبي للزجاجة، وتصميم ELITE بارز.',
+    },
+    category: 'accessories',
+    subcategory: 'bags',
+    productType: 'Basketball Backpack',
+    price: 64,
+    sizes: ['One Size'],
+    colors: [
+      { ...C.black, image: '/images/products/lha-elite-basketball-backpack-black.jpeg' },
+      { ...C.white, image: '/images/products/lha-elite-basketball-backpack-white.jpeg' },
+      { ...C.camo, image: '/images/products/lha-elite-basketball-backpack-camo.jpeg' },
+    ],
+    stockPerVariant: 10,
+    material: { en: 'Durable performance polyester with reinforced base', ar: 'بوليستر متين للأداء مع قاعدة معززة' },
+    fit: { en: 'Adjustable padded shoulder straps', ar: 'أحزمة كتف مبطنة قابلة للتعديل' },
+    care: { en: 'Spot clean with a damp cloth.', ar: 'يُنظف موضعياً بقطعة قماش مبللة.' },
+    features: {
+      en: ['Structured lower compartment', 'Multiple zip pockets', 'Side mesh bottle pocket'],
+      ar: ['قسم سفلي ثابت', 'جيوب متعددة بسحّاب', 'جيب شبكي جانبي للزجاجة'],
+    },
+    newArrival: true,
+    image: '/images/products/lha-elite-basketball-backpack-black.jpeg',
+    related: ['p028'],
+  }),
+  product({
+    id: 'p028',
+    slug: 'lha-academy-everyday-backpack',
+    sku: 'LHA-BAG-ACADEMY',
+    name: { en: 'LHA Academy Everyday Backpack', ar: 'حقيبة ظهر LHA أكاديمي اليومية' },
+    description: {
+      en: 'Clean everyday academy backpack with a spacious main compartment, front pocket and dual side mesh pockets.',
+      ar: 'حقيبة أكاديمية يومية بتصميم نظيف، وقسم رئيسي واسع، وجيب أمامي، وجيبين شبكيين جانبيين.',
+    },
+    category: 'accessories',
+    subcategory: 'bags',
+    productType: 'Everyday Backpack',
+    price: 48,
+    sizes: ['One Size'],
+    colors: [
+      { ...C.black, image: '/images/products/lha-academy-backpack-black.jpeg' },
+      { ...C.red, image: '/images/products/lha-academy-backpack-red.jpeg' },
+      { ...C.beige, image: '/images/products/lha-academy-backpack-beige.jpeg' },
+    ],
+    stockPerVariant: 12,
+    material: { en: 'Durable woven polyester with reinforced lower panel', ar: 'بوليستر منسوج متين مع جزء سفلي معزز' },
+    fit: { en: 'Adjustable padded shoulder straps', ar: 'أحزمة كتف مبطنة قابلة للتعديل' },
+    care: { en: 'Spot clean with a damp cloth.', ar: 'يُنظف موضعياً بقطعة قماش مبللة.' },
+    features: {
+      en: ['Spacious main compartment', 'Front zip pocket', 'Dual side mesh pockets'],
+      ar: ['قسم رئيسي واسع', 'جيب أمامي بسحّاب', 'جيبان شبكيان جانبيان'],
+    },
+    newArrival: true,
+    image: '/images/products/lha-academy-backpack-black.jpeg',
+    related: ['p027'],
+  }),
 ];
 
 // ── Selectors ──
