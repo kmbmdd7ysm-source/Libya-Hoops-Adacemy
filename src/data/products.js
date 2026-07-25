@@ -19,6 +19,7 @@ const C = {
   grey: { key: 'grey', name: { en: 'Grey', ar: 'رمادي' }, hex: '#9a9a9a' },
   red: { key: 'red', name: { en: 'Red', ar: 'أحمر' }, hex: '#e4002b' },
   beige: { key: 'beige', name: { en: 'Beige', ar: 'بيج' }, hex: '#d8d0c2' },
+  cream: { key: 'cream', name: { en: 'Cream', ar: 'كريمي' }, hex: '#eee9dc' },
   camo: { key: 'camo', name: { en: 'Grey Camo', ar: 'تمويه رمادي' }, hex: '#6f7175' },
 };
 
@@ -344,6 +345,45 @@ export const products = [
     newArrival: true,
     image: '/images/products/lha-academy-backpack-black.jpeg',
     related: ['p027'],
+  }),
+
+  product({
+    id: 'p029',
+    slug: 'lha-premium-fleece-set',
+    sku: 'LHA-FLC-PREMIUM',
+    name: { en: 'LHA Premium Fleece Set', ar: 'طقم LHA فليس فاخر' },
+    description: {
+      en: 'A premium unisex fleece set with an oversized hoodie, relaxed joggers and subtle LHA Own the Game branding.',
+      ar: 'طقم فليس فاخر للجنسين يتكون من هودي واسع وبنطال مريح مع شعار LHA وعبارة Own the Game بتصميم هادئ.',
+    },
+    category: 'clothing',
+    subcategory: 'fleece-sets',
+    productType: 'Unisex Premium Fleece Set',
+    price: 88,
+    colors: [
+      { ...C.black, image: '/images/products/lha-premium-fleece-set-black.jpeg' },
+      { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/lha-premium-fleece-set-grey.jpeg' },
+      { ...C.cream, image: '/images/products/lha-premium-fleece-set-cream.jpeg' },
+    ],
+    stockPerVariant: 10,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed oversized unisex fit', ar: 'قصة واسعة ومريحة للجنسين' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: {
+      en: ['Oversized pullover hoodie', 'Relaxed joggers with drawcord', 'Subtle LHA Own the Game branding'],
+      ar: ['هودي واسع بجيب أمامي', 'بنطال مريح برباط خصر', 'شعار LHA وعبارة Own the Game بتصميم هادئ'],
+    },
+    sizeGuide: 'fleece-sets',
+    newArrival: true,
+    featured: true,
+    image: '/images/products/lha-premium-fleece-set-black.jpeg',
+    hoverImage: '/images/products/lha-premium-fleece-set-black-close.jpeg',
+    gallery: [
+      '/images/products/lha-premium-fleece-set-black-close.jpeg',
+      '/images/products/lha-premium-fleece-set-grey.jpeg',
+      '/images/products/lha-premium-fleece-set-cream.jpeg',
+    ],
+    related: ['p019', 'p017', 'p018'],
   }),
 ];
 

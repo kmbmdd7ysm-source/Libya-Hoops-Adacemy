@@ -53,6 +53,11 @@ export const categories = [
     image: '/images/categories/accessories-hero-player.jpeg',
     subcategories: [
       { slug: 'bags', name: { en: 'Bags', ar: 'حقائب' }, image: '/images/categories/bags.jpg' },
+      { slug: 'socks', name: { en: 'Socks', ar: 'جوارب' }, image: '/images/products/performance-socks-black-white.webp' },
+      { slug: 'balls', name: { en: 'Balls', ar: 'كرات' }, image: '/images/categories/balls.jpg' },
+      { slug: 'hats', name: { en: 'Hats', ar: 'قبعات' }, image: '/images/categories/hats.jpg' },
+      { slug: 'towels', name: { en: 'Towels', ar: 'مناشف' }, image: '/images/categories/towels.jpg' },
+      { slug: 'sleeves-and-armbands', name: { en: 'Sleeves & Armbands', ar: 'أكمام وأربطة الذراع' }, image: '/images/categories/sleeves-and-armbands.jpg' },
       { slug: 'other', name: { en: 'Other', ar: 'أخرى' }, image: '/images/categories/other.jpg' },
     ],
   },
