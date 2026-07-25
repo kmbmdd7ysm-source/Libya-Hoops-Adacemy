@@ -446,8 +446,12 @@ export default function ShopPage() {
 
             {filtered.length > 0 ? (
               <div className="product-grid">
-                {filtered.map((p, i) => (
-                  <ProductCard key={p.id} product={p} eager={i < 4} />
+                {filtered.flatMap((p) =>
+                  p.colors.length > 1
+                    ? p.colors.map((c) => ({ product: p, color: c.key }))
+                    : [{ product: p, color: p.colors[0]?.key }],
+                ).map(({ product: p, color }, i) => (
+                  <ProductCard key={`${p.id}-${color || 'default'}`} product={p} displayColor={color} eager={i < 4} />
                 ))}
               </div>
             ) : (

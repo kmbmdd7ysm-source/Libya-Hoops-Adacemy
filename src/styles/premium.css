@@ -1901,3 +1901,6 @@ main,
     content: none !important;
   }
 }
+
+/* Product photography must remain on a pure white studio surface. */
+.product-card-media, .gallery-main, .smart-img { background: #fff !important; }

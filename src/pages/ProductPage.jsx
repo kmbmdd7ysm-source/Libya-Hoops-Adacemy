@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart, cartKey } from '../context/CartContext';
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
@@ -29,6 +29,7 @@ import PurchaseActions from '../components/shop/PurchaseActions';
 // PurchaseActions preserves aria-busy={adding} and the legacy guard disabled={adding || !matchedVariant for rendered behavior.
 export default function ProductPage() {
   const { slug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t, pick, lang } = useLanguage();
   const { addItem } = useCart();
   const compare = useCompare();
@@ -50,7 +51,11 @@ export default function ProductPage() {
     if (product) {
       record(product.id);
       trackEvent('view_item', { item_id: product.id, item_name: pick(product.name) });
-      setColor(product.colors.length === 1 ? product.colors[0].key : '');
+      const requestedColor = searchParams.get('color');
+      const initialColor = product.colors.some((c) => c.key === requestedColor)
+        ? requestedColor
+        : product.colors[0]?.key || '';
+      setColor(initialColor);
       setSize(product.sizes.length === 1 ? product.sizes[0] : '');
       setQty(1);
       setActiveImg(0);
@@ -60,8 +65,12 @@ export default function ProductPage() {
 
   const gallery = useMemo(() => {
     if (!product) return [];
-    return [product.image, product.hoverImage, ...(product.gallery || [])].filter(Boolean);
-  }, [product]);
+    const selected = product.colors.find((c) => c.key === color);
+    const variantImages = product.colors.map((c) => c.image).filter(Boolean);
+    return [selected?.image || product.image, ...variantImages, product.hoverImage, ...(product.gallery || [])]
+      .filter(Boolean)
+      .filter((src, index, arr) => arr.indexOf(src) === index);
+  }, [product, color]);
 
   const needsColor = product && product.colors.length > 1;
   const needsSize = product && !(product.sizes.length === 1 && product.sizes[0] === 'OS');
@@ -273,7 +282,12 @@ export default function ProductPage() {
                   value={color}
                   onChange={(c) => {
                     setColor(c);
+                    setActiveImg(0);
                     setError('');
+                    setSearchParams((params) => {
+                      params.set('color', c);
+                      return params;
+                    }, { replace: true });
                   }}
                 />
                 {needsSize && (

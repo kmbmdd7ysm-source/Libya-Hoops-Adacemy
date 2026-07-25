@@ -9,7 +9,7 @@ import Badge from '../common/Badge';
 import { useCompare } from '../../context/CompareContext';
 import Icon from '../icons/Icon';
 
-export default function ProductCard({ product, eager = false }) {
+export default function ProductCard({ product, eager = false, displayColor = null }) {
   const { t, pick } = useLanguage();
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
@@ -17,7 +17,9 @@ export default function ProductCard({ product, eager = false }) {
   const soldOut = product.availability === 'sold-out';
   const onSale = product.compareAt && product.compareAt > product.price;
   const low = isLowStock(product);
-  const to = `/products/${product.slug}`;
+  const to = `/products/${product.slug}${displayColor ? `?color=${displayColor}` : ''}`;
+  const cardColor = product.colors.find((c) => c.key === displayColor);
+  const cardImage = cardColor?.image || product.image;
 
   const quickAdd = () => {
     if (soldOut) return;
@@ -29,7 +31,7 @@ export default function ProductCard({ product, eager = false }) {
       id: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.image,
+      image: cardImage,
       price: product.price,
       size: variant.size,
       color: variant.color,
@@ -45,7 +47,7 @@ export default function ProductCard({ product, eager = false }) {
       <div className="product-card-media">
         <Link to={to} aria-label={pick(product.name)}>
           <SmartImage
-            src={product.image}
+            src={cardImage}
             alt={pick(product.alt)}
             className="product-card-img product-card-img--main"
             eager={eager}
