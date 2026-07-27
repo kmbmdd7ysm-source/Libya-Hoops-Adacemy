@@ -1904,3 +1904,5 @@ main,
 
 /* Product photography must remain on a pure white studio surface. */
 .product-card-media, .gallery-main, .smart-img { background: #fff !important; }
+
+.media-lightbox{position:fixed!important;inset:0!important}.lightbox-stage img{width:auto!important;height:auto!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}

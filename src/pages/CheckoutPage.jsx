@@ -257,7 +257,7 @@ export default function CheckoutPage() {
           );
           return;
         }
-        const orderNumber = `LHA-${Date.now().toString(36).toUpperCase()}-${idempotencyRef.current.slice(0, 6).toUpperCase()}`;
+        const orderNumber = `LHA${Date.now().toString().slice(-8)}`;
         const displaySubtotal = convert(subtotal) ?? subtotal;
         const displayShippingTotal = convert(shippingEstimate) ?? shippingEstimate;
         const displayTotal = convert(total) ?? total;
@@ -280,8 +280,8 @@ export default function CheckoutPage() {
             displayCurrency: currency,
             paymentMethod: 'cash_on_delivery',
             paymentStatus: 'pending',
-            orderStatus: 'received',
-            fulfillmentStatus: 'unfulfilled',
+            orderStatus: shipping.countryCode === 'LY' ? 'confirmed' : 'received',
+            fulfillmentStatus: shipping.countryCode === 'LY' ? 'in_delivery_process' : 'unfulfilled',
             orderNumber,
             createdAt: new Date().toISOString(),
             idempotencyKey: idempotencyRef.current,
@@ -537,6 +537,7 @@ export default function CheckoutPage() {
                     ) : (
                       <fieldset className="form-block">
                         <legend>{t.checkout.delivery}</legend>
+                        {isLibyaAddress && <p className="field-help">{pick({ en: 'Estimated delivery: 24–48 hours', ar: 'مدة التوصيل المتوقعة: 24–48 ساعة' })}</p>}
                         {hasPhysical && !digitalOnly && items.some((i) => i.type !== 'product') && (
                           <p className="notice notice--muted">{t.checkout.mixedNote}</p>
                         )}

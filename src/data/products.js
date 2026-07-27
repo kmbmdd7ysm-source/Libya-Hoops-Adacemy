@@ -131,7 +131,7 @@ export const products = [
     colors: [{ ...C.black, image: '/images/products/lha-performance-shorts-black.png' }], stockPerVariant: 12,
     material: { en: 'Quick-dry performance polyester', ar: 'بوليستر أداء سريع الجفاف' }, fit: { en: 'Regular basketball fit', ar: 'قصة كرة سلة عادية' }, care: { en: 'Machine wash cold, hang dry.', ar: 'يُغسل بارداً ويُجفف بالتعليق.' },
     features: { en: ['Elastic waistband','Supplied LHA logo','Clean back'], ar: ['خصر مطاطي','شعار LHA المرفق','ظهر سادة'] }, sizeGuide: 'shorts', newArrival: true,
-    image: '/images/products/lha-performance-shorts-black.png', related: ['p016','p019','p004'],
+    image: '/images/products/lha-performance-shorts-black.png', related: ['p016','p019','p029'],
   }),
   product({
     id: 'p019', slug: 'lha-logo-performance-tee', sku: 'LHA-TEE-LOGO',
@@ -347,6 +347,66 @@ export const products = [
     related: ['p027'],
   }),
 
+
+  product({
+    id: 'p030',
+    slug: 'lha-compression-shorts',
+    sku: 'LHA-CMP-SHORTS',
+    name: { en: 'LHA Compression Shorts', ar: 'شورت LHA الضاغط' },
+    description: {
+      en: 'Supportive basketball compression shorts with a secure waistband, flat seams and LHA logo detail.',
+      ar: 'شورت ضاغط لكرة السلة بخصر ثابت وحياكة مسطحة وتفاصيل شعار LHA.',
+    },
+    category: 'clothing',
+    subcategory: 'compression',
+    productType: 'Compression Shorts',
+    price: 34,
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: [
+      { ...C.black, image: '/images/products/compression-shorts-black.png' },
+      { ...C.white, image: '/images/products/compression-shorts-white.png' },
+    ],
+    stockPerVariant: 12,
+    material: { en: 'Four-way stretch compression knit', ar: 'نسيج ضاغط بمرونة رباعية' },
+    fit: { en: 'Second-skin compression fit', ar: 'قصة ضاغطة محكمة' },
+    care: { en: 'Machine wash cold, no fabric softener.', ar: 'يُغسل بارداً، بدون منعّم أقمشة.' },
+    features: {
+      en: ['Supportive compression fit', 'Flatlock seams', 'LHA logo detail'],
+      ar: ['قصة ضاغطة داعمة', 'حياكة مسطحة', 'تفاصيل شعار LHA'],
+    },
+    sizeGuide: 'compression',
+    newArrival: true,
+    image: '/images/products/compression-shorts-black.png',
+    related: ['p023', 'p024', 'p025'],
+  }),
+  product({
+    id: 'p031',
+    slug: 'lha-performance-basketball-socks',
+    sku: 'LHA-SOCK-PERF',
+    name: { en: 'LHA Performance Basketball Socks', ar: 'جوارب LHA لكرة السلة' },
+    description: {
+      en: 'Cushioned performance basketball socks with ribbed support, breathable zones and embroidered LHA branding.',
+      ar: 'جوارب أداء مبطنة لكرة السلة بدعم مضلع ومناطق جيدة التهوية وشعار LHA مطرز.',
+    },
+    category: 'accessories',
+    subcategory: 'socks',
+    productType: 'Basketball Socks',
+    price: 18,
+    sizes: ['S/M', 'L/XL'],
+    colors: [C.white, C.black],
+    stockPerVariant: 18,
+    material: { en: 'Breathable performance knit', ar: 'نسيج أداء جيد التهوية' },
+    fit: { en: 'Supportive crew fit', ar: 'قصة طويلة داعمة' },
+    care: { en: 'Machine wash cold, tumble dry low.', ar: 'يُغسل بارداً ويُجفف بحرارة منخفضة.' },
+    features: {
+      en: ['Cushioned footbed', 'Ribbed ankle support', 'Black and white colour options'],
+      ar: ['تبطين أسفل القدم', 'دعم مضلع للكاحل', 'خيارات بالأسود والأبيض'],
+    },
+    newArrival: true,
+    image: '/images/products/performance-socks-black-white.webp',
+    related: ['p018', 'p030', 'p027'],
+  }),
+
   product({
     id: 'p029',
     slug: 'lha-premium-fleece-set',
@@ -385,6 +445,9 @@ export const products = [
     ],
     related: ['p019', 'p017', 'p018'],
   }),
+
+  product({ id:'p032', slug:'own-the-game-essential-tee', sku:'LHA-TEE-OTG', name:{en:'Own The Game Essential Tee',ar:'تيشيرت امتلك اللعبة الأساسي'}, description:{en:'Premium relaxed tee with the small LHA Own The Game chest mark.',ar:'تيشيرت فاخر بقصة مريحة مع شعار LHA الصغير وعبارة امتلك اللعبة.'}, category:'clothing', subcategory:'t-shirts', productType:'T-Shirt', price:36, colors:[{...C.black,image:'/images/products/own-the-game-essential-tee-black.jpeg'},{...C.grey,image:'/images/products/own-the-game-essential-tee-grey.jpeg'},{...C.white,image:'/images/products/own-the-game-essential-tee-white.jpeg'}], stockPerVariant:12, material:{en:'Premium cotton blend',ar:'مزيج قطني فاخر'}, fit:{en:'Relaxed athletic fit',ar:'قصة رياضية مريحة'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Small LHA chest mark','Three colours'],ar:['شعار LHA صغير','ثلاثة ألوان']}, sizeGuide:'t-shirts',newArrival:true,featured:true,image:'/images/products/own-the-game-essential-tee-black.jpeg',related:['p033','p014'] }),
+  product({ id:'p033', slug:'own-the-game-sleeveless-top', sku:'LHA-TOP-OTG', name:{en:'Own The Game Sleeveless Top',ar:'توب امتلك اللعبة بدون أكمام'}, description:{en:'Oversized sleeveless basketball top with a small LHA chest mark.',ar:'توب كرة سلة واسع بدون أكمام مع شعار LHA صغير.'}, category:'clothing', subcategory:'tops', productType:'Sleeveless Top', price:34, colors:[{...C.black,image:'/images/products/own-the-game-sleeveless-top-black.jpeg'},{...C.white,image:'/images/products/own-the-game-sleeveless-top-white.jpeg'},{...C.grey,image:'/images/products/own-the-game-sleeveless-top-grey.jpeg'}], stockPerVariant:12, material:{en:'Breathable cotton blend',ar:'مزيج قطني جيد التهوية'}, fit:{en:'Oversized sleeveless fit',ar:'قصة واسعة بدون أكمام'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Sleeveless basketball cut','Three colours'],ar:['قصة كرة سلة بدون أكمام','ثلاثة ألوان']}, sizeGuide:'tops',newArrival:true,featured:true,image:'/images/products/own-the-game-sleeveless-top-black.jpeg',related:['p032','p020'] }),
 ];
 
 // ── Selectors ──

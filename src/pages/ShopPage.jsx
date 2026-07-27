@@ -190,7 +190,11 @@ export default function ShopPage() {
       const max = num(activeFilters.priceMax);
       const q = activeFilters.q.trim().toLowerCase();
       return products.filter((p) => {
-        if (activeFilters.category && p.category !== activeFilters.category) return false;
+        if (activeFilters.category) {
+          const sharedSocks = p.subcategory === 'socks' &&
+            (activeFilters.category === 'clothing' || activeFilters.category === 'accessories');
+          if (!sharedSocks && p.category !== activeFilters.category) return false;
+        }
         if (activeFilters.subcategory && p.subcategory !== activeFilters.subcategory) return false;
         if (activeFilters.sizes.length && !p.sizes.some((s) => activeFilters.sizes.includes(s)))
           return false;

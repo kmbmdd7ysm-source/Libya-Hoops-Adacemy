@@ -25,6 +25,11 @@ export const categories = [
         image: '/images/categories/shorts.jpg',
       },
       {
+        slug: 'compression',
+        name: { en: 'Compression', ar: 'ملابس ضاغطة' },
+        image: '/images/categories/compression.jpg',
+      },
+      {
         slug: 'hoodies',
         name: { en: 'Hoodies', ar: 'هوديز' },
         image: '/images/categories/hoodies.jpg',
@@ -34,11 +39,6 @@ export const categories = [
         slug: 'fleece-sets',
         name: { en: 'Fleece Sets', ar: 'أطقم فليس' },
         image: '/images/categories/fleece-sets.jpg',
-      },
-      {
-        slug: 'compression',
-        name: { en: 'Compression', ar: 'ملابس ضاغطة' },
-        image: '/images/categories/compression.jpg',
       },
       {
         slug: 'socks',

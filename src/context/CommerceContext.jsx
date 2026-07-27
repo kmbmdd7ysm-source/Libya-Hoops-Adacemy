@@ -122,6 +122,13 @@ export function CommerceProvider({ children }) {
       });
   }, [userId]);
 
+  useEffect(() => {
+    if (readCountryPreference(userId)) return;
+    let active = true;
+    fetch('/api/geo').then((x)=>x.ok?x.json():null).then((g)=>{ if(active && g?.country==='LY' && !explicitCurrency.current){ setCountryState('LY'); setCurrencyState('LYD'); writeCountryPreference(userId,'LY'); writeCurrencyPreference(userId,'LYD'); }}).catch(()=>{});
+    return () => { active = false; };
+  }, [userId]);
+
   const persistCloud = useCallback(
     (patch) => {
       if (!userId) return;
