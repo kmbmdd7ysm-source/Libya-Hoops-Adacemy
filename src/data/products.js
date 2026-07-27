@@ -485,6 +485,58 @@ export const products = [
     sizeGuide: 'tops', newArrival: true, featured: true,
     image: '/images/products/own-the-game-crewneck-black.jpeg', related: ['p034','p029','p032'],
   }),
+
+  product({
+    id: 'p036', slug: 'own-the-game-fleece-shorts', sku: 'LHA-SHORT-FLEECE-OTG',
+    name: { en: 'Own The Game Fleece Shorts', ar: 'شورت فليس امتلك اللعبة' },
+    description: { en: 'Premium relaxed fleece shorts with an elastic drawcord waist, side pockets and subtle LHA Own The Game branding.', ar: 'شورت فليس فاخر بقصة مريحة وخصر مطاطي برباط وجيوب جانبية وشعار LHA امتلك اللعبة بشكل بسيط.' },
+    category: 'clothing', subcategory: 'shorts', productType: 'Fleece Shorts', price: 46,
+    colors: [
+      { ...C.black, image: '/images/products/own-the-game-fleece-shorts-black.jpeg' },
+      { ...C.cream, image: '/images/products/own-the-game-fleece-shorts-cream.jpeg' },
+    ],
+    stockPerVariant: 12,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed above-knee fit', ar: 'قصة مريحة فوق الركبة' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: { en: ['Elastic drawcord waist', 'Side pockets', 'Subtle LHA branding'], ar: ['خصر مطاطي برباط', 'جيوب جانبية', 'شعار LHA بسيط'] },
+    sizeGuide: 'shorts', newArrival: true, featured: true,
+    image: '/images/products/own-the-game-fleece-shorts-black.jpeg', related: ['p034','p035','p037'],
+  }),
+  product({
+    id: 'p037', slug: 'own-the-game-pullover-hoodie', sku: 'LHA-HOOD-PULL-OTG',
+    name: { en: 'Own The Game Pullover Hoodie', ar: 'هودي امتلك اللعبة بدون سحّاب' },
+    description: { en: 'Premium oversized pullover hoodie with a kangaroo pocket and minimal LHA Own The Game chest branding.', ar: 'هودي فاخر واسع بدون سحّاب مع جيب أمامي وشعار LHA امتلك اللعبة على الصدر.' },
+    category: 'clothing', subcategory: 'hoodies', productType: 'Pullover Hoodie', price: 66,
+    colors: [
+      { ...C.black, image: '/images/products/own-the-game-pullover-hoodie-black.jpeg' },
+      { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-pullover-hoodie-grey.jpeg' },
+      { ...C.cream, image: '/images/products/own-the-game-pullover-hoodie-cream.jpeg' },
+    ],
+    stockPerVariant: 10,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed oversized unisex fit', ar: 'قصة واسعة ومريحة للجنسين' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: { en: ['Kangaroo pocket', 'Relaxed drop shoulder', 'Minimal chest branding'], ar: ['جيب أمامي', 'كتف منخفض وقصة مريحة', 'شعار بسيط على الصدر'] },
+    sizeGuide: 'hoodies', newArrival: true, featured: true,
+    image: '/images/products/own-the-game-pullover-hoodie-black.jpeg', related: ['p034','p035','p036'],
+  }),
+  product({
+    id: 'p038', slug: 'own-the-game-fleece-pants', sku: 'LHA-PANT-FLEECE-OTG',
+    name: { en: 'Own The Game Fleece Pants', ar: 'سروال فليس امتلك اللعبة' },
+    description: { en: 'Premium relaxed fleece pants with an adjustable drawcord waist, side pockets and subtle LHA Own The Game branding.', ar: 'سروال فليس فاخر بقصة مريحة وخصر برباط قابل للتعديل وجيوب جانبية وشعار LHA امتلك اللعبة.' },
+    category: 'clothing', subcategory: 'pants', productType: 'Fleece Pants', price: 58,
+    colors: [
+      { ...C.black, image: '/images/products/own-the-game-fleece-pants-black.jpeg' },
+    ],
+    stockPerVariant: 12,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed straight-leg fit', ar: 'قصة مستقيمة ومريحة' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: { en: ['Adjustable drawcord waist', 'Side pockets', 'Subtle LHA branding'], ar: ['خصر برباط قابل للتعديل', 'جيوب جانبية', 'شعار LHA بسيط'] },
+    sizeGuide: 'pants', newArrival: true, featured: true,
+    image: '/images/products/own-the-game-fleece-pants-black.jpeg', related: ['p034','p036','p037'],
+  }),
 ];
 
 // ── Selectors ──
