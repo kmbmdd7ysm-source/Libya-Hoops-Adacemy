@@ -13,6 +13,8 @@ import { isSupportedCountryCode, normalizeCountryCode } from '../data/countries'
 import { convertPrice, formatMoney } from '../services/money';
 import {
   clearPendingCommercePreference,
+  hasCountryPreference,
+  hasCurrencyPreference,
   normalizeCurrency,
   readCountryPreference,
   readCurrencyPreference,
@@ -123,10 +125,21 @@ export function CommerceProvider({ children }) {
   }, [userId]);
 
   useEffect(() => {
-    if (readCountryPreference(userId)) return;
+    // Geo defaults apply only before the visitor has made an explicit choice.
+    if (hasCountryPreference(userId) || hasCurrencyPreference(userId)) return;
     let active = true;
-    fetch('/api/geo').then((x)=>x.ok?x.json():null).then((g)=>{ if(active && g?.country==='LY' && !explicitCurrency.current){ setCountryState('LY'); setCurrencyState('LYD'); writeCountryPreference(userId,'LY'); writeCurrencyPreference(userId,'LYD'); }}).catch(()=>{});
-    return () => { active = false; };
+    const controller = new AbortController();
+    fetch('/api/geo', { cache: 'no-store', signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((geo) => {
+        if (!active || geo?.country !== 'LY' || explicitCurrency.current || explicitCountry.current) return;
+        setCountryState('LY');
+        setCurrencyState('LYD');
+        writeCountryPreference(userId, 'LY');
+        writeCurrencyPreference(userId, 'LYD');
+      })
+      .catch(() => {});
+    return () => { active = false; controller.abort(); };
   }, [userId]);
 
   const persistCloud = useCallback(

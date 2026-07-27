@@ -159,23 +159,23 @@ export const products = [
   product({
     id: 'p021', slug: 'lha-chest-logo-tank', sku: 'LHA-TANK-CHEST',
     name: { en: 'LHA Chest Logo Performance Tank', ar: 'قميص LHA أداء بدون أكمام بشعار جانبي' }, description: { en: 'Fitted performance tank with a compact LHA chest logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA صغير على الصدر.' },
-    category: 'clothing', subcategory: 'tops', productType: 'Performance Tank', price: 30,
+    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 30,
     colors: [
       { ...C.white, image: '/images/products/lha-chest-logo-tank-white.png' },
       { ...C.black, image: '/images/products/lha-chest-logo-tank-black.png' },
     ], stockPerVariant: 12, material: { en: 'Stretch performance knit', ar: 'نسيج أداء مرن' }, fit: { en: 'Compression fit', ar: 'قصة ضاغطة' }, care: { en: 'Machine wash cold.', ar: 'يُغسل بارداً.' },
-    features: { en: ['Sleeveless','Compact chest logo','Four-way stretch'], ar: ['بدون أكمام','شعار صغير على الصدر','مرونة رباعية'] }, sizeGuide: 'tops', newArrival: true,
+    features: { en: ['Sleeveless','Compact chest logo','Four-way stretch'], ar: ['بدون أكمام','شعار صغير على الصدر','مرونة رباعية'] }, sizeGuide: 'compression', newArrival: true,
     image: '/images/products/lha-chest-logo-tank-white.png', related: ['p022','p023','p019'],
   }),
   product({
     id: 'p022', slug: 'lha-center-logo-tank', sku: 'LHA-TANK-CENTER',
     name: { en: 'LHA Center Logo Performance Tank', ar: 'قميص LHA أداء بدون أكمام بشعار وسطي' }, description: { en: 'Fitted performance tank with a centered LHA logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA في المنتصف.' },
-    category: 'clothing', subcategory: 'tops', productType: 'Performance Tank', price: 30,
+    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 30,
     colors: [
       { ...C.white, image: '/images/products/lha-center-logo-tank-white.png' },
       { ...C.black, image: '/images/products/lha-center-logo-tank-black.png' },
     ], stockPerVariant: 12, material: { en: 'Stretch performance knit', ar: 'نسيج أداء مرن' }, fit: { en: 'Compression fit', ar: 'قصة ضاغطة' }, care: { en: 'Machine wash cold.', ar: 'يُغسل بارداً.' },
-    features: { en: ['Sleeveless','Centered logo','Four-way stretch'], ar: ['بدون أكمام','شعار وسطي','مرونة رباعية'] }, sizeGuide: 'tops', newArrival: true,
+    features: { en: ['Sleeveless','Centered logo','Four-way stretch'], ar: ['بدون أكمام','شعار وسطي','مرونة رباعية'] }, sizeGuide: 'compression', newArrival: true,
     image: '/images/products/lha-center-logo-tank-white.png', related: ['p021','p023','p019'],
   }),
   product({
@@ -262,7 +262,7 @@ export const products = [
       ar: 'تيشيرت أداء ضيق قصير الأكمام بواجهة وظهر سادة وشعارات LHA على كلا الكمين.',
     },
     category: 'clothing',
-    subcategory: 't-shirts',
+    subcategory: 'compression',
     productType: 'Performance T-Shirt',
     price: 38,
     colors: [
@@ -277,7 +277,7 @@ export const products = [
       en: ['LHA logos on both sleeves', 'Clean front and back', 'Four-way stretch'],
       ar: ['شعار LHA على كلا الكمين', 'واجهة وظهر سادة', 'مرونة رباعية الاتجاهات'],
     },
-    sizeGuide: 't-shirts',
+    sizeGuide: 'compression',
     newArrival: true,
     image: '/images/products/lha-sleeve-logo-performance-tee-black.png',
     related: ['p019', 'p020', 'p023'],
@@ -448,6 +448,43 @@ export const products = [
 
   product({ id:'p032', slug:'own-the-game-essential-tee', sku:'LHA-TEE-OTG', name:{en:'Own The Game Essential Tee',ar:'تيشيرت امتلك اللعبة الأساسي'}, description:{en:'Premium relaxed tee with the small LHA Own The Game chest mark.',ar:'تيشيرت فاخر بقصة مريحة مع شعار LHA الصغير وعبارة امتلك اللعبة.'}, category:'clothing', subcategory:'t-shirts', productType:'T-Shirt', price:36, colors:[{...C.black,image:'/images/products/own-the-game-essential-tee-black.jpeg'},{...C.grey,image:'/images/products/own-the-game-essential-tee-grey.jpeg'},{...C.white,image:'/images/products/own-the-game-essential-tee-white.jpeg'}], stockPerVariant:12, material:{en:'Premium cotton blend',ar:'مزيج قطني فاخر'}, fit:{en:'Relaxed athletic fit',ar:'قصة رياضية مريحة'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Small LHA chest mark','Three colours'],ar:['شعار LHA صغير','ثلاثة ألوان']}, sizeGuide:'t-shirts',newArrival:true,featured:true,image:'/images/products/own-the-game-essential-tee-black.jpeg',related:['p033','p014'] }),
   product({ id:'p033', slug:'own-the-game-sleeveless-top', sku:'LHA-TOP-OTG', name:{en:'Own The Game Sleeveless Top',ar:'توب امتلك اللعبة بدون أكمام'}, description:{en:'Oversized sleeveless basketball top with a small LHA chest mark.',ar:'توب كرة سلة واسع بدون أكمام مع شعار LHA صغير.'}, category:'clothing', subcategory:'tops', productType:'Sleeveless Top', price:34, colors:[{...C.black,image:'/images/products/own-the-game-sleeveless-top-black.jpeg'},{...C.white,image:'/images/products/own-the-game-sleeveless-top-white.jpeg'},{...C.grey,image:'/images/products/own-the-game-sleeveless-top-grey.jpeg'}], stockPerVariant:12, material:{en:'Breathable cotton blend',ar:'مزيج قطني جيد التهوية'}, fit:{en:'Oversized sleeveless fit',ar:'قصة واسعة بدون أكمام'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Sleeveless basketball cut','Three colours'],ar:['قصة كرة سلة بدون أكمام','ثلاثة ألوان']}, sizeGuide:'tops',newArrival:true,featured:true,image:'/images/products/own-the-game-sleeveless-top-black.jpeg',related:['p032','p020'] }),
+
+  product({
+    id: 'p034', slug: 'own-the-game-zip-hoodie', sku: 'LHA-HOOD-ZIP-OTG',
+    name: { en: 'Own The Game Zip Hoodie', ar: 'هودي امتلك اللعبة بسحّاب' },
+    description: { en: 'Premium relaxed full-zip hoodie with subtle LHA Own The Game chest branding.', ar: 'هودي فاخر مريح بسحّاب كامل وشعار LHA وعبارة امتلك اللعبة على الصدر.' },
+    category: 'clothing', subcategory: 'hoodies', productType: 'Full-Zip Hoodie', price: 68,
+    colors: [
+      { ...C.black, image: '/images/products/own-the-game-zip-hoodie-black.jpeg' },
+      { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-zip-hoodie-grey.jpeg' },
+      { ...C.cream, image: '/images/products/own-the-game-zip-hoodie-cream.jpeg' },
+    ],
+    stockPerVariant: 10,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed oversized unisex fit', ar: 'قصة واسعة ومريحة للجنسين' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: { en: ['Full front zip', 'Split kangaroo pockets', 'Subtle LHA chest branding'], ar: ['سحّاب أمامي كامل', 'جيبان أماميان', 'شعار LHA هادئ على الصدر'] },
+    sizeGuide: 'hoodies', newArrival: true, featured: true,
+    image: '/images/products/own-the-game-zip-hoodie-black.jpeg', related: ['p035','p029','p032'],
+  }),
+  product({
+    id: 'p035', slug: 'own-the-game-crewneck', sku: 'LHA-CREW-OTG',
+    name: { en: 'Own The Game Crewneck', ar: 'سويت شيرت امتلك اللعبة' },
+    description: { en: 'Premium relaxed crewneck sweatshirt with minimal LHA Own The Game chest branding.', ar: 'سويت شيرت فاخر مريح برقبة دائرية وشعار LHA وعبارة امتلك اللعبة بتصميم بسيط.' },
+    category: 'clothing', subcategory: 'tops', productType: 'Crewneck Sweatshirt', price: 62,
+    colors: [
+      { ...C.black, image: '/images/products/own-the-game-crewneck-black.jpeg' },
+      { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-crewneck-grey.jpeg' },
+      { ...C.cream, image: '/images/products/own-the-game-crewneck-cream.jpeg' },
+    ],
+    stockPerVariant: 10,
+    material: { en: 'Heavyweight brushed fleece', ar: 'فليس ثقيل مبطن وناعم' },
+    fit: { en: 'Relaxed oversized unisex fit', ar: 'قصة واسعة ومريحة للجنسين' },
+    care: { en: 'Machine wash cold with similar colours. Hang dry.', ar: 'يُغسل بارداً مع ألوان مشابهة ويُجفف بالتعليق.' },
+    features: { en: ['Ribbed crew neck', 'Relaxed drop shoulder', 'Minimal LHA chest branding'], ar: ['رقبة دائرية مضلعة', 'كتف منخفض وقصة مريحة', 'شعار LHA بسيط على الصدر'] },
+    sizeGuide: 'tops', newArrival: true, featured: true,
+    image: '/images/products/own-the-game-crewneck-black.jpeg', related: ['p034','p029','p032'],
+  }),
 ];
 
 // ── Selectors ──

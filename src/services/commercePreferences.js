@@ -12,6 +12,14 @@ export function normalizeCurrency(value) {
   return isSupportedDisplayCurrency(value) ? value : commerceConfig.defaultDisplayCurrency;
 }
 
+export function hasCurrencyPreference(userId) {
+  return safeRead(scopeKey(BASES.currency, userId), null) != null;
+}
+
+export function hasCountryPreference(userId) {
+  return safeRead(scopeKey(BASES.country, userId), null) != null;
+}
+
 export function readCurrencyPreference(userId) {
   return normalizeCurrency(
     safeRead(scopeKey(BASES.currency, userId), commerceConfig.defaultDisplayCurrency),

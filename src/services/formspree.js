@@ -65,19 +65,17 @@ async function postDirect(body) {
 
 export async function sendFormspree(payload, subject = 'Libya Hoops Academy website message') {
   const body = normalizePayload(payload, subject);
-  let lastError;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      // Vercel server-side delivery avoids Safari/CORS/content-blocker failures.
-      return await postThroughSite(body);
-    } catch (proxyError) {
-      try {
-        return await postDirect(body);
-      } catch (directError) {
-        lastError = new Error(`${proxyError.message}; ${directError.message}`);
-        if (attempt < 2) await wait(600 * 2 ** attempt);
-      }
-    }
+  let directError;
+  try {
+    // Formspree's public endpoint is the primary delivery path and works on static deployments.
+    return await postDirect(body);
+  } catch (error) {
+    directError = error;
   }
-  throw lastError || new Error('formspree_delivery_failed');
+  try {
+    // Same-origin Vercel function is the fallback for browsers/content blockers that reject direct posts.
+    return await postThroughSite(body);
+  } catch (proxyError) {
+    throw new Error(`${directError?.message || 'formspree_direct_failed'}; ${proxyError.message}`);
+  }
 }
