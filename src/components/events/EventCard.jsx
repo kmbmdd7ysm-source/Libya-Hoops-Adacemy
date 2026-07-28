@@ -14,7 +14,7 @@ export default function EventCard({ event }) {
   return (
     <article className="event-card">
       <Link to={to} className="event-card-media" aria-label={pick(event.title)}>
-        <SmartImage src={event.coverImage} alt={pick(event.title)} className="event-card-img" />
+        <SmartImage src={event.coverImage} alt={pick(event.title)} eager className="event-card-img" />
         <div className="event-card-badges">
           {ended && <Badge tone="sold">{t.events.ended}</Badge>}
           {full && <Badge tone="limited">{t.events.full}</Badge>}

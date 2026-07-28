@@ -14,6 +14,7 @@ export default function TrainingCard({ program }) {
         <SmartImage
           src={program.coverImage}
           alt={pick(program.title)}
+          eager
           className="training-card-img"
         />
         <span className="training-card-play" aria-hidden="true">
