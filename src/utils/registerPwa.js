@@ -15,15 +15,21 @@ export function registerPwa() {
     emit('installed');
   });
   navigator.serviceWorker
-    .register('/sw.js', { scope: '/' })
+    .register('/sw.js', { scope: '/', updateViaCache: 'none' })
     .then((reg) => {
       registration = reg;
-      if (reg.waiting) emit('update-ready', { registration: reg });
+      reg.update().catch(() => {});
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        emit('update-ready', { registration: reg });
+      }
       reg.addEventListener('updatefound', () => {
         const w = reg.installing;
         w?.addEventListener('statechange', () => {
-          if (w.state === 'installed' && navigator.serviceWorker.controller)
+          if (w.state === 'installed' && navigator.serviceWorker.controller) {
+            w.postMessage({ type: 'SKIP_WAITING' });
             emit('update-ready', { registration: reg });
+          }
         });
       });
       navigator.serviceWorker.addEventListener('controllerchange', () =>

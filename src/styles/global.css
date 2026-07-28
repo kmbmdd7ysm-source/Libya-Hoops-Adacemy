@@ -6804,3 +6804,17 @@ button {
 .notfound-links{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:28px}
 .notfound-links .block{width:auto;min-width:170px}
 .payment-logo--samsung-pay{width:158px!important;height:34px!important;max-width:158px!important;filter:none!important;background:transparent!important}
+
+/* Reliable academy media rendering across desktop, tablet and mobile. */
+.event-card-media > .smart-img,
+.program-card-media > .smart-img,
+.training-card-media > .smart-img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  object-fit: cover !important;
+}
