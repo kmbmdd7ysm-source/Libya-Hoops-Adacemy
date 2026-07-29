@@ -6815,3 +6815,28 @@ button {
 .training-purchase-option small{font-size:.78rem;opacity:.72}
 .training-purchase-option .option-saving{font-weight:700;opacity:1}
 @media(max-width:640px){.training-purchase-option{align-items:flex-start}.training-purchase-option>span:last-child{min-width:110px}}
+
+
+/* Cross-device catalogue media hardening */
+.event-card-media,
+.program-card-media,
+.training-card-media {
+  display: block;
+  min-height: 220px;
+}
+.event-card-img,
+.program-card-img,
+.training-card-img {
+  display: block;
+  opacity: 1 !important;
+  visibility: visible !important;
+  min-width: 100%;
+  min-height: 100%;
+}
+@media (min-width: 960px) {
+  .event-card-media,
+  .program-card-media,
+  .training-card-media {
+    min-height: 240px;
+  }
+}
