@@ -118,13 +118,21 @@ export function AuthProvider({ children }) {
       },
       signUp: async (email, password, metadata = {}) => {
         const s = await client();
-        return s
-          ? s.auth.signUp({
-              email,
-              password,
-              options: { data: metadata, emailRedirectTo: `${location.origin}/account` },
-            })
-          : localSignUp(email, password, metadata);
+        if (!s) return localSignUp(email, password, metadata);
+        let lastResult;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          lastResult = await s.auth.signUp({
+            email,
+            password,
+            options: { data: metadata, emailRedirectTo: `${location.origin}/account` },
+          });
+          if (!lastResult?.error) return lastResult;
+          const message = String(lastResult.error.message || '').toLowerCase();
+          const retryable = message.includes('network') || message.includes('fetch') || message.includes('timeout');
+          if (!retryable || attempt === 1) return lastResult;
+          await new Promise((resolve) => setTimeout(resolve, 700));
+        }
+        return lastResult;
       },
       resendVerification: async (email) => {
         const s = await client();
