@@ -19,6 +19,8 @@ export default async function handler(request, response) {
     const params = new URLSearchParams();
     Object.entries(payload).forEach(([key, value]) => params.set(key, sanitize(value)));
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
     const upstream = await fetch(ENDPOINT, {
       method: 'POST',
       headers: {
@@ -27,7 +29,9 @@ export default async function handler(request, response) {
         'User-Agent': 'Libya-Hoops-Academy-Order-Service/1.0',
       },
       body: params,
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     const text = await upstream.text();
     if (!upstream.ok) {
       return response.status(502).json({

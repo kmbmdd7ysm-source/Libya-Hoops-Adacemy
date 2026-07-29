@@ -6840,3 +6840,51 @@ button {
     min-height: 240px;
   }
 }
+
+/* Final launch media reliability: desktop and mobile use the same visible media rules. */
+.hero-webgl,
+.hero-vignette,
+.hero-noise {
+  display: none !important;
+}
+.hero-media,
+.hero-poster,
+.hero-media > video {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+}
+.event-card-media,
+.program-card-media,
+.training-card-media {
+  display: block !important;
+  position: relative !important;
+  aspect-ratio: 16 / 10 !important;
+  min-height: 0 !important;
+  background: #f3f3f3 !important;
+  overflow: hidden !important;
+}
+.event-card-img,
+.program-card-img,
+.training-card-img,
+.event-card-media > .smart-img,
+.program-card-media > .smart-img,
+.training-card-media > .smart-img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  transform: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .event-card:hover .event-card-img,
+  .program-card:hover .program-card-img,
+  .training-card:hover .training-card-img {
+    transform: scale(1.025);
+  }
+}

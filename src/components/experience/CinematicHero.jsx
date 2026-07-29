@@ -1,7 +1,6 @@
 import Icon from '../icons/Icon';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import HeroDepth from './HeroDepth';
 import { useLanguage } from '../../context/LanguageContext';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 export default function CinematicHero() {
@@ -58,9 +57,6 @@ export default function CinematicHero() {
             Your browser does not support background video.
           </video>
         )}
-        <HeroDepth />
-        <span className="hero-vignette" />
-        <span className="hero-noise" />
       </div>
       <div className="container hero-inner">
         <p className="hero-kicker">

@@ -30,6 +30,19 @@ const toFormBody = (payload) => {
 };
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const retry = async (operation, attempts = 3) => {
+  let lastError;
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (index < attempts - 1) await wait(350 * 2 ** index);
+    }
+  }
+  throw lastError;
+};
+
 async function postThroughSite(body) {
   const response = await fetch('/api/formspree', {
     method: 'POST',
@@ -70,14 +83,14 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
   // Use the same-origin Vercel function first. It avoids browser CORS/privacy blockers
   // and keeps the Formspree endpoint out of the checkout UI.
   try {
-    return await postThroughSite(body);
+    return await retry(() => postThroughSite(body), 3);
   } catch (error) {
     failures.push(error);
   }
 
   // Direct browser delivery remains a fallback for local/static previews.
   try {
-    return await postDirect(body);
+    return await retry(() => postDirect(body), 2);
   } catch (error) {
     failures.push(error);
   }
