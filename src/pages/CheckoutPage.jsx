@@ -385,8 +385,8 @@ export default function CheckoutPage() {
               customerName: payload.customer.name,
               customerEmail: payload.customer.email,
               customerPhone: payload.customer.phone,
-              shippingAddress: payload.shipping,
-              items: displayItems,
+              // Keep the transport payload compact; the complete human-readable
+              // order is already included in `message` above.
               subtotal: displaySubtotal,
               shippingTotal: displayShippingTotal,
               total: displayTotal,

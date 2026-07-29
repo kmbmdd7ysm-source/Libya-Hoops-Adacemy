@@ -1,60 +1,65 @@
-import Icon from '../icons/Icon';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+
 export default function CinematicHero() {
   const { t, pick } = useLanguage();
   const video = useRef(null);
-  const [paused, setPaused] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [canPlayVideo, setCanPlayVideo] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(false);
   const reduced = useReducedMotion();
+
   useEffect(() => {
-    const connection =
-      navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    const saveData = Boolean(connection?.saveData);
-    setCanPlayVideo(!reduced && !saveData);
+    if (reduced) return undefined;
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (connection?.saveData) return undefined;
+
+    const enable = () => setVideoEnabled(true);
+    const options = { once: true, passive: true };
+    window.addEventListener('pointerdown', enable, options);
+    window.addEventListener('touchstart', enable, options);
+    window.addEventListener('scroll', enable, options);
+    window.addEventListener('keydown', enable, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', enable);
+      window.removeEventListener('touchstart', enable);
+      window.removeEventListener('scroll', enable);
+      window.removeEventListener('keydown', enable);
+    };
   }, [reduced]);
 
   useEffect(() => {
-    if (!canPlayVideo || failed) return;
-    video.current?.play().catch(() => setPaused(true));
-  }, [canPlayVideo, failed]);
-  const toggle = () => {
-    const v = video.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play();
-      setPaused(false);
-    } else {
-      v.pause();
-      setPaused(true);
-    }
-  };
+    if (!videoEnabled || failed) return;
+    video.current?.play().catch(() => {});
+  }, [videoEnabled, failed]);
+
   return (
     <section className="hero cinematic-hero">
       <div className="hero-media" aria-hidden="true">
         <img
           className="hero-poster"
-          src="/media/hero/lha-hero-poster.jpg"
+          src="/media/hero/lha-hero-poster.webp"
           alt=""
           width="1940"
           height="1024"
+          fetchPriority="high"
+          decoding="async"
         />
-        {canPlayVideo && !failed && (
+        {videoEnabled && !failed && (
           <video
             ref={video}
             muted
             loop
             playsInline
             autoPlay
-            preload="none"
-            poster="/media/hero/lha-hero-poster.jpg"
+            preload="metadata"
+            poster="/media/hero/lha-hero-poster.webp"
+            width="1940"
+            height="1024"
             onError={() => setFailed(true)}
           >
             <source src="/media/hero/lha-hero.mp4" type="video/mp4" />
-            Your browser does not support background video.
           </video>
         )}
       </div>
@@ -64,45 +69,17 @@ export default function CinematicHero() {
         </p>
         <h1 className="hero-title display-title">
           {pick({
-            en: (
-              <>
-                OWN THE
-                <br />
-                <span className="outline">GAME.</span>
-              </>
-            ),
-            ar: (
-              <>
-                امتلك
-                <br />
-                <span className="outline">اللعبة.</span>
-              </>
-            ),
+            en: <><span>OWN THE</span><br /><span className="outline">GAME.</span></>,
+            ar: <><span>امتلك</span><br /><span className="outline">اللعبة.</span></>,
           })}
         </h1>
         <p className="hero-text">{t.home.heroText}</p>
         <div className="hero-actions">
-          <Link to="/programs" className="btn-primary block">
-            {t.common.explorePrograms}
-          </Link>
-          <Link to="/shop" className="btn-secondary block">
-            {t.common.shopNow}
-          </Link>
+          <Link to="/programs" className="btn-primary block">{t.common.explorePrograms}</Link>
+          <Link to="/shop" className="btn-secondary block">{t.common.shopNow}</Link>
         </div>
       </div>
-      {canPlayVideo && !failed && (
-        <button
-          type="button"
-          className="hero-video-control"
-          onClick={toggle}
-          aria-label={paused ? 'Play background video' : 'Pause background video'}
-        >
-          <Icon name={paused ? 'play' : 'pause'} size={20} />
-        </button>
-      )}
-      <a className="hero-scroll" href="#home-story" aria-label="Scroll to content">
-        <span />
-      </a>
+      <a className="hero-scroll" href="#home-story" aria-label="Scroll to content"><span /></a>
     </section>
   );
 }

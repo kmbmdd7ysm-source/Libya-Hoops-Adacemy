@@ -203,15 +203,15 @@ export default function AccountPage() {
         const parts = normalizedName.split(/\s+/).filter(Boolean);
         const firstName = parts.shift() || '';
         const lastName = parts.join(' ');
-        let avatarUrl = '';
-        const selectedPhoto = photoRef.current?.files?.[0];
-        if (selectedPhoto) avatarUrl = await createProfileImageDataUrl(selectedPhoto);
+        // Keep signup metadata deliberately small. Embedding an uploaded image in
+        // auth metadata can exceed Supabase request limits and prevent account creation.
+        // The user can save the photo immediately after signing in or verifying email.
         r = await auth.signUp(normalizedEmail, password, {
           fullName: normalizedName,
+          full_name: normalizedName,
           first_name: firstName,
           last_name: lastName,
           display_name: normalizedName,
-          avatar_url: avatarUrl || null,
         });
       }
       else if (mode === 'reset') r = await auth.reset(normalizedEmail);

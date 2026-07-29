@@ -1,21 +1,51 @@
-const ENDPOINT = process.env.FORMSPREE_ORDER_ENDPOINT || 'https://formspree.io/f/mqerbqvd';
+const ENDPOINT = process.env.FORMSPREE_ORDER_ENDPOINT || process.env.VITE_FORM_ENDPOINT || 'https://formspree.io/f/mqerbqvd';
+
+const safe = (value, max = 12000) => String(value ?? '').replace(/\0/g, '').slice(0, max);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'method_not_allowed' });
-  const payload = req.body && typeof req.body === 'object' ? req.body : {};
-  const params = new URLSearchParams();
-  params.set('_subject', payload._subject || `New LHA order ${payload.orderNumber || ''}`);
-  params.set('form_type', 'order');
-  params.set('_template', 'table');
-  params.set('name', payload.customerName || payload.name || 'LHA customer');
-  params.set('email', payload.customerEmail || payload.email || 'orders@libyahoopsacademy.com');
-  params.set('_replyto', payload.customerEmail || payload.email || '');
-  params.set('message', payload.message || JSON.stringify(payload, null, 2));
-  for (const [k,v] of Object.entries(payload)) if (!params.has(k)) params.set(k, typeof v === 'string' ? v : JSON.stringify(v));
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return res.status(405).json({ ok: false, error: 'method_not_allowed' });
+  }
+  const input = req.body && typeof req.body === 'object' ? req.body : {};
+  if (!input.orderNumber || !input.message) {
+    return res.status(400).json({ ok: false, error: 'missing_order_payload' });
+  }
+  const params = new URLSearchParams({
+    _subject: safe(input._subject || `New LHA order ${input.orderNumber}`, 180),
+    _template: 'table',
+    form_type: 'order',
+    order_number: safe(input.orderNumber, 80),
+    customer_name: safe(input.customerName || input.name, 160),
+    customer_email: safe(input.customerEmail || input.email, 240),
+    customer_phone: safe(input.customerPhone, 80),
+    payment_method: safe(input.paymentMethod, 100),
+    total: safe(input.total, 100),
+    currency: safe(input.currency, 20),
+    email: safe(input.customerEmail || input.email, 240),
+    _replyto: safe(input.customerEmail || input.email, 240),
+    message: safe(input.message),
+  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const upstream = await fetch(ENDPOINT, { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Accept':'application/json'}, body:params.toString() });
+    const upstream = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+      body: params.toString(),
+      signal: controller.signal,
+    });
     const text = await upstream.text();
-    if (!upstream.ok) return res.status(502).json({ok:false,status:upstream.status,detail:text.slice(0,500)});
-    return res.status(200).json({ok:true});
-  } catch (e) { return res.status(502).json({ok:false,error:String(e?.message||e)}); }
+    if (!upstream.ok) {
+      return res.status(502).json({ ok: false, error: 'formspree_rejected', status: upstream.status, detail: text.slice(0, 500) });
+    }
+    return res.status(200).json({ ok: true, provider: 'formspree', orderNumber: input.orderNumber });
+  } catch (error) {
+    return res.status(502).json({ ok: false, error: 'formspree_delivery_failed', detail: safe(error?.message || error, 500) });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
