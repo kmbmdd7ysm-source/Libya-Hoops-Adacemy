@@ -59,9 +59,16 @@ export default function AccountPage() {
     [msg, setMsg] = useState(''),
     [ordersState, setOrdersState] = useState({ state: 'idle', orders: [], error: null }),
     [profile, setProfile] = useState(() => ({
-      firstName: data?.profile?.first_name || data?.profile?.firstName || '',
-      lastName: data?.profile?.last_name || data?.profile?.lastName || '',
-      displayName: data?.profile?.display_name || data?.profile?.displayName || '',
+      firstName:
+        data?.profile?.first_name || data?.profile?.firstName || auth.user?.user_metadata?.first_name || '',
+      lastName:
+        data?.profile?.last_name || data?.profile?.lastName || auth.user?.user_metadata?.last_name || '',
+      displayName:
+        data?.profile?.display_name ||
+        data?.profile?.displayName ||
+        auth.user?.user_metadata?.display_name ||
+        auth.user?.user_metadata?.fullName ||
+        '',
       preferredLanguage: data?.profile?.preferred_language || lang,
       preferredSize: data?.profile?.preferred_size || '',
       preferredColors: data?.profile?.preferred_colors || [],
@@ -97,6 +104,13 @@ export default function AccountPage() {
     setAccountEmail(auth.user.email || '');
     setProfile((current) => ({
       ...current,
+      firstName: current.firstName || auth.user.user_metadata?.first_name || '',
+      lastName: current.lastName || auth.user.user_metadata?.last_name || '',
+      displayName:
+        current.displayName ||
+        auth.user.user_metadata?.display_name ||
+        auth.user.user_metadata?.fullName ||
+        '',
       phone: auth.user.user_metadata?.phone || current.phone || '',
       avatarUrl:
         auth.user.user_metadata?.avatar_url ||
@@ -184,10 +198,22 @@ export default function AccountPage() {
           confirmRef,
         );
       let r;
-      if (mode === 'signup')
+      if (mode === 'signup') {
+        const normalizedName = clean(fullName);
+        const parts = normalizedName.split(/\s+/).filter(Boolean);
+        const firstName = parts.shift() || '';
+        const lastName = parts.join(' ');
+        let avatarUrl = '';
+        const selectedPhoto = photoRef.current?.files?.[0];
+        if (selectedPhoto) avatarUrl = await createProfileImageDataUrl(selectedPhoto);
         r = await auth.signUp(normalizedEmail, password, {
-          fullName: clean(fullName),
+          fullName: normalizedName,
+          first_name: firstName,
+          last_name: lastName,
+          display_name: normalizedName,
+          avatar_url: avatarUrl || null,
         });
+      }
       else if (mode === 'reset') r = await auth.reset(normalizedEmail);
       else if (mode === 'reset-password') r = await auth.updatePassword(password);
       else r = await auth.signIn(normalizedEmail, password);
@@ -419,7 +445,14 @@ export default function AccountPage() {
         lastName: clean(profile.lastName),
         displayName: clean(profile.displayName),
       });
+      const firstName = clean(profile.firstName);
+      const lastName = clean(profile.lastName);
+      const displayName = clean(profile.displayName) || [firstName, lastName].filter(Boolean).join(' ');
       const metadataResult = await auth.updateMetadata({
+        first_name: firstName,
+        last_name: lastName,
+        display_name: displayName,
+        fullName: displayName,
         phone: clean(profile.phone),
         avatar_url: profile.avatarUrl || null,
       });

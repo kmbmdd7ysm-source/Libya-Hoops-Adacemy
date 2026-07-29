@@ -68,15 +68,19 @@ export async function saveAddress(userId, input, id) {
     throw e;
   }
   const s = await client();
-  if (value.is_default) {
-    const { error } = await s.rpc('set_default_address', {
-      p_address_id: id || null,
-      p_address: value,
-    });
-    if (error) throw error;
-    return listAddresses(userId);
-  }
   const payload = { ...value, user_id: userId, updated_at: new Date().toISOString() };
+
+  // Save first, then enforce the single-default rule with owner-scoped updates.
+  // This avoids depending on a database RPC that may not be deployed yet.
+  if (value.is_default) {
+    const { error: clearError } = await s
+      .from('addresses')
+      .update({ is_default: false, updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('is_default', true);
+    if (clearError) throw clearError;
+  }
+
   const q = id
     ? s.from('addresses').update(payload).eq('id', id).eq('user_id', userId)
     : s.from('addresses').insert(payload);

@@ -14,6 +14,7 @@ import './styles/global.css';
 import './styles/premium.css';
 import './styles/account-sync.css';
 import { registerPwa } from './utils/registerPwa';
+import { retryPendingFormspree } from './services/formspree';
 registerPwa();
 
 createRoot(document.getElementById('root')).render(
@@ -39,3 +40,8 @@ createRoot(document.getElementById('root')).render(
     </HelmetProvider>
   </StrictMode>,
 );
+
+if (typeof window !== 'undefined') {
+  retryPendingFormspree().catch(() => {});
+  window.addEventListener('online', () => retryPendingFormspree().catch(() => {}));
+}

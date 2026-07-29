@@ -76,6 +76,30 @@ async function postDirect(body) {
   return response;
 }
 
+
+const QUEUE_KEY = 'lha-formspree-retry-v1';
+const readQueue = () => {
+  try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch { return []; }
+};
+const writeQueue = (items) => localStorage.setItem(QUEUE_KEY, JSON.stringify(items.slice(-20)));
+const queuePayload = (body) => {
+  const items = readQueue();
+  items.push({ id: crypto.randomUUID?.() || String(Date.now()), body, createdAt: new Date().toISOString() });
+  writeQueue(items);
+};
+
+export async function retryPendingFormspree() {
+  const pending = readQueue();
+  if (!pending.length) return { sent: 0, remaining: 0 };
+  const remaining = [];
+  let sent = 0;
+  for (const item of pending) {
+    try { await retry(() => postThroughSite(item.body), 2); sent += 1; }
+    catch { remaining.push(item); }
+  }
+  writeQueue(remaining);
+  return { sent, remaining: remaining.length };
+}
 export async function sendFormspree(payload, subject = 'Libya Hoops Academy website message') {
   const body = normalizePayload(payload, subject);
   const failures = [];
@@ -95,5 +119,6 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
     failures.push(error);
   }
 
+  queuePayload(body);
   throw new Error(failures.map((error) => error?.message || String(error)).join('; '));
 }
