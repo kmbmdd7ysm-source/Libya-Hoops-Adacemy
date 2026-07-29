@@ -14,6 +14,7 @@ const normalizePayload = (payload, subject) => {
     form_type: payload?.formType || 'website',
     email: customerEmail,
     _replyto: customerEmail,
+    _template: 'table',
   };
   Object.entries(payload || {}).forEach(([key, value]) => {
     normalized[key] = stringifyValue(value);
@@ -107,13 +108,13 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
   const body = normalizePayload(payload, subject);
   const failures = [];
 
-  // Orders use a dedicated server route first, then the exact same direct route as Contact/Subscribe.
+  // Orders intentionally use the exact same proven direct Formspree path as Contact first.
+  try { return await retry(() => postDirect(body), 3); }
+  catch (error) { failures.push(error); }
   if (body.form_type === 'order') {
     try { return await retry(() => postOrderThroughSite(body), 3); }
     catch (error) { failures.push(error); }
   }
-  try { return await retry(() => postDirect(body), 3); }
-  catch (error) { failures.push(error); }
   try { return await retry(() => postThroughSite(body), 3); }
   catch (error) { failures.push(error); }
 

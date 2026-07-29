@@ -4,6 +4,7 @@ import { getSupabase } from '../services/supabase';
 const C = createContext(null);
 const LOCAL_ACCOUNTS_KEY = 'lha-local-accounts-v1';
 const LOCAL_SESSION_KEY = 'lha-local-session-v1';
+const allowLocalAuth = import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(location.hostname);
 
 const readJson = (key, fallback) => {
   try {
@@ -114,10 +115,12 @@ export function AuthProvider({ children }) {
       cloudConfigured,
       signIn: async (email, password) => {
         const s = await client();
-        return s ? s.auth.signInWithPassword({ email, password }) : localSignIn(email, password);
+        if (!s && !allowLocalAuth) return { data: null, error: new Error('Account service is not configured on this deployment.') };
+        return s ? s.auth.signInWithPassword({ email: String(email).trim().toLowerCase(), password }) : localSignIn(email, password);
       },
       signUp: async (email, password, metadata = {}) => {
         const s = await client();
+        if (!s && !allowLocalAuth) return { data: null, error: new Error('Account service is not configured on this deployment.') };
         if (!s) return localSignUp(email, password, metadata);
         let lastResult;
         for (let attempt = 0; attempt < 2; attempt += 1) {

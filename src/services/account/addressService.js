@@ -8,6 +8,17 @@ const readLocal = (userId) => {
 };
 const writeLocal = (userId, rows) => localStorage.setItem(localKey(userId), JSON.stringify(rows));
 const now = () => new Date().toISOString();
+const normalizeRow = (row = {}) => ({
+  ...row,
+  address_line_1: row.address_line_1 || row.line1 || '',
+  address_line_2: row.address_line_2 || row.line2 || null,
+});
+const cloudPayload = (value, userId) => ({
+  user_id: userId, label: value.label, first_name: value.first_name, last_name: value.last_name,
+  company: value.company, line1: value.address_line_1, line2: value.address_line_2, city: value.city,
+  region: value.region, postal_code: value.postal_code, country: value.country, phone: value.phone,
+  is_default: value.is_default, updated_at: now(),
+});
 
 export function normalizeAddress(input) {
   return {
@@ -54,8 +65,9 @@ export async function listAddresses(userId, options = {}) {
     if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
     const { data, error } = await query;
     if (error) throw error;
-    if (data?.length) writeLocal(userId, data);
-    return data || readLocal(userId);
+    const normalized = (data || []).map(normalizeRow);
+    if (normalized.length) writeLocal(userId, normalized);
+    return normalized.length ? normalized : readLocal(userId).map(normalizeRow);
   } catch (error) {
     const cached = readLocal(userId);
     if (cached.length) return cached;
@@ -73,13 +85,13 @@ export async function saveAddress(userId, input, id) {
       const { error } = await s.from('addresses').update({ is_default: false, updated_at: now() }).eq('user_id', userId).eq('is_default', true);
       if (error) throw error;
     }
-    const payload = { ...value, user_id: userId, updated_at: now() };
+    const payload = cloudPayload(value, userId);
     const query = id ? s.from('addresses').update(payload).eq('id', id).eq('user_id', userId) : s.from('addresses').insert(payload);
     const { data, error } = await query.select().single();
     if (error) throw error;
     const rows = readLocal(userId).map((row) => row.id === localRecord.id ? data : row);
     writeLocal(userId, rows);
-    return data;
+    return normalizeRow(data);
   } catch (error) {
     console.warn('Address saved locally; cloud sync unavailable', error);
     return localRecord;

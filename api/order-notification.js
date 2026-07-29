@@ -6,6 +6,8 @@ export default async function handler(req, res) {
   const params = new URLSearchParams();
   params.set('_subject', payload._subject || `New LHA order ${payload.orderNumber || ''}`);
   params.set('form_type', 'order');
+  params.set('_template', 'table');
+  params.set('name', payload.customerName || payload.name || 'LHA customer');
   params.set('email', payload.customerEmail || payload.email || 'orders@libyahoopsacademy.com');
   params.set('_replyto', payload.customerEmail || payload.email || '');
   params.set('message', payload.message || JSON.stringify(payload, null, 2));

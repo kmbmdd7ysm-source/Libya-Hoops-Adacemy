@@ -30,14 +30,20 @@ export function ColorSelector({ colors, value, onChange }) {
   );
 }
 
+const STANDARD_DISPLAY_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL'];
+
 export function SizeSelector({ sizes, value, onChange, stockFor }) {
   const { t } = useLanguage();
   if (!sizes || (sizes.length === 1 && sizes[0] === 'OS')) return null;
+  const displaySizes = STANDARD_DISPLAY_SIZES.includes(sizes[0])
+    ? STANDARD_DISPLAY_SIZES
+    : sizes;
   return (
     <div className="variant-group size-selector-group">
       <div className="size-row" role="radiogroup" aria-label={t.a11y.selectSize}>
-        {sizes.map((s) => {
-          const outOfStock = stockFor && stockFor(s) <= 0;
+        {displaySizes.map((s) => {
+          const unavailable = !sizes.includes(s);
+          const outOfStock = unavailable || (stockFor && stockFor(s) <= 0);
           return (
             <button
               key={s}
@@ -45,6 +51,7 @@ export function SizeSelector({ sizes, value, onChange, stockFor }) {
               role="radio"
               aria-checked={value === s}
               disabled={outOfStock}
+              aria-label={outOfStock ? `${s} unavailable` : s}
               className={`size-pill${value === s ? ' selected' : ''}${outOfStock ? ' out' : ''}`}
               onClick={() => onChange(s)}
             >

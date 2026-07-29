@@ -22,6 +22,7 @@ import PageHero from '../components/common/PageHero';
 import SmartImage from '../components/common/SmartImage';
 import EmptyState from '../components/common/EmptyState';
 import { sendFormspree } from '../services/formspree';
+import { listAddresses } from '../services/account/addressService';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const configured = isPaymentsConfigured();
@@ -57,6 +58,8 @@ export default function CheckoutPage() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState('');
   const [checkoutMode, setCheckoutMode] = useState(auth.user ? 'account' : '');
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState('');
   const idempotencyRef = useRef(
     sessionStorage.getItem('lha-checkout-idempotency') || createIdempotencyKey(),
   );
@@ -116,6 +119,48 @@ export default function CheckoutPage() {
       setPaymentMethod('online');
     }
   };
+
+
+  const applySavedAddress = (address) => {
+    if (!address) return;
+    setSelectedAddressId(address.id || '');
+    const nextCountry = normalizeCountryCode(address.country || countryCode);
+    setForm((current) => ({
+      ...current,
+      firstName: address.first_name || current.firstName,
+      lastName: address.last_name || current.lastName,
+      country: nextCountry,
+      address: address.address_line_1 || address.line1 || '',
+      apartment: address.address_line_2 || address.line2 || '',
+      city: address.city || '',
+      state: address.region || '',
+      postal: address.postal_code || '',
+      phone: address.phone || current.phone,
+    }));
+    setCountryCode(nextCountry);
+    setPaymentMethod(isCashEligibleCountry(nextCountry) ? 'cash' : 'online');
+  };
+
+  useEffect(() => {
+    let active = true;
+    if (!auth.user?.id) {
+      setSavedAddresses([]);
+      setSelectedAddressId('');
+      return undefined;
+    }
+    listAddresses(auth.user.id)
+      .then((rows) => {
+        if (!active) return;
+        const list = rows || [];
+        setSavedAddresses(list);
+        const preferred = list.find((row) => row.is_default) || list[0];
+        if (preferred) applySavedAddress(preferred);
+      })
+      .catch(() => {
+        if (active) setSavedAddresses([]);
+      });
+    return () => { active = false; };
+  }, [auth.user?.id]);
 
   const shipping = useMemo(
     () =>
@@ -537,6 +582,26 @@ export default function CheckoutPage() {
                     ) : (
                       <fieldset className="form-block">
                         <legend>{t.checkout.delivery}</legend>
+                        {auth.user && savedAddresses.length > 0 && (
+                          <label className="field saved-address-picker">
+                            <span>{pick({ en: 'Saved address', ar: 'العنوان المحفوظ' })}</span>
+                            <select
+                              value={selectedAddressId}
+                              onChange={(event) =>
+                                applySavedAddress(savedAddresses.find((row) => row.id === event.target.value))
+                              }
+                            >
+                              {savedAddresses.map((address) => (
+                                <option key={address.id} value={address.id}>
+                                  {address.label || 'Home'} — {address.address_line_1 || address.line1}, {address.city}
+                                </option>
+                              ))}
+                            </select>
+                            <Link to="/account?section=addresses" className="inline-link">
+                              {pick({ en: 'Change or add address', ar: 'تغيير أو إضافة عنوان' })}
+                            </Link>
+                          </label>
+                        )}
                         {isLibyaAddress && <p className="field-help">{pick({ en: 'Estimated delivery: 24–48 hours', ar: 'مدة التوصيل المتوقعة: 24–48 ساعة' })}</p>}
                         {hasPhysical && !digitalOnly && items.some((i) => i.type !== 'product') && (
                           <p className="notice notice--muted">{t.checkout.mixedNote}</p>
