@@ -1,10 +1,14 @@
 import { getSupabase } from '../supabase';
 import { getAddressRequirements, normalizeCountryCode } from '../../data/countries';
-const clean = (v) =>
-  String(v ?? '')
-    .replace(/[<>]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+
+const clean = (v) => String(v ?? '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
+const localKey = (userId) => `lha-addresses-v2:${userId}`;
+const readLocal = (userId) => {
+  try { return JSON.parse(localStorage.getItem(localKey(userId)) || '[]'); } catch { return []; }
+};
+const writeLocal = (userId, rows) => localStorage.setItem(localKey(userId), JSON.stringify(rows));
+const now = () => new Date().toISOString();
+
 export function normalizeAddress(input) {
   return {
     label: clean(input.label).slice(0, 40) || 'Home',
@@ -22,80 +26,82 @@ export function normalizeAddress(input) {
   };
 }
 export function validateAddress(input) {
-  const a = normalizeAddress(input),
-    errors = {};
-  for (const [k, label] of [
-    ['first_name', 'firstName'],
-    ['last_name', 'lastName'],
-    ['address_line_1', 'addressLine1'],
-    ['city', 'city'],
-    ['country', 'country'],
-  ])
-    if (!a[k]) errors[label] = 'required';
+  const a = normalizeAddress(input), errors = {};
+  for (const [k, label] of [['first_name','firstName'],['last_name','lastName'],['address_line_1','addressLine1'],['city','city'],['country','country']]) if (!a[k]) errors[label] = 'required';
   const requirements = getAddressRequirements(a.country);
   if (!requirements) errors.country = 'invalid';
   if (requirements?.regionRequired && !a.region) errors.region = 'required';
   if (requirements?.postalCodeRequired && !a.postal_code) errors.postalCode = 'required';
-  if (a.country === 'US' && a.postal_code && !/^\d{5}(-\d{4})?$/.test(a.postal_code))
-    errors.postalCode = 'invalid';
-  if (a.country === 'CA' && a.postal_code && !/^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.test(a.postal_code))
-    errors.postalCode = 'invalid';
+  if (a.country === 'US' && a.postal_code && !/^\d{5}(-\d{4})?$/.test(a.postal_code)) errors.postalCode = 'invalid';
+  if (a.country === 'CA' && a.postal_code && !/^[A-Z]\d[A-Z][ -]?\d[A-Z]\d$/i.test(a.postal_code)) errors.postalCode = 'invalid';
   return { value: a, errors, valid: Object.keys(errors).length === 0 };
 }
-async function client() {
-  const s = await getSupabase();
-  if (!s) throw Error('Supabase is not configured');
-  return s;
+async function cloud() { return await getSupabase(); }
+function localSave(userId, value, id) {
+  let rows = readLocal(userId);
+  if (value.is_default) rows = rows.map((row) => ({ ...row, is_default: false }));
+  const record = { ...value, id: id || crypto.randomUUID?.() || `addr-${Date.now()}`, user_id: userId, updated_at: now(), created_at: rows.find((r) => r.id === id)?.created_at || now() };
+  rows = id ? rows.map((row) => row.id === id ? record : row) : [record, ...rows];
+  if (!rows.some((row) => row.is_default)) rows = rows.map((row, index) => index === 0 ? { ...row, is_default: true } : row);
+  writeLocal(userId, rows);
+  return record;
 }
 export async function listAddresses(userId, options = {}) {
-  const s = await client();
-  let query = s
-    .from('addresses')
-    .select('*')
-    .eq('user_id', userId)
-    .order('is_default', { ascending: false })
-    .order('updated_at', { ascending: false });
-  const signal = options.signal;
-  if (signal && typeof query.abortSignal === 'function') query = query.abortSignal(signal);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+  const s = await cloud();
+  if (!s) return readLocal(userId).sort((a,b) => Number(b.is_default)-Number(a.is_default));
+  try {
+    let query = s.from('addresses').select('*').eq('user_id', userId).order('is_default', { ascending: false }).order('updated_at', { ascending: false });
+    if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
+    const { data, error } = await query;
+    if (error) throw error;
+    if (data?.length) writeLocal(userId, data);
+    return data || readLocal(userId);
+  } catch (error) {
+    const cached = readLocal(userId);
+    if (cached.length) return cached;
+    throw error;
+  }
 }
 export async function saveAddress(userId, input, id) {
   const { value, errors, valid } = validateAddress(input);
-  if (!valid) {
-    const e = Object.assign(Error('Invalid address'), { code: 'VALIDATION', fields: errors });
-    throw e;
+  if (!valid) throw Object.assign(Error('Invalid address'), { code: 'VALIDATION', fields: errors });
+  const localRecord = localSave(userId, value, id);
+  const s = await cloud();
+  if (!s) return localRecord;
+  try {
+    if (value.is_default) {
+      const { error } = await s.from('addresses').update({ is_default: false, updated_at: now() }).eq('user_id', userId).eq('is_default', true);
+      if (error) throw error;
+    }
+    const payload = { ...value, user_id: userId, updated_at: now() };
+    const query = id ? s.from('addresses').update(payload).eq('id', id).eq('user_id', userId) : s.from('addresses').insert(payload);
+    const { data, error } = await query.select().single();
+    if (error) throw error;
+    const rows = readLocal(userId).map((row) => row.id === localRecord.id ? data : row);
+    writeLocal(userId, rows);
+    return data;
+  } catch (error) {
+    console.warn('Address saved locally; cloud sync unavailable', error);
+    return localRecord;
   }
-  const s = await client();
-  const payload = { ...value, user_id: userId, updated_at: new Date().toISOString() };
-
-  // Save first, then enforce the single-default rule with owner-scoped updates.
-  // This avoids depending on a database RPC that may not be deployed yet.
-  if (value.is_default) {
-    const { error: clearError } = await s
-      .from('addresses')
-      .update({ is_default: false, updated_at: new Date().toISOString() })
-      .eq('user_id', userId)
-      .eq('is_default', true);
-    if (clearError) throw clearError;
-  }
-
-  const q = id
-    ? s.from('addresses').update(payload).eq('id', id).eq('user_id', userId)
-    : s.from('addresses').insert(payload);
-  const { data, error } = await q.select().single();
-  if (error) throw error;
-  return data;
 }
 export async function deleteAddress(userId, id) {
-  const s = await client();
+  writeLocal(userId, readLocal(userId).filter((row) => row.id !== id));
+  const s = await cloud();
+  if (!s) return;
   const { error } = await s.from('addresses').delete().eq('id', id).eq('user_id', userId);
-  if (error) throw error;
+  if (error) console.warn('Cloud address delete failed', error);
 }
 export async function setDefaultAddress(userId, id) {
-  const s = await client();
-  const { error } = await s.rpc('make_address_default', { p_address_id: id });
-  if (error) throw error;
+  const rows = readLocal(userId).map((row) => ({ ...row, is_default: row.id === id, updated_at: now() }));
+  writeLocal(userId, rows);
+  const s = await cloud();
+  if (s) {
+    try {
+      await s.from('addresses').update({ is_default: false, updated_at: now() }).eq('user_id', userId);
+      const { error } = await s.from('addresses').update({ is_default: true, updated_at: now() }).eq('id', id).eq('user_id', userId);
+      if (error) throw error;
+    } catch (error) { console.warn('Cloud default address update failed', error); }
+  }
   return listAddresses(userId);
 }

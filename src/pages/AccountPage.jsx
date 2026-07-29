@@ -113,10 +113,10 @@ export default function AccountPage() {
         '',
       phone: auth.user.user_metadata?.phone || current.phone || '',
       avatarUrl:
+        current.avatarUrl ||
         auth.user.user_metadata?.avatar_url ||
         data?.profile?.avatar_url ||
         data?.profile?.avatarUrl ||
-        current.avatarUrl ||
         '',
     }));
   }, [auth.user?.id, auth.user?.user_metadata, data?.profile]);
@@ -506,10 +506,14 @@ export default function AccountPage() {
                     const validation = await validateProfileImage(file);
                     if (!validation.valid) throw new Error('invalid_profile_image');
                     const avatarUrl = await createProfileImageDataUrl(file);
-                    const result = await auth.updateMetadata({ avatar_url: avatarUrl });
-                    if (result?.error) throw result.error;
                     setProfile((current) => ({ ...current, avatarUrl }));
-                    setMsg(pick({ en: 'Profile photo updated.', ar: 'تم تحديث الصورة الشخصية.' }));
+                    const [metadataResult] = await Promise.all([
+                      auth.updateMetadata({ avatar_url: avatarUrl }),
+                      data.saveProfile({ ...profile, avatarUrl, avatar_url: avatarUrl }),
+                    ]);
+                    if (metadataResult?.error) throw metadataResult.error;
+                    setProfile((current) => ({ ...current, avatarUrl }));
+                    setMsg(pick({ en: 'Profile photo updated and saved.', ar: 'تم تحديث الصورة الشخصية وحفظها.' }));
                   } catch (error) {
                     setMsg(
                       error?.message === 'invalid_profile_image'
