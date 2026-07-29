@@ -9,15 +9,16 @@ export const events = [
   {
     id: 'ev01',
     slug: 'summer-elite-camp-2026',
-    status: 'open',
+    status: 'closed',
+    comingSoon: true,
     featured: true,
     category: 'camps',
-    title: { en: 'Summer Elite Camp 2026', ar: 'معسكر الصيف للنخبة 2026' },
+    title: { en: 'LHA Elite Camp 2026', ar: 'معسكر LHA Elite 2026' },
     description: {
       en: 'A five-day intensive camp packed with skill development, competition and athletic training for committed players. Limited spots.',
       ar: 'معسكر مكثّف لخمسة أيام مليء بتطوير المهارات والمنافسة والتدريب البدني للاعبين الملتزمين. أماكن محدودة.',
     },
-    coverImage: '/images/events/summer-camp.jpg?v=20260728-2',
+    coverImage: '/images/events/summer-camp.jpg',
     gallery: [],
     startDate: '2026-08-10',
     endDate: '2026-08-14',
@@ -48,15 +49,16 @@ export const events = [
   {
     id: 'ev02',
     slug: 'shooting-clinic-august',
-    status: 'open',
+    status: 'closed',
+    comingSoon: true,
     featured: true,
     category: 'clinics',
-    title: { en: 'Shooting Clinic', ar: 'ورشة التسديد' },
+    title: { en: 'LHA Shot Clinic', ar: 'ورشة LHA Shot' },
     description: {
       en: 'A focused half-day clinic dedicated to shooting mechanics, range and confidence. All levels welcome.',
       ar: 'ورشة نصف يوم مخصّصة لميكانيكا التسديد والمدى والثقة. جميع المستويات مرحّب بها.',
     },
-    coverImage: '/images/events/shooting-clinic.jpg?v=20260728-2',
+    coverImage: '/images/events/shooting-clinic.jpg',
     gallery: [],
     startDate: '2026-08-23',
     endDate: '2026-08-23',
@@ -84,14 +86,15 @@ export const events = [
   {
     id: 'ev03',
     slug: 'academy-tryouts-september',
-    status: 'full',
+    status: 'closed',
+    comingSoon: true,
     category: 'tryouts',
-    title: { en: 'Academy Tryouts', ar: 'اختبارات الأكاديمية' },
+    title: { en: 'LHA Select Tryouts', ar: 'اختبارات LHA Select' },
     description: {
       en: 'Open tryouts for placement into the academy development pathway. (Demo: currently full.)',
       ar: 'اختبارات مفتوحة للانضمام إلى مسار تطوير الأكاديمية. (تجريبي: مكتمل حالياً.)',
     },
-    coverImage: '/images/events/tryouts.jpg?v=20260728-2',
+    coverImage: '/images/events/tryouts.jpg',
     gallery: [],
     startDate: '2026-09-06',
     endDate: '2026-09-06',
@@ -116,14 +119,15 @@ export const events = [
   {
     id: 'ev04',
     slug: '3x3-open-run',
-    status: 'open',
+    status: 'closed',
+    comingSoon: true,
     category: 'open-runs',
-    title: { en: '3x3 Open Run', ar: 'جري مفتوح 3×3' },
+    title: { en: 'LHA 3X3 Run', ar: 'فعالية LHA 3×3 Run' },
     description: {
       en: 'Competitive 3x3 open run. Bring your game — teams formed on the day. Casual, competitive, fun.',
       ar: 'جري مفتوح تنافسي 3×3. أحضر مستواك — تُشكّل الفرق في نفس اليوم. ودّي وتنافسي وممتع.',
     },
-    coverImage: '/images/events/open-run.jpg?v=20260728-2',
+    coverImage: '/images/events/open-run.jpg',
     gallery: [],
     startDate: '2026-09-20',
     endDate: '2026-09-20',
@@ -151,14 +155,15 @@ export const events = [
   {
     id: 'ev05',
     slug: 'spring-skills-clinic-2026',
-    status: 'ended',
+    status: 'closed',
+    comingSoon: true,
     category: 'clinics',
-    title: { en: 'Spring Skills Clinic', ar: 'ورشة مهارات الربيع' },
+    title: { en: 'LHA Spring Lab 2026', ar: 'مختبر مهارات LHA Spring 2026' },
     description: {
       en: 'A past skills clinic covering handling, finishing and footwork. (Demo: this event has ended.)',
       ar: 'ورشة مهارات سابقة غطّت التحكم والإنهاء وحركة القدمين. (تجريبي: انتهت هذه الفعالية.)',
     },
-    coverImage: '/images/events/spring-clinic.jpg?v=20260728-2',
+    coverImage: '/images/events/spring-clinic.jpg',
     gallery: [],
     startDate: '2026-05-17',
     endDate: '2026-05-17',
@@ -195,7 +200,7 @@ export const eventCategories = [
 
 export const getEvent = (slug) => events.find((e) => e.slug === slug);
 export const isEventEnded = (e) =>
-  e.status === 'ended' || new Date(e.endDate) < new Date(new Date().toDateString());
+  !e.comingSoon && (e.status === 'ended' || new Date(e.endDate) < new Date(new Date().toDateString()));
 export const canRegister = (e) =>
   e.status === 'open' &&
   e.remaining > 0 &&

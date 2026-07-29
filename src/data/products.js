@@ -72,9 +72,9 @@ export const products = [
     id: 'p014',
     slug: 'all-i-know-is-win-tee',
     sku: 'LHA-TEE-WIN',
-    name: { en: 'All I Know Is Win Tee', ar: 'تيشيرت كل ما أعرفه هو الفوز' },
+    name: { en: 'LHA Win Tee', ar: 'LHA Win Tee' },
     description: { en: 'Short-sleeve tee featuring the supplied “All I Know Is Win” LHA front graphic and a clean back.', ar: 'تيشيرت قصير الأكمام بطباعة LHA «كل ما أعرفه هو الفوز» في الأمام وظهر سادة.' },
-    category: 'clothing', subcategory: 't-shirts', productType: 'T-Shirt', price: 34,
+    category: 'clothing', subcategory: 't-shirts', productType: 'T-Shirt', price: 20,
     colors: [
       { ...C.black, image: '/images/products/all-i-know-is-win-tee-black.png' },
       { ...C.white, image: '/images/products/all-i-know-is-win-tee-white.png' },
@@ -86,9 +86,9 @@ export const products = [
   }),
   product({
     id: 'p015', slug: 'hoops-for-troops-tee', sku: 'LHA-TEE-TROOPS',
-    name: { en: 'Hoops for Troops Tee', ar: 'تيشيرت هوبس فور تروبس' },
+    name: { en: 'LHA Troops Tee', ar: 'LHA Troops Tee' },
     description: { en: 'Performance tee with the supplied Hoops for Troops artwork and a clean back.', ar: 'تيشيرت أداء بتصميم Hoops for Troops المرفق وظهر سادة.' },
-    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 38,
+    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 20,
     colors: [
       { ...C.black, image: '/images/products/hoops-for-troops-tee-black.png' },
       { ...C.grey, image: '/images/products/hoops-for-troops-tee-grey.png' },
@@ -100,9 +100,9 @@ export const products = [
   }),
   product({
     id: 'p016', slug: 'hoopers-performance-tee', sku: 'LHA-TEE-HOOPERS',
-    name: { en: 'Hoopers Performance Tee', ar: 'تيشيرت هوبرز للأداء' },
+    name: { en: 'LHA Hoopers Tee', ar: 'LHA Hoopers Tee' },
     description: { en: 'Black performance tee featuring the supplied Hoopers badge artwork, Dri-Fit detail and woven lower label.', ar: 'تيشيرت أداء أسود بتصميم هوبرز المرفق وتفصيل Dri-Fit والملصق السفلي المنسوج.' },
-    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 38,
+    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 20,
     colors: [
       { ...C.black, image: '/images/products/hoopers-performance-tee-black.jpeg' },
       { ...C.grey, image: '/images/products/hoopers-performance-tee-grey.jpeg' },
@@ -113,9 +113,9 @@ export const products = [
   }),
   product({
     id: 'p017', slug: 'hoopers-long-sleeve-performance', sku: 'LHA-LS-HOOPERS',
-    name: { en: 'Hoopers Long Sleeve Performance', ar: 'قميص هوبرز طويل الأكمام للأداء' },
+    name: { en: 'LHA Hoopers Long Sleeve', ar: 'LHA Hoopers Long Sleeve' },
     description: { en: 'Grey long-sleeve performance top featuring the supplied Hoopers badge artwork.', ar: 'قميص أداء رمادي طويل الأكمام بتصميم هوبرز المرفق.' },
-    category: 'clothing', subcategory: 'tops', productType: 'Long Sleeve Performance Top', price: 42,
+    category: 'clothing', subcategory: 'tops', productType: 'Long Sleeve Performance Top', price: 22,
     colors: [
       { ...C.grey, image: '/images/products/hoopers-long-sleeve-performance-grey.jpeg' },
       { ...C.black, image: '/images/products/hoopers-long-sleeve-performance-black.jpeg' },
@@ -126,8 +126,8 @@ export const products = [
   }),
   product({
     id: 'p018', slug: 'lha-performance-shorts', sku: 'LHA-SHT-PERF',
-    name: { en: 'LHA Performance Shorts', ar: 'شورت LHA للأداء' }, description: { en: 'Black performance shorts with the supplied white LHA logo.', ar: 'شورت أداء أسود بشعار LHA الأبيض.' },
-    category: 'clothing', subcategory: 'shorts', productType: 'Performance Shorts', price: 44,
+    name: { en: 'LHA Court Shorts', ar: 'LHA Court Shorts' }, description: { en: 'Black performance shorts with the supplied white LHA logo.', ar: 'شورت أداء أسود بشعار LHA الأبيض.' },
+    category: 'clothing', subcategory: 'shorts', productType: 'Performance Shorts', price: 17,
     colors: [{ ...C.black, image: '/images/products/lha-performance-shorts-black.png' }], stockPerVariant: 12,
     material: { en: 'Quick-dry performance polyester', ar: 'بوليستر أداء سريع الجفاف' }, fit: { en: 'Regular basketball fit', ar: 'قصة كرة سلة عادية' }, care: { en: 'Machine wash cold, hang dry.', ar: 'يُغسل بارداً ويُجفف بالتعليق.' },
     features: { en: ['Elastic waistband','Supplied LHA logo','Clean back'], ar: ['خصر مطاطي','شعار LHA المرفق','ظهر سادة'] }, sizeGuide: 'shorts', newArrival: true,
@@ -135,8 +135,8 @@ export const products = [
   }),
   product({
     id: 'p019', slug: 'lha-logo-performance-tee', sku: 'LHA-TEE-LOGO',
-    name: { en: 'LHA Logo Performance Tee', ar: 'تيشيرت شعار LHA للأداء' }, description: { en: 'Performance tee with a centered LHA logo and clean back.', ar: 'تيشيرت أداء بشعار LHA في المنتصف وظهر سادة.' },
-    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 36,
+    name: { en: 'LHA Icon Tee', ar: 'LHA Icon Tee' }, description: { en: 'Performance tee with a centered LHA logo and clean back.', ar: 'تيشيرت أداء بشعار LHA في المنتصف وظهر سادة.' },
+    category: 'clothing', subcategory: 't-shirts', productType: 'Performance T-Shirt', price: 20,
     colors: [
       { ...C.black, image: '/images/products/lha-logo-performance-tee-black.png' },
       { ...C.grey, image: '/images/products/lha-logo-performance-tee-grey.png' },
@@ -147,8 +147,8 @@ export const products = [
   }),
   product({
     id: 'p020', slug: 'libya-hoops-academy-tee', sku: 'LHA-TEE-ACADEMY',
-    name: { en: 'Libya Hoops Academy Tee', ar: 'تيشيرت أكاديمية ليبيا هوبس' }, description: { en: 'Clean short-sleeve tee with bold Libya Hoops Academy typography.', ar: 'تيشيرت قصير الأكمام بطباعة أكاديمية ليبيا هوبس الواضحة.' },
-    category: 'clothing', subcategory: 't-shirts', productType: 'T-Shirt', price: 34,
+    name: { en: 'LHA Academy Tee', ar: 'LHA Academy Tee' }, description: { en: 'Clean short-sleeve tee with bold Libya Hoops Academy typography.', ar: 'تيشيرت قصير الأكمام بطباعة أكاديمية ليبيا هوبس الواضحة.' },
+    category: 'clothing', subcategory: 't-shirts', productType: 'T-Shirt', price: 20,
     colors: [
       { ...C.black, image: '/images/products/libya-hoops-academy-tee-black.png' },
       { ...C.grey, image: '/images/products/libya-hoops-academy-tee-grey.png' },
@@ -158,8 +158,8 @@ export const products = [
   }),
   product({
     id: 'p021', slug: 'lha-chest-logo-tank', sku: 'LHA-TANK-CHEST',
-    name: { en: 'LHA Chest Logo Performance Tank', ar: 'قميص LHA أداء بدون أكمام بشعار جانبي' }, description: { en: 'Fitted performance tank with a compact LHA chest logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA صغير على الصدر.' },
-    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 30,
+    name: { en: 'LHA Pro Tank', ar: 'LHA Pro Tank' }, description: { en: 'Fitted performance tank with a compact LHA chest logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA صغير على الصدر.' },
+    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 16,
     colors: [
       { ...C.white, image: '/images/products/lha-chest-logo-tank-white.png' },
       { ...C.black, image: '/images/products/lha-chest-logo-tank-black.png' },
@@ -169,8 +169,8 @@ export const products = [
   }),
   product({
     id: 'p022', slug: 'lha-center-logo-tank', sku: 'LHA-TANK-CENTER',
-    name: { en: 'LHA Center Logo Performance Tank', ar: 'قميص LHA أداء بدون أكمام بشعار وسطي' }, description: { en: 'Fitted performance tank with a centered LHA logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA في المنتصف.' },
-    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 30,
+    name: { en: 'LHA Pro Logo Tank', ar: 'LHA Pro Logo Tank' }, description: { en: 'Fitted performance tank with a centered LHA logo.', ar: 'قميص أداء ضيق بدون أكمام بشعار LHA في المنتصف.' },
+    category: 'clothing', subcategory: 'compression', productType: 'Performance Tank', price: 16,
     colors: [
       { ...C.white, image: '/images/products/lha-center-logo-tank-white.png' },
       { ...C.black, image: '/images/products/lha-center-logo-tank-black.png' },
@@ -180,8 +180,8 @@ export const products = [
   }),
   product({
     id: 'p023', slug: 'lha-compression-long-sleeve', sku: 'LHA-COMP-LS',
-    name: { en: 'LHA Compression Long Sleeve', ar: 'قميص LHA ضاغط طويل الأكمام' }, description: { en: 'Long-sleeve compression top with a centered LHA logo.', ar: 'قميص ضاغط طويل الأكمام بشعار LHA في المنتصف.' },
-    category: 'clothing', subcategory: 'compression', productType: 'Compression Top', price: 42,
+    name: { en: 'LHA Pro Long Sleeve', ar: 'LHA Pro Long Sleeve' }, description: { en: 'Long-sleeve compression top with a centered LHA logo.', ar: 'قميص ضاغط طويل الأكمام بشعار LHA في المنتصف.' },
+    category: 'clothing', subcategory: 'compression', productType: 'Compression Top', price: 17,
     colors: [
       { ...C.white, image: '/images/products/lha-compression-long-sleeve-white.png' },
       { ...C.black, image: '/images/products/lha-compression-long-sleeve-black.png' },
@@ -194,7 +194,7 @@ export const products = [
     id: 'p024',
     slug: 'lha-full-length-compression-tights',
     sku: 'LHA-CMP-FULL',
-    name: { en: 'LHA Full-Length Compression Tights', ar: 'بنطال LHA ضاغط كامل الطول' },
+    name: { en: 'LHA Pro Tights', ar: 'LHA Pro Tights' },
     description: {
       en: 'Full-length compression tights with a secure performance waistband and LHA lower-leg logo.',
       ar: 'بنطال ضاغط كامل الطول بخصر رياضي ثابت وشعار LHA أسفل الساق.',
@@ -202,7 +202,7 @@ export const products = [
     category: 'clothing',
     subcategory: 'compression',
     productType: 'Compression Tights',
-    price: 48,
+    price: 17,
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { ...C.black, image: '/images/products/lha-full-length-compression-tights-black.png' },
@@ -225,7 +225,7 @@ export const products = [
     id: 'p025',
     slug: 'lha-one-leg-compression-tights',
     sku: 'LHA-CMP-ONELEG',
-    name: { en: 'LHA One-Leg Compression Tights', ar: 'بنطال LHA ضاغط بساق واحدة' },
+    name: { en: 'LHA Pro One-Leg Tights', ar: 'LHA Pro One-Leg Tights' },
     description: {
       en: 'Asymmetric one-leg compression tights designed for basketball movement, support and layering.',
       ar: 'بنطال ضاغط غير متماثل بساق واحدة مصمم لحركة كرة السلة والدعم والارتداء تحت الزي.',
@@ -233,7 +233,7 @@ export const products = [
     category: 'clothing',
     subcategory: 'compression',
     productType: 'One-Leg Compression Tights',
-    price: 46,
+    price: 17,
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { ...C.black, image: '/images/products/lha-one-leg-compression-tights-black.png' },
@@ -256,7 +256,7 @@ export const products = [
     id: 'p026',
     slug: 'lha-sleeve-logo-performance-tee',
     sku: 'LHA-TEE-SLEEVE',
-    name: { en: 'LHA Sleeve Logo Performance Tee', ar: 'تيشيرت LHA للأداء بشعار الأكمام' },
+    name: { en: 'LHA Pro Tee', ar: 'LHA Pro Tee' },
     description: {
       en: 'Fitted short-sleeve performance tee with clean front and back panels and LHA logos on both sleeves.',
       ar: 'تيشيرت أداء ضيق قصير الأكمام بواجهة وظهر سادة وشعارات LHA على كلا الكمين.',
@@ -264,7 +264,7 @@ export const products = [
     category: 'clothing',
     subcategory: 'compression',
     productType: 'Performance T-Shirt',
-    price: 38,
+    price: 17,
     colors: [
       { ...C.black, image: '/images/products/lha-sleeve-logo-performance-tee-black.png' },
       { ...C.white, image: '/images/products/lha-sleeve-logo-performance-tee-white.png' },
@@ -288,7 +288,7 @@ export const products = [
     id: 'p027',
     slug: 'lha-elite-basketball-backpack',
     sku: 'LHA-BAG-ELITE',
-    name: { en: 'LHA Elite Basketball Backpack', ar: 'حقيبة ظهر LHA إيليت لكرة السلة' },
+    name: { en: 'LHA Elite Pack', ar: 'LHA Elite Pack' },
     description: {
       en: 'Premium basketball backpack with a structured base, multiple zip compartments, side bottle pocket and bold ELITE branding.',
       ar: 'حقيبة ظهر فاخرة لكرة السلة بقاعدة ثابتة، وجيوب متعددة بسحّاب، وجيب جانبي للزجاجة، وتصميم ELITE بارز.',
@@ -296,7 +296,7 @@ export const products = [
     category: 'accessories',
     subcategory: 'bags',
     productType: 'Basketball Backpack',
-    price: 64,
+    price: 25,
     sizes: ['One Size'],
     colors: [
       { ...C.black, image: '/images/products/lha-elite-basketball-backpack-black.jpeg' },
@@ -319,7 +319,7 @@ export const products = [
     id: 'p028',
     slug: 'lha-academy-everyday-backpack',
     sku: 'LHA-BAG-ACADEMY',
-    name: { en: 'LHA Academy Everyday Backpack', ar: 'حقيبة ظهر LHA أكاديمي اليومية' },
+    name: { en: 'LHA Academy Pack', ar: 'LHA Academy Pack' },
     description: {
       en: 'Clean everyday academy backpack with a spacious main compartment, front pocket and dual side mesh pockets.',
       ar: 'حقيبة أكاديمية يومية بتصميم نظيف، وقسم رئيسي واسع، وجيب أمامي، وجيبين شبكيين جانبيين.',
@@ -327,7 +327,7 @@ export const products = [
     category: 'accessories',
     subcategory: 'bags',
     productType: 'Everyday Backpack',
-    price: 48,
+    price: 20,
     sizes: ['One Size'],
     colors: [
       { ...C.black, image: '/images/products/lha-academy-backpack-black.jpeg' },
@@ -352,7 +352,7 @@ export const products = [
     id: 'p030',
     slug: 'lha-compression-shorts',
     sku: 'LHA-CMP-SHORTS',
-    name: { en: 'LHA Compression Shorts', ar: 'شورت LHA الضاغط' },
+    name: { en: 'LHA Pro Shorts', ar: 'LHA Pro Shorts' },
     description: {
       en: 'Supportive basketball compression shorts with a secure waistband, flat seams and LHA logo detail.',
       ar: 'شورت ضاغط لكرة السلة بخصر ثابت وحياكة مسطحة وتفاصيل شعار LHA.',
@@ -360,7 +360,7 @@ export const products = [
     category: 'clothing',
     subcategory: 'compression',
     productType: 'Compression Shorts',
-    price: 34,
+    price: 16,
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
       { ...C.black, image: '/images/products/compression-shorts-black.png' },
@@ -383,7 +383,7 @@ export const products = [
     id: 'p031',
     slug: 'lha-performance-basketball-socks',
     sku: 'LHA-SOCK-PERF',
-    name: { en: 'LHA Performance Basketball Socks', ar: 'جوارب LHA لكرة السلة' },
+    name: { en: 'LHA Court Socks', ar: 'LHA Court Socks' },
     description: {
       en: 'Cushioned performance basketball socks with ribbed support, breathable zones and embroidered LHA branding.',
       ar: 'جوارب أداء مبطنة لكرة السلة بدعم مضلع ومناطق جيدة التهوية وشعار LHA مطرز.',
@@ -391,7 +391,7 @@ export const products = [
     category: 'accessories',
     subcategory: 'socks',
     productType: 'Basketball Socks',
-    price: 18,
+    price: 5,
     sizes: ['S/M', 'L/XL'],
     colors: [C.white, C.black],
     stockPerVariant: 18,
@@ -411,7 +411,7 @@ export const products = [
     id: 'p029',
     slug: 'lha-premium-fleece-set',
     sku: 'LHA-FLC-PREMIUM',
-    name: { en: 'LHA Premium Fleece Set', ar: 'طقم LHA فليس فاخر' },
+    name: { en: 'LHA Own The Game Fleece Set', ar: 'LHA Own The Game Fleece Set' },
     description: {
       en: 'A premium unisex fleece set with an oversized hoodie, relaxed joggers and subtle LHA Own the Game branding.',
       ar: 'طقم فليس فاخر للجنسين يتكون من هودي واسع وبنطال مريح مع شعار LHA وعبارة Own the Game بتصميم هادئ.',
@@ -419,7 +419,7 @@ export const products = [
     category: 'clothing',
     subcategory: 'fleece-sets',
     productType: 'Unisex Premium Fleece Set',
-    price: 88,
+    available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/lha-premium-fleece-set-black.jpeg' },
       { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/lha-premium-fleece-set-grey.jpeg' },
@@ -446,14 +446,14 @@ export const products = [
     related: ['p019', 'p017', 'p018'],
   }),
 
-  product({ id:'p032', slug:'own-the-game-essential-tee', sku:'LHA-TEE-OTG', name:{en:'Own The Game Essential Tee',ar:'تيشيرت امتلك اللعبة الأساسي'}, description:{en:'Premium relaxed tee with the small LHA Own The Game chest mark.',ar:'تيشيرت فاخر بقصة مريحة مع شعار LHA الصغير وعبارة امتلك اللعبة.'}, category:'clothing', subcategory:'t-shirts', productType:'T-Shirt', price:36, colors:[{...C.black,image:'/images/products/own-the-game-essential-tee-black.jpeg'},{...C.grey,image:'/images/products/own-the-game-essential-tee-grey.jpeg'},{...C.white,image:'/images/products/own-the-game-essential-tee-white.jpeg'}], stockPerVariant:12, material:{en:'Premium cotton blend',ar:'مزيج قطني فاخر'}, fit:{en:'Relaxed athletic fit',ar:'قصة رياضية مريحة'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Small LHA chest mark','Three colours'],ar:['شعار LHA صغير','ثلاثة ألوان']}, sizeGuide:'t-shirts',newArrival:true,featured:true,image:'/images/products/own-the-game-essential-tee-black.jpeg',related:['p033','p014'] }),
-  product({ id:'p033', slug:'own-the-game-sleeveless-top', sku:'LHA-TOP-OTG', name:{en:'Own The Game Sleeveless Top',ar:'توب امتلك اللعبة بدون أكمام'}, description:{en:'Oversized sleeveless basketball top with a small LHA chest mark.',ar:'توب كرة سلة واسع بدون أكمام مع شعار LHA صغير.'}, category:'clothing', subcategory:'tops', productType:'Sleeveless Top', price:34, colors:[{...C.black,image:'/images/products/own-the-game-sleeveless-top-black.jpeg'},{...C.white,image:'/images/products/own-the-game-sleeveless-top-white.jpeg'},{...C.grey,image:'/images/products/own-the-game-sleeveless-top-grey.jpeg'}], stockPerVariant:12, material:{en:'Breathable cotton blend',ar:'مزيج قطني جيد التهوية'}, fit:{en:'Oversized sleeveless fit',ar:'قصة واسعة بدون أكمام'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Sleeveless basketball cut','Three colours'],ar:['قصة كرة سلة بدون أكمام','ثلاثة ألوان']}, sizeGuide:'tops',newArrival:true,featured:true,image:'/images/products/own-the-game-sleeveless-top-black.jpeg',related:['p032','p020'] }),
+  product({ id:'p032', slug:'own-the-game-essential-tee', sku:'LHA-TEE-OTG', name:{en:'LHA Own The Game Tee',ar:'LHA Own The Game Tee'}, description:{en:'Premium relaxed tee with the small LHA Own The Game chest mark.',ar:'تيشيرت فاخر بقصة مريحة مع شعار LHA الصغير وعبارة امتلك اللعبة.'}, category:'clothing', subcategory:'t-shirts', productType:'T-Shirt', available: false, comingSoon: true, price:0, colors:[{...C.black,image:'/images/products/own-the-game-essential-tee-black.jpeg'},{...C.grey,image:'/images/products/own-the-game-essential-tee-grey.jpeg'},{...C.white,image:'/images/products/own-the-game-essential-tee-white.jpeg'}], stockPerVariant:12, material:{en:'Premium cotton blend',ar:'مزيج قطني فاخر'}, fit:{en:'Relaxed athletic fit',ar:'قصة رياضية مريحة'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Small LHA chest mark','Three colours'],ar:['شعار LHA صغير','ثلاثة ألوان']}, sizeGuide:'t-shirts',newArrival:true,featured:true,image:'/images/products/own-the-game-essential-tee-black.jpeg',related:['p033','p014'] }),
+  product({ id:'p033', slug:'own-the-game-sleeveless-top', sku:'LHA-TOP-OTG', name:{en:'LHA Own The Game Sleeveless Top',ar:'LHA Own The Game Sleeveless Top'}, description:{en:'Oversized sleeveless basketball top with a small LHA chest mark.',ar:'توب كرة سلة واسع بدون أكمام مع شعار LHA صغير.'}, category:'clothing', subcategory:'tops', productType:'Sleeveless Top', available: false, comingSoon: true, price:0, colors:[{...C.black,image:'/images/products/own-the-game-sleeveless-top-black.jpeg'},{...C.white,image:'/images/products/own-the-game-sleeveless-top-white.jpeg'},{...C.grey,image:'/images/products/own-the-game-sleeveless-top-grey.jpeg'}], stockPerVariant:12, material:{en:'Breathable cotton blend',ar:'مزيج قطني جيد التهوية'}, fit:{en:'Oversized sleeveless fit',ar:'قصة واسعة بدون أكمام'}, care:{en:'Machine wash cold.',ar:'يُغسل بارداً.'}, features:{en:['Sleeveless basketball cut','Three colours'],ar:['قصة كرة سلة بدون أكمام','ثلاثة ألوان']}, sizeGuide:'tops',newArrival:true,featured:true,image:'/images/products/own-the-game-sleeveless-top-black.jpeg',related:['p032','p020'] }),
 
   product({
     id: 'p034', slug: 'own-the-game-zip-hoodie', sku: 'LHA-HOOD-ZIP-OTG',
-    name: { en: 'Own The Game Zip Hoodie', ar: 'هودي امتلك اللعبة بسحّاب' },
+    name: { en: 'LHA Own The Game Zip Hoodie', ar: 'LHA Own The Game Zip Hoodie' },
     description: { en: 'Premium relaxed full-zip hoodie with subtle LHA Own The Game chest branding.', ar: 'هودي فاخر مريح بسحّاب كامل وشعار LHA وعبارة امتلك اللعبة على الصدر.' },
-    category: 'clothing', subcategory: 'hoodies', productType: 'Full-Zip Hoodie', price: 68,
+    category: 'clothing', subcategory: 'hoodies', productType: 'Full-Zip Hoodie', available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/own-the-game-zip-hoodie-black.jpeg' },
       { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-zip-hoodie-grey.jpeg' },
@@ -469,9 +469,9 @@ export const products = [
   }),
   product({
     id: 'p035', slug: 'own-the-game-crewneck', sku: 'LHA-CREW-OTG',
-    name: { en: 'Own The Game Crewneck', ar: 'سويت شيرت امتلك اللعبة' },
+    name: { en: 'LHA Own The Game Crewneck', ar: 'LHA Own The Game Crewneck' },
     description: { en: 'Premium relaxed crewneck sweatshirt with minimal LHA Own The Game chest branding.', ar: 'سويت شيرت فاخر مريح برقبة دائرية وشعار LHA وعبارة امتلك اللعبة بتصميم بسيط.' },
-    category: 'clothing', subcategory: 'tops', productType: 'Crewneck Sweatshirt', price: 62,
+    category: 'clothing', subcategory: 'tops', productType: 'Crewneck Sweatshirt', available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/own-the-game-crewneck-black.jpeg' },
       { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-crewneck-grey.jpeg' },
@@ -488,9 +488,9 @@ export const products = [
 
   product({
     id: 'p036', slug: 'own-the-game-fleece-shorts', sku: 'LHA-SHORT-FLEECE-OTG',
-    name: { en: 'Own The Game Fleece Shorts', ar: 'شورت فليس امتلك اللعبة' },
+    name: { en: 'LHA Own The Game Fleece Shorts', ar: 'LHA Own The Game Fleece Shorts' },
     description: { en: 'Premium relaxed fleece shorts with an elastic drawcord waist, side pockets and subtle LHA Own The Game branding.', ar: 'شورت فليس فاخر بقصة مريحة وخصر مطاطي برباط وجيوب جانبية وشعار LHA امتلك اللعبة بشكل بسيط.' },
-    category: 'clothing', subcategory: 'shorts', productType: 'Fleece Shorts', price: 46,
+    category: 'clothing', subcategory: 'shorts', productType: 'Fleece Shorts', available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/own-the-game-fleece-shorts-black.jpeg' },
       { ...C.cream, image: '/images/products/own-the-game-fleece-shorts-cream.jpeg' },
@@ -505,9 +505,9 @@ export const products = [
   }),
   product({
     id: 'p037', slug: 'own-the-game-pullover-hoodie', sku: 'LHA-HOOD-PULL-OTG',
-    name: { en: 'Own The Game Pullover Hoodie', ar: 'هودي امتلك اللعبة بدون سحّاب' },
+    name: { en: 'LHA Own The Game Pullover Hoodie', ar: 'LHA Own The Game Pullover Hoodie' },
     description: { en: 'Premium oversized pullover hoodie with a kangaroo pocket and minimal LHA Own The Game chest branding.', ar: 'هودي فاخر واسع بدون سحّاب مع جيب أمامي وشعار LHA امتلك اللعبة على الصدر.' },
-    category: 'clothing', subcategory: 'hoodies', productType: 'Pullover Hoodie', price: 66,
+    category: 'clothing', subcategory: 'hoodies', productType: 'Pullover Hoodie', available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/own-the-game-pullover-hoodie-black.jpeg' },
       { ...C.grey, name: { en: 'Light Grey', ar: 'رمادي فاتح' }, image: '/images/products/own-the-game-pullover-hoodie-grey.jpeg' },
@@ -523,9 +523,9 @@ export const products = [
   }),
   product({
     id: 'p038', slug: 'own-the-game-fleece-pants', sku: 'LHA-PANT-FLEECE-OTG',
-    name: { en: 'Own The Game Fleece Pants', ar: 'سروال فليس امتلك اللعبة' },
+    name: { en: 'LHA Own The Game Fleece Joggers', ar: 'LHA Own The Game Fleece Joggers' },
     description: { en: 'Premium relaxed fleece pants with an adjustable drawcord waist, side pockets and subtle LHA Own The Game branding.', ar: 'سروال فليس فاخر بقصة مريحة وخصر برباط قابل للتعديل وجيوب جانبية وشعار LHA امتلك اللعبة.' },
-    category: 'clothing', subcategory: 'pants', productType: 'Fleece Pants', price: 58,
+    category: 'clothing', subcategory: 'pants', productType: 'Fleece Pants', available: false, comingSoon: true, price: 0,
     colors: [
       { ...C.black, image: '/images/products/own-the-game-fleece-pants-black.jpeg' },
     ],

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function SmartImage({
@@ -12,11 +12,6 @@ export default function SmartImage({
 }) {
   const [failed, setFailed] = useState(false);
   const { pick } = useLanguage();
-
-  // A card can be reused with a different image after navigation/language changes.
-  // Reset the fallback state whenever its source changes.
-  useEffect(() => setFailed(false), [src]);
-
   const unavailable = failed || !src;
 
   if (unavailable) {
@@ -24,10 +19,12 @@ export default function SmartImage({
       <span
         className={`smart-img smart-img--fallback ${className}`.trim()}
         role="img"
-        aria-label={alt || pick({ en: 'Image unavailable', ar: 'الصورة غير متوفرة' })}
+        aria-label={alt || pick({ en: 'Product image unavailable', ar: 'صورة المنتج غير متوفرة' })}
         style={width || height ? { width, height } : undefined}
       >
-        <span className="smart-img-fallback-mark" aria-hidden="true">LHA</span>
+        <span className="smart-img-fallback-mark" aria-hidden="true">
+          LHA
+        </span>
         <span className="smart-img-fallback-copy">
           {pick({ en: 'Media coming soon', ar: 'الصورة قريبًا' })}
         </span>
@@ -37,17 +34,14 @@ export default function SmartImage({
 
   return (
     <img
-      key={src}
       src={src}
       alt={alt || ''}
       width={width}
       height={height}
       sizes={sizes}
       loading={eager ? 'eager' : 'lazy'}
-      fetchPriority="auto"
-      decoding="async"
-      referrerPolicy="same-origin"
-      draggable="false"
+      fetchpriority={eager ? 'high' : 'auto'}
+      decoding={eager ? 'sync' : 'async'}
       onError={() => setFailed(true)}
       className={`smart-img ${className}`.trim()}
     />

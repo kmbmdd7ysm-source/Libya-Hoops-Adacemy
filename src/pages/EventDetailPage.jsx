@@ -33,8 +33,9 @@ export default function EventDetailPage() {
 
   if (!event) return <NotFoundPage />;
 
-  const ended = isEventEnded(event);
-  const open = canRegister(event);
+  const comingSoon = event.comingSoon === true;
+  const ended = !comingSoon && isEventEnded(event);
+  const open = !comingSoon && canRegister(event);
   const full = event.status === 'full' || event.remaining <= 0;
   const isFree = !event.price || event.price === 0;
   const crumbs = [{ label: t.events.title, to: '/events' }, { label: pick(event.title) }];
@@ -150,9 +151,9 @@ export default function EventDetailPage() {
   const facts = [
     {
       label: t.events.date,
-      value: `${formatDate(event.startDate, lang)}${event.endDate && event.endDate !== event.startDate ? ' – ' + formatDate(event.endDate, lang) : ''}`,
+      value: comingSoon ? pick({ en: 'Date to be announced', ar: 'سيتم إعلان الموعد قريباً' }) : `${formatDate(event.startDate, lang)}${event.endDate && event.endDate !== event.startDate ? ' – ' + formatDate(event.endDate, lang) : ''}`,
     },
-    (event.startTime || event.endTime) && {
+    !comingSoon && (event.startTime || event.endTime) && {
       label: t.events.time,
       value: [event.startTime, event.endTime].filter(Boolean).join(' – '),
     },
@@ -228,12 +229,14 @@ export default function EventDetailPage() {
               ))}
               <div className="fact">
                 <dt>{t.events.price}</dt>
-                <dd>{isFree ? t.events.free : format(event.price, lang)}</dd>
+                <dd>{comingSoon ? pick({ en: 'Coming Soon', ar: 'قريباً' }) : isFree ? t.events.free : format(event.price, lang)}</dd>
               </div>
             </dl>
 
             <div className="detail-cta">
-              {ended ? (
+              {comingSoon ? (
+                <span className="status-pill closed">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</span>
+              ) : ended ? (
                 <span className="status-pill ended">{t.events.ended}</span>
               ) : full ? (
                 <span className="status-pill full">{t.events.full}</span>

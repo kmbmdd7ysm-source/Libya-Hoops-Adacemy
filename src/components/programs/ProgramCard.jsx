@@ -9,7 +9,7 @@ export default function ProgramCard({ program }) {
   return (
     <article className="program-card">
       <Link to={to} className="program-card-media" aria-label={pick(program.name)}>
-        <SmartImage src={program.image} alt={pick(program.name)} eager className="program-card-img" />
+        <SmartImage src={program.image} alt={pick(program.name)} className="program-card-img" />
       </Link>
       <div className="program-card-body">
         <h3 className="program-card-title">

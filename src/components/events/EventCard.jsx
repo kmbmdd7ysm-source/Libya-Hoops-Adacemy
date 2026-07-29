@@ -9,38 +9,42 @@ import Price from '../common/Price';
 export default function EventCard({ event }) {
   const { t, pick, lang } = useLanguage();
   const to = `/events/${event.slug}`;
-  const ended = isEventEnded(event);
+  const comingSoon = event.comingSoon === true;
+  const ended = !comingSoon && isEventEnded(event);
   const full = event.remaining <= 0 && !ended;
   return (
     <article className="event-card">
       <Link to={to} className="event-card-media" aria-label={pick(event.title)}>
-        <SmartImage src={event.coverImage} alt={pick(event.title)} eager className="event-card-img" />
+        <SmartImage src={event.coverImage} alt={pick(event.title)} className="event-card-img" />
         <div className="event-card-badges">
-          {ended && <Badge tone="sold">{t.events.ended}</Badge>}
-          {full && <Badge tone="limited">{t.events.full}</Badge>}
-          {!ended && !full && event.price === 0 && <Badge tone="free">{t.badge.free}</Badge>}
+          {comingSoon && <Badge tone="limited">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</Badge>}
+          {!comingSoon && ended && <Badge tone="sold">{t.events.ended}</Badge>}
+          {!comingSoon && full && <Badge tone="limited">{t.events.full}</Badge>}
+          {!comingSoon && !ended && !full && event.price === 0 && <Badge tone="free">{t.badge.free}</Badge>}
         </div>
       </Link>
       <div className="event-card-body">
-        <span className="event-card-date">{formatDate(event.startDate, lang)}</span>
+        <span className="event-card-date">{comingSoon ? pick({ en: 'Date to be announced', ar: 'سيتم إعلان الموعد قريباً' }) : formatDate(event.startDate, lang)}</span>
         <Link to={to} className="event-card-title">
           {pick(event.title)}
         </Link>
-        <ul className="event-card-meta">
+        {!comingSoon && <ul className="event-card-meta">
           <li>
             {event.startTime}
             {event.endTime ? `–${event.endTime}` : ''}
           </li>
           <li>{pick(event.venue)}</li>
           <li>{pick(event.ageGroup)}</li>
-        </ul>
+        </ul>}
         <div className="event-card-foot">
-          {event.price > 0 ? (
+          {comingSoon ? (
+            <span className="event-free">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</span>
+          ) : event.price > 0 ? (
             <Price amount={event.price} size="sm" />
           ) : (
             <span className="event-free">{t.events.free}</span>
           )}
-          {!ended && !full && canRegister(event) && (
+          {!comingSoon && !ended && !full && canRegister(event) && (
             <span className="event-spaces">
               {event.remaining} {t.events.spacesLeft}
             </span>

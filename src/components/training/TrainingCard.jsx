@@ -14,7 +14,6 @@ export default function TrainingCard({ program }) {
         <SmartImage
           src={program.coverImage}
           alt={pick(program.title)}
-          eager
           className="training-card-img"
         />
         <span className="training-card-play" aria-hidden="true">
@@ -36,7 +35,11 @@ export default function TrainingCard({ program }) {
           </li>
         </ul>
         <div className="training-card-foot">
-          <Price amount={program.price} compareAt={program.compareAt} size="sm" />
+          {program.available === false ? (
+            <span className="status-pill">{t.training.comingSoon}</span>
+          ) : (
+            <Price amount={program.price} compareAt={program.compareAt} size="sm" />
+          )}
           <Link to={to} className="training-card-link">
             {t.common.viewDetails} <Icon name="arrow" size={18} />
           </Link>

@@ -92,6 +92,7 @@ export default function ProductPage() {
 
   if (!product) return <NotFoundPage />;
 
+  const comingSoon = product.available === false || product.comingSoon === true;
   const soldOut = product.availability === 'sold-out';
   const low = isLowStock(product);
   const onSale = product.compareAt && product.compareAt > product.price;
@@ -109,7 +110,7 @@ export default function ProductPage() {
   ];
 
   const addToCart = () => {
-    if (soldOut || adding) return;
+    if (soldOut || comingSoon || adding) return;
     if (needsColor && !color) {
       setError(t.product.chooseColor);
       return;
@@ -174,7 +175,9 @@ export default function ProductPage() {
     { title: t.product.shipping, content: <p>{t.product.shippingText}</p> },
   ].filter(Boolean);
 
-  const availabilitySchema = soldOut
+  const availabilitySchema = comingSoon
+    ? 'https://schema.org/PreOrder'
+    : soldOut
     ? 'https://schema.org/OutOfStock'
     : 'https://schema.org/InStock';
   const jsonLd = [
@@ -189,7 +192,7 @@ export default function ProductPage() {
       offers: {
         '@type': 'Offer',
         priceCurrency: product.currency || SITE.currency,
-        price: product.price,
+        ...(comingSoon ? {} : { price: product.price }),
         availability: availabilitySchema,
         url: `${SITE.domain}/products/${product.slug}`,
       },
@@ -240,10 +243,11 @@ export default function ProductPage() {
                 <span>{pick({ en: 'View full screen', ar: 'عرض كامل' })}</span>
               </button>
               <div className="product-card-badges">
-                {soldOut && <Badge tone="sold">{t.badge.soldOut}</Badge>}
-                {!soldOut && onSale && <Badge tone="sale">{t.badge.sale}</Badge>}
-                {!soldOut && product.newArrival && <Badge tone="new">{t.badge.new}</Badge>}
-                {!soldOut && low && <Badge tone="limited">{t.badge.limited}</Badge>}
+                {comingSoon && <Badge tone="limited">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</Badge>}
+                {!comingSoon && soldOut && <Badge tone="sold">{t.badge.soldOut}</Badge>}
+                {!comingSoon && !soldOut && onSale && <Badge tone="sale">{t.badge.sale}</Badge>}
+                {!comingSoon && !soldOut && product.newArrival && <Badge tone="new">{t.badge.new}</Badge>}
+                {!comingSoon && !soldOut && low && <Badge tone="limited">{t.badge.limited}</Badge>}
               </div>
             </div>
             {gallery.length > 1 && (
@@ -268,14 +272,18 @@ export default function ProductPage() {
             {sub && <p className="section-label">{pick(sub.name)}</p>}
             <h1 className="product-title">{pick(product.name)}</h1>
             <div className="product-price-row">
-              <Price amount={product.price} compareAt={product.compareAt} size="lg" />
+              {comingSoon ? (
+                <span className="status-pill">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</span>
+              ) : (
+                <Price amount={product.price} compareAt={product.compareAt} size="lg" />
+              )}
               <span className="product-sku">
                 {t.product.sku}: {product.sku}
               </span>
             </div>
             <p className="product-desc">{pick(product.description)}</p>
 
-            {!soldOut && (
+            {!comingSoon && !soldOut && (
               <>
                 <ColorSelector
                   colors={product.colors}
@@ -339,7 +347,14 @@ export default function ProductPage() {
               </>
             )}
 
-            {soldOut && (
+            {comingSoon && (
+              <div className="soldout-block">
+                <p className="stock-note">{pick({ en: 'This Own The Game piece is coming soon.', ar: 'هذه القطعة من مجموعة Own The Game ستتوفر قريباً.' })}</p>
+                <PurchaseActions quantity={1} showQuantity={false} onAdd={() => {}} addDisabled favorite={wishlist.has(product.id)} onFavorite={() => wishlist.toggle(product.id)} />
+              </div>
+            )}
+
+            {!comingSoon && soldOut && (
               <div className="soldout-block">
                 <p className="stock-note">{t.product.soldOut}</p>
                 <PurchaseActions

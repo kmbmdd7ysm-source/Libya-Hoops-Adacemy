@@ -14,6 +14,7 @@ export default function ProductCard({ product, eager = false, displayColor = nul
   const { addItem } = useCart();
   const { has, toggle } = useWishlist();
   const compare = useCompare();
+  const comingSoon = product.available === false || product.comingSoon === true;
   const soldOut = product.availability === 'sold-out';
   const onSale = product.compareAt && product.compareAt > product.price;
   const low = isLowStock(product);
@@ -22,7 +23,7 @@ export default function ProductCard({ product, eager = false, displayColor = nul
   const cardImage = cardColor?.image || product.image;
 
   const quickAdd = () => {
-    if (soldOut) return;
+    if (soldOut || comingSoon) return;
     const variant = product.variants.find((v) => v.stock > 0);
     if (!variant) return;
     addItem({
@@ -61,11 +62,12 @@ export default function ProductCard({ product, eager = false, displayColor = nul
           )}
         </Link>
         <div className="product-card-badges">
-          {soldOut && <Badge tone="sold">{t.badge.soldOut}</Badge>}
-          {!soldOut && onSale && <Badge tone="sale">{t.badge.sale}</Badge>}
-          {!soldOut && product.newArrival && <Badge tone="new">{t.badge.new}</Badge>}
-          {!soldOut && product.bestSeller && <Badge tone="best">{t.badge.best}</Badge>}
-          {!soldOut && low && <Badge tone="limited">{t.badge.limited}</Badge>}
+          {comingSoon && <Badge tone="limited">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</Badge>}
+          {!comingSoon && soldOut && <Badge tone="sold">{t.badge.soldOut}</Badge>}
+          {!comingSoon && !soldOut && onSale && <Badge tone="sale">{t.badge.sale}</Badge>}
+          {!comingSoon && !soldOut && product.newArrival && <Badge tone="new">{t.badge.new}</Badge>}
+          {!comingSoon && !soldOut && product.bestSeller && <Badge tone="best">{t.badge.best}</Badge>}
+          {!comingSoon && !soldOut && low && <Badge tone="limited">{t.badge.limited}</Badge>}
         </div>
         <button
           type="button"
@@ -85,7 +87,7 @@ export default function ProductCard({ product, eager = false, displayColor = nul
         >
           <Icon name="compare" />
         </button>
-        {!soldOut && (
+        {!comingSoon && !soldOut && (
           <button type="button" className="quick-add" onClick={quickAdd}>
             {t.common.quickAdd}
           </button>
@@ -96,7 +98,11 @@ export default function ProductCard({ product, eager = false, displayColor = nul
           {pick(product.name)}
         </Link>
         <div className="product-card-meta">
-          <Price amount={product.price} compareAt={product.compareAt} size="sm" />
+          {comingSoon ? (
+            <span className="status-pill">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</span>
+          ) : (
+            <Price amount={product.price} compareAt={product.compareAt} size="sm" />
+          )}
           {product.colors.length > 1 && (
             <span className="color-dots" aria-hidden="true">
               {product.colors.slice(0, 4).map((c) => (
