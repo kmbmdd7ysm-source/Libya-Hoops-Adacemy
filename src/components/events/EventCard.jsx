@@ -15,7 +15,7 @@ export default function EventCard({ event }) {
   return (
     <article className="event-card">
       <Link to={to} className="event-card-media" aria-label={pick(event.title)}>
-        <SmartImage src={event.coverImage} alt={pick(event.title)} className="event-card-img" />
+        <SmartImage src={event.coverImage} alt={pick(event.title)} className="event-card-img" eager />
         <div className="event-card-badges">
           {comingSoon && <Badge tone="limited">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</Badge>}
           {!comingSoon && ended && <Badge tone="sold">{t.events.ended}</Badge>}

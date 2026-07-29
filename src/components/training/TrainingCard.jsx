@@ -15,6 +15,7 @@ export default function TrainingCard({ program }) {
           src={program.coverImage}
           alt={pick(program.title)}
           className="training-card-img"
+          eager
         />
         <span className="training-card-play" aria-hidden="true">
           <Icon name="play" size={20} />
