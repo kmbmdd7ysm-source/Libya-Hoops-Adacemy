@@ -450,37 +450,13 @@ export default function ShopPage() {
 
             {filtered.length > 0 ? (
               <div className="product-grid">
-                {(() => {
-                  const cards = filtered.flatMap((p) =>
-                    p.colors.length > 1
-                      ? p.colors.map((c) => ({ product: p, color: c.key }))
-                      : [{ product: p, color: p.colors[0]?.key }],
-                  );
-                  // Stable catalogue mix: products and colour cards are deliberately interleaved,
-                  // while explicit user-selected sorting still remains exact.
-                  const mixed = sort === 'featured'
-                    ? [...cards].sort((a, b) => {
-                        const score = (item) => {
-                          const key = `${item.product.id}:${item.color || 'default'}`;
-                          let hash = 2166136261;
-                          for (let i = 0; i < key.length; i += 1) {
-                            hash ^= key.charCodeAt(i);
-                            hash = Math.imul(hash, 16777619);
-                          }
-                          return hash >>> 0;
-                        };
-                        return score(a) - score(b);
-                      })
-                    : cards;
-                  return mixed.map(({ product: p, color }, i) => (
-                    <ProductCard
-                      key={`${p.id}-${color || 'default'}`}
-                      product={p}
-                      displayColor={color}
-                      eager={i < 4}
-                    />
-                  ));
-                })()}
+                {filtered.flatMap((p) =>
+                  p.colors.length > 1
+                    ? p.colors.map((c) => ({ product: p, color: c.key }))
+                    : [{ product: p, color: p.colors[0]?.key }],
+                ).map(({ product: p, color }, i) => (
+                  <ProductCard key={`${p.id}-${color || 'default'}`} product={p} displayColor={color} eager={i < 4} />
+                ))}
               </div>
             ) : (
               <EmptyState

@@ -296,7 +296,7 @@ export const products = [
     category: 'accessories',
     subcategory: 'bags',
     productType: 'Basketball Backpack',
-    available: false, comingSoon: true, price: 0,
+    price: 25,
     sizes: ['One Size'],
     colors: [
       { ...C.black, image: '/images/products/lha-elite-basketball-backpack-black.jpeg' },
@@ -327,7 +327,7 @@ export const products = [
     category: 'accessories',
     subcategory: 'bags',
     productType: 'Everyday Backpack',
-    available: false, comingSoon: true, price: 0,
+    price: 20,
     sizes: ['One Size'],
     colors: [
       { ...C.black, image: '/images/products/lha-academy-backpack-black.jpeg' },
@@ -393,10 +393,7 @@ export const products = [
     productType: 'Basketball Socks',
     price: 5,
     sizes: ['S/M', 'L/XL'],
-    colors: [
-      { ...C.black, image: '/images/products/lha-court-socks-black.jpeg' },
-      { ...C.white, image: '/images/products/lha-court-socks-white.jpeg' },
-    ],
+    colors: [C.white, C.black],
     stockPerVariant: 18,
     material: { en: 'Breathable performance knit', ar: 'نسيج أداء جيد التهوية' },
     fit: { en: 'Supportive crew fit', ar: 'قصة طويلة داعمة' },
@@ -406,7 +403,7 @@ export const products = [
       ar: ['تبطين أسفل القدم', 'دعم مضلع للكاحل', 'خيارات بالأسود والأبيض'],
     },
     newArrival: true,
-    image: '/images/products/lha-court-socks-black.jpeg',
+    image: '/images/products/performance-socks-black-white.webp',
     related: ['p018', 'p030', 'p027'],
   }),
 

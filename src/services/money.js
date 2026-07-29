@@ -62,17 +62,9 @@ export class Money {
   }
 }
 
-export function roundLydPrice(value) {
-  const amount = Number(value);
-  if (!Number.isFinite(amount)) return amount;
-  return Math.ceil(amount / 5) * 5;
-}
-
 export function convertPrice(amount, fromCurrency, toCurrency, rate) {
-  const converted = Money.fromMajor(amount, fromCurrency).convert(toCurrency, rate).toMajor();
-  return toCurrency === 'LYD' ? roundLydPrice(converted) : converted;
+  return Money.fromMajor(amount, fromCurrency).convert(toCurrency, rate).toMajor();
 }
-
 
 export function sumMoney(values, currency = commerceConfig.baseCurrency) {
   assertCurrency(currency);
@@ -89,12 +81,11 @@ export function formatMoney(amount, currency, lang = 'en') {
   }
 
   const locale = lang === 'ar' ? 'ar-LY-u-nu-latn' : 'en-US';
-  const displayValue = currency === 'LYD' ? roundLydPrice(value) : value;
   const number = new Intl.NumberFormat(locale, {
-    minimumFractionDigits: currency === 'LYD' ? 0 : 2,
-    maximumFractionDigits: currency === 'LYD' ? 0 : 2,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
     useGrouping: true,
-  }).format(displayValue);
+  }).format(value);
 
   if (currency === 'LYD') {
     const label = lang === 'ar' ? 'د.ل' : 'LYD';
@@ -108,11 +99,10 @@ export function formatMoney(amount, currency, lang = 'en') {
 export function getAccessibleMoneyLabel(amount, currency, lang = 'en') {
   const value = Number(amount);
   if (!Number.isFinite(value)) return lang === 'ar' ? 'السعر غير متاح' : 'Price unavailable';
-  const displayValue = currency === 'LYD' ? roundLydPrice(value) : value;
   const formatted = new Intl.NumberFormat(lang === 'ar' ? 'ar-LY-u-nu-latn' : 'en-US', {
-    minimumFractionDigits: currency === 'LYD' ? 0 : 2,
-    maximumFractionDigits: currency === 'LYD' ? 0 : 2,
-  }).format(displayValue);
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
   if (lang === 'ar') {
     return currency === 'LYD' ? `${formatted} دينار ليبي` : `${formatted} دولار أمريكي`;
   }
