@@ -48,6 +48,17 @@ async function postDirect(body) {
   return response;
 }
 
+
+async function postOrderThroughSite(body) {
+  const response = await fetch('/api/order-notification', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body), credentials: 'same-origin', cache: 'no-store',
+  });
+  const detail = await response.text().catch(() => '');
+  if (!response.ok) throw new Error(`order_notification_failed:${response.status}:${detail.slice(0, 240)}`);
+  return response;
+}
+
 async function postThroughSite(body) {
   const response = await fetch('/api/formspree', {
     method: 'POST',
@@ -96,11 +107,13 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
   const body = normalizePayload(payload, subject);
   const failures = [];
 
-  // Use the exact same browser-to-Formspree delivery path as newsletter/subscribe forms.
+  // Orders use a dedicated server route first, then the exact same direct route as Contact/Subscribe.
+  if (body.form_type === 'order') {
+    try { return await retry(() => postOrderThroughSite(body), 3); }
+    catch (error) { failures.push(error); }
+  }
   try { return await retry(() => postDirect(body), 3); }
   catch (error) { failures.push(error); }
-
-  // Vercel serverless fallback for browsers or privacy tools that block direct form requests.
   try { return await retry(() => postThroughSite(body), 3); }
   catch (error) { failures.push(error); }
 

@@ -25,9 +25,11 @@ const C = {
 
 // Factory: fills defaults + builds variants/inventory from sizes × colours.
 function product(p) {
-  const sizes = p.sizes || DEFAULT_CLOTHING_SIZES;
+  const isPhysicalActive = (p.fulfillmentType || 'physical') === 'physical' && p.available !== false && !p.comingSoon;
+  const sizes = isPhysicalActive ? ['L', 'XL', 'XXL'] : (p.sizes || DEFAULT_CLOTHING_SIZES);
   const colors = p.colors || [C.black];
-  const perVariant = p.stockPerVariant ?? 12;
+  const perVariant = p.stockPerVariant ?? 0;
+  const launchStock = { L: 1, XL: 2, XXL: 3 };
   const variants = [];
   for (const color of colors) {
     for (const size of sizes) {
@@ -35,7 +37,7 @@ function product(p) {
         size,
         color: color.key,
         sku: `${p.sku}-${color.key.slice(0, 2).toUpperCase()}-${size}`,
-        stock: color.stock ?? perVariant,
+        stock: isPhysicalActive ? launchStock[size] : (color.stock ?? perVariant),
       });
     }
   }

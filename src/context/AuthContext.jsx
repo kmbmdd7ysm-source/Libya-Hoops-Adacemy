@@ -124,7 +124,7 @@ export function AuthProvider({ children }) {
           lastResult = await s.auth.signUp({
             email,
             password,
-            options: { data: metadata, emailRedirectTo: `${location.origin}/account` },
+            options: { data: { ...metadata, full_name: metadata.full_name || metadata.fullName || metadata.display_name || '', name: metadata.full_name || metadata.fullName || metadata.display_name || '' }, emailRedirectTo: `${location.origin}/account` },
           });
           if (!lastResult?.error) return lastResult;
           const message = String(lastResult.error.message || '').toLowerCase();
