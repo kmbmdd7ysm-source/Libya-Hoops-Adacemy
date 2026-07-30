@@ -10,7 +10,7 @@ export const SITE = {
   name: 'Libya Hoops Academy',
   shortName: 'LHA',
   slogan: { en: 'Own The Game.', ar: 'امتلك اللعبة.' },
-  domain: 'https://libyahoopsacademy.com', // - change to your production domain
+  domain: 'https://www.libyahoopsacademy.com', // - change to your production domain
 
   // ── Official Libya Hoops Academy brand assets ──
   logo: '/brand/lha-mark-black.png',

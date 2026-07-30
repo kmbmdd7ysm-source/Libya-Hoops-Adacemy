@@ -61,7 +61,15 @@ export default function MediaLightbox({
           setZoom((z) => Math.max(1, Math.min(3, z + (e.deltaY < 0 ? 0.25 : -0.25))));
         }}
       >
-        <img src={items[i]} alt="" style={{ '--lightbox-zoom': zoom }} draggable="false" />
+        <img
+          src={items[i]}
+          alt=""
+          width="1600"
+          height="2000"
+          style={{ '--lightbox-zoom': zoom }}
+          draggable="false"
+          decoding="async"
+        />
       </div>
       <button className="lightbox-nav next" onClick={next} aria-label="Next">
         <Icon name="next" />

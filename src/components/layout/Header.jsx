@@ -88,7 +88,7 @@ export default function Header() {
       <header className={`site-header${scrolled ? ' scrolled' : ''}`}>
         <div className="container header-inner">
           <Link to="/" className="brand" aria-label={SITE.name}>
-            <img src={SITE.logo} alt="" className="brand-logo brand-logo--header" />
+            <img src={SITE.logo} alt="" width="415" height="482" className="brand-logo brand-logo--header" />
           </Link>
           <nav className="desktop-nav" aria-label={t.a11y.mainNav}>
             {mainNav.map((item) =>
@@ -233,7 +233,7 @@ export default function Header() {
       >
         <div className="mobile-menu-head">
           <Link to="/" className="brand" onClick={close}>
-            <img src={SITE.logo} alt="" className="brand-logo brand-logo--header" />
+            <img src={SITE.logo} alt="" width="415" height="482" className="brand-logo brand-logo--header" />
           </Link>
           <button className="icon-btn" onClick={close} aria-label={t.a11y.closeMenu}>
             <Icon name="close" />

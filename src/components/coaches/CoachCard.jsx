@@ -9,7 +9,14 @@ export default function CoachCard({ coach }) {
   return (
     <article className="coach-card">
       <Link to={to} className="coach-card-media" aria-label={pick(coach.name)}>
-        <SmartImage src={coach.image} alt={pick(coach.name)} className="coach-card-img" />
+        <SmartImage
+          src={coach.image}
+          alt={pick(coach.name)}
+          width="800"
+          height="1000"
+          sizes="(max-width: 700px) 92vw, (max-width: 1100px) 46vw, 31vw"
+          className="coach-card-img"
+        />
       </Link>
       <div className="coach-card-body">
         <h3 className="coach-card-name">

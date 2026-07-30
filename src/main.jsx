@@ -15,7 +15,6 @@ import './styles/premium.css';
 import './styles/account-sync.css';
 import { registerPwa } from './utils/registerPwa';
 import { retryPendingFormspree } from './services/formspree';
-registerPwa();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -42,6 +41,15 @@ createRoot(document.getElementById('root')).render(
 );
 
 if (typeof window !== 'undefined') {
-  retryPendingFormspree().catch(() => {});
+  const startBackgroundTasks = () => {
+    const run = () => {
+      registerPwa();
+      retryPendingFormspree().catch(() => {});
+    };
+    if ('requestIdleCallback' in window) window.requestIdleCallback(run, { timeout: 2000 });
+    else window.setTimeout(run, 400);
+  };
+  if (document.readyState === 'complete') startBackgroundTasks();
+  else window.addEventListener('load', startBackgroundTasks, { once: true });
   window.addEventListener('online', () => retryPendingFormspree().catch(() => {}));
 }

@@ -4,7 +4,13 @@ export default function OfflinePage() {
   const { pick } = useLanguage();
   return (
     <section className="offline-page">
-      <img src="/brand/lha-mark-white.png" alt="LHA" />
+      <img
+        src="/brand/lha-mark-white.png"
+        alt="LHA"
+        width="415"
+        height="482"
+        decoding="async"
+      />
       <h1>{pick({ en: 'You are offline', ar: 'أنت غير متصل' })}</h1>
       <p>
         {pick({

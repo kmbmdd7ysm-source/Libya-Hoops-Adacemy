@@ -33,7 +33,7 @@ describe('production deployment hotfixes', () => {
     const auth = read('src/context/AuthContext.jsx');
     expect(auth).toContain('LOCAL_ACCOUNTS_KEY');
     expect(auth).toContain('localSignUp');
-    expect(auth).toContain('configured: true');
+    expect(auth).toContain('configured: cloudConfigured || allowLocalAuth');
   });
 
   it('contains the mobile filter, colour and RTL containment corrections', () => {

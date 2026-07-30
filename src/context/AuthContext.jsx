@@ -1,10 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { getSupabase } from '../services/supabase';
+import {
+  authRedirectUrl,
+  completeAuthRedirect,
+  getSupabase,
+  getSupabaseConfigStatus,
+} from '../services/supabase';
 
 const C = createContext(null);
 const LOCAL_ACCOUNTS_KEY = 'lha-local-accounts-v1';
 const LOCAL_SESSION_KEY = 'lha-local-session-v1';
-const allowLocalAuth = import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(location.hostname);
+const allowLocalAuth =
+  import.meta.env.DEV || ['localhost', '127.0.0.1'].includes(globalThis.location?.hostname || '');
 
 const readJson = (key, fallback) => {
   try {
@@ -22,6 +28,21 @@ const localUser = (record) => ({
   user_metadata: record.metadata || {},
   app_metadata: { provider: 'local' },
 });
+const normalizeEmail = (email) => String(email || '').trim().toLowerCase();
+const cloudError = () =>
+  new Error(
+    'Account service is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel Environment Variables.',
+  );
+const isTransientAuthError = (error) => {
+  const message = String(error?.message || error || '').toLowerCase();
+  return (
+    message.includes('network') ||
+    message.includes('fetch') ||
+    message.includes('timeout') ||
+    message.includes('temporarily unavailable')
+  );
+};
+
 async function hashPassword(value) {
   const bytes = new TextEncoder().encode(value);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
@@ -33,34 +54,53 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cloudConfigured, setCloudConfigured] = useState(false);
+  const [configStatus, setConfigStatus] = useState(getSupabaseConfigStatus());
 
   useEffect(() => {
     let sub;
     let alive = true;
+
     (async () => {
-      const s = await getSupabase();
-      if (!alive) return;
-      setCloudConfigured(Boolean(s));
-      if (!s) {
-        const saved = readJson(LOCAL_SESSION_KEY, null);
-        if (saved?.user) {
-          setSession(saved);
-          setUser(saved.user);
+      try {
+        const s = await getSupabase();
+        if (!alive) return;
+        setCloudConfigured(Boolean(s));
+        setConfigStatus(getSupabaseConfigStatus());
+
+        if (!s) {
+          if (allowLocalAuth) {
+            const saved = readJson(LOCAL_SESSION_KEY, null);
+            if (saved?.user) {
+              setSession(saved);
+              setUser(saved.user);
+            }
+          }
+          return;
         }
-        setLoading(false);
-        return;
+
+        try {
+          const callback = await completeAuthRedirect(s);
+          if (callback.error) throw callback.error;
+        } catch (error) {
+          console.warn('Unable to complete authentication callback:', error);
+        }
+
+        const { data, error } = await s.auth.getSession();
+        if (error) console.warn(error);
+        if (!alive) return;
+        setSession(data.session || null);
+        setUser(data.session?.user || null);
+
+        sub = s.auth.onAuthStateChange((_event, next) => {
+          setSession(next);
+          setUser(next?.user || null);
+          setLoading(false);
+        }).data.subscription;
+      } finally {
+        if (alive) setLoading(false);
       }
-      const { data, error } = await s.auth.getSession();
-      if (error) console.warn(error);
-      setSession(data.session || null);
-      setUser(data.session?.user || null);
-      sub = s.auth.onAuthStateChange((_event, next) => {
-        setSession(next);
-        setUser(next?.user || null);
-        setLoading(false);
-      }).data.subscription;
-      setLoading(false);
     })();
+
     return () => {
       alive = false;
       sub?.unsubscribe();
@@ -70,7 +110,7 @@ export function AuthProvider({ children }) {
   const client = useCallback(async () => await getSupabase(), []);
 
   const localSignUp = useCallback(async (email, password, metadata = {}) => {
-    const normalized = String(email).trim().toLowerCase();
+    const normalized = normalizeEmail(email);
     const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
     if (accounts.some((item) => item.email === normalized)) {
       return { data: null, error: new Error('An account with this email already exists.') };
@@ -92,7 +132,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const localSignIn = useCallback(async (email, password) => {
-    const normalized = String(email).trim().toLowerCase();
+    const normalized = normalizeEmail(email);
     const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
     const record = accounts.find((item) => item.email === normalized);
     if (!record || record.passwordHash !== (await hashPassword(password))) {
@@ -111,45 +151,78 @@ export function AuthProvider({ children }) {
       user,
       session,
       loading,
-      configured: true,
+      configured: cloudConfigured || allowLocalAuth,
       cloudConfigured,
+      configStatus,
       signIn: async (email, password) => {
         const s = await client();
-        if (!s && !allowLocalAuth) return { data: null, error: new Error('Account service is not configured on this deployment.') };
-        return s ? s.auth.signInWithPassword({ email: String(email).trim().toLowerCase(), password }) : localSignIn(email, password);
+        if (!s && !allowLocalAuth) return { data: null, error: cloudError() };
+        return s
+          ? s.auth.signInWithPassword({ email: normalizeEmail(email), password })
+          : localSignIn(email, password);
       },
       signUp: async (email, password, metadata = {}) => {
         const s = await client();
-        if (!s && !allowLocalAuth) return { data: null, error: new Error('Account service is not configured on this deployment.') };
+        if (!s && !allowLocalAuth) return { data: null, error: cloudError() };
         if (!s) return localSignUp(email, password, metadata);
+
+        const normalizedEmail = normalizeEmail(email);
+        const normalizedName = String(
+          metadata.full_name || metadata.fullName || metadata.display_name || metadata.name || '',
+        )
+          .trim()
+          .slice(0, 100);
+        const safeMetadata = {
+          first_name: String(metadata.first_name || '').trim().slice(0, 80),
+          last_name: String(metadata.last_name || '').trim().slice(0, 80),
+          display_name: normalizedName,
+          fullName: normalizedName,
+        };
         let lastResult;
-        for (let attempt = 0; attempt < 2; attempt += 1) {
+
+        for (let attempt = 0; attempt < 3; attempt += 1) {
           lastResult = await s.auth.signUp({
-            email,
+            email: normalizedEmail,
             password,
-            options: { data: { ...metadata, full_name: metadata.full_name || metadata.fullName || metadata.display_name || '', name: metadata.full_name || metadata.fullName || metadata.display_name || '' }, emailRedirectTo: `${location.origin}/account` },
+            options: {
+              data: safeMetadata,
+              emailRedirectTo: authRedirectUrl('confirm'),
+            },
           });
-          if (!lastResult?.error) return lastResult;
-          const message = String(lastResult.error.message || '').toLowerCase();
-          const retryable = message.includes('network') || message.includes('fetch') || message.includes('timeout');
-          if (!retryable || attempt === 1) return lastResult;
-          await new Promise((resolve) => setTimeout(resolve, 700));
+
+          if (!lastResult?.error) {
+            const identities = lastResult?.data?.user?.identities;
+            if (Array.isArray(identities) && identities.length === 0) {
+              return {
+                data: lastResult.data,
+                error: new Error('An account with this email already exists.'),
+              };
+            }
+            return lastResult;
+          }
+
+          if (!isTransientAuthError(lastResult.error) || attempt === 2) return lastResult;
+          await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
         }
         return lastResult;
       },
       resendVerification: async (email) => {
         const s = await client();
-        return s
-          ? s.auth.resend({
-              type: 'signup',
-              email,
-              options: { emailRedirectTo: `${location.origin}/account` },
-            })
-          : { data: {}, error: null };
+        if (!s) {
+          return allowLocalAuth
+            ? { data: {}, error: null }
+            : { data: null, error: cloudError() };
+        }
+        return s.auth.resend({
+          type: 'signup',
+          email: normalizeEmail(email),
+          options: { emailRedirectTo: authRedirectUrl('confirm') },
+        });
       },
       updateMetadata: async (metadata = {}) => {
         const s = await client();
         if (s) return s.auth.updateUser({ data: metadata });
+        if (!allowLocalAuth) return { data: null, error: cloudError() };
         if (!user?.email) return { data: null, error: new Error('Sign in first.') };
         const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
         let updatedRecord = null;
@@ -168,12 +241,14 @@ export function AuthProvider({ children }) {
       },
       reset: async (email) => {
         const s = await client();
-        if (s)
-          return s.auth.resetPasswordForEmail(email, {
-            redirectTo: `${location.origin}/account?mode=reset-password`,
+        if (s) {
+          return s.auth.resetPasswordForEmail(normalizeEmail(email), {
+            redirectTo: authRedirectUrl('recovery'),
           });
+        }
+        if (!allowLocalAuth) return { data: null, error: cloudError() };
         const exists = readJson(LOCAL_ACCOUNTS_KEY, []).some(
-          (item) => item.email === String(email).trim().toLowerCase(),
+          (item) => item.email === normalizeEmail(email),
         );
         return exists
           ? { data: {}, error: null }
@@ -182,6 +257,7 @@ export function AuthProvider({ children }) {
       updatePassword: async (password) => {
         const s = await client();
         if (s) return s.auth.updateUser({ password });
+        if (!allowLocalAuth) return { data: null, error: cloudError() };
         if (!user?.email) return { data: null, error: new Error('Sign in first.') };
         const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
         const updated = await Promise.all(
@@ -196,9 +272,10 @@ export function AuthProvider({ children }) {
       },
       updateEmail: async (email) => {
         const s = await client();
-        if (s) return s.auth.updateUser({ email });
+        if (s) return s.auth.updateUser({ email: normalizeEmail(email) });
+        if (!allowLocalAuth) return { data: null, error: cloudError() };
         if (!user?.email) return { data: null, error: new Error('Sign in first.') };
-        const normalized = String(email).trim().toLowerCase();
+        const normalized = normalizeEmail(email);
         const accounts = readJson(LOCAL_ACCOUNTS_KEY, []);
         if (accounts.some((item) => item.email === normalized && item.email !== user.email)) {
           return { data: null, error: new Error('An account with this email already exists.') };
@@ -220,6 +297,7 @@ export function AuthProvider({ children }) {
       signOut: async (scope) => {
         const s = await client();
         if (s) return s.auth.signOut(scope ? { scope } : undefined);
+        if (!allowLocalAuth) return { error: cloudError() };
         localStorage.removeItem(LOCAL_SESSION_KEY);
         setUser(null);
         setSession(null);
@@ -233,6 +311,7 @@ export function AuthProvider({ children }) {
           await s.auth.signOut();
           return;
         }
+        if (!allowLocalAuth) throw cloudError();
         writeJson(
           LOCAL_ACCOUNTS_KEY,
           readJson(LOCAL_ACCOUNTS_KEY, []).filter((item) => item.email !== user?.email),
@@ -248,12 +327,23 @@ export function AuthProvider({ children }) {
           if (error) throw error;
           return data;
         }
+        if (!allowLocalAuth) throw cloudError();
         return { session, user };
       },
     }),
-    [user, session, loading, cloudConfigured, client, localSignIn, localSignUp],
+    [
+      user,
+      session,
+      loading,
+      cloudConfigured,
+      configStatus,
+      client,
+      localSignIn,
+      localSignUp,
+    ],
   );
 
   return <C.Provider value={api}>{children}</C.Provider>;
 }
+
 export const useAuth = () => useContext(C);

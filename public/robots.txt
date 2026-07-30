@@ -3,4 +3,4 @@ Allow: /
 Disallow: /checkout
 Disallow: /cart
 
-Sitemap: https://libyahoopsacademy.com/sitemap.xml
+Sitemap: https://www.libyahoopsacademy.com/sitemap.xml

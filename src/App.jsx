@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import Home from './pages/HomePage';
 import { Navigate, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -10,8 +11,6 @@ import LoadingScreen from './components/common/LoadingScreen';
 import { usePageTracking } from './hooks/usePageTracking';
 import RouteExperience from './components/experience/RouteExperience';
 import PwaPrompt from './components/pwa/PwaPrompt';
-
-const Home = lazy(() => import('./pages/HomePage'));
 const About = lazy(() => import('./pages/AboutPage'));
 const Shop = lazy(() => import('./pages/ShopPage'));
 const Product = lazy(() => import('./pages/ProductPage'));

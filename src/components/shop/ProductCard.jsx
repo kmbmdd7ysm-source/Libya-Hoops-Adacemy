@@ -50,6 +50,9 @@ export default function ProductCard({ product, eager = false, displayColor = nul
           <SmartImage
             src={cardImage}
             alt={pick(product.alt)}
+            width={900}
+            height={1200}
+            sizes="(min-width: 1040px) 25vw, (min-width: 700px) 33vw, 50vw"
             className="product-card-img product-card-img--main"
             eager={eager}
           />
@@ -57,6 +60,9 @@ export default function ProductCard({ product, eager = false, displayColor = nul
             <SmartImage
               src={product.hoverImage}
               alt=""
+              width={900}
+              height={1200}
+              sizes="(min-width: 1040px) 25vw, (min-width: 700px) 33vw, 50vw"
               className="product-card-img product-card-img--hover"
             />
           )}

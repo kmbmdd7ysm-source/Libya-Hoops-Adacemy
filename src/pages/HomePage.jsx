@@ -96,13 +96,13 @@ export default function HomePage() {
             linkLabel={t.common.viewAll}
           />
           <div className="category-grid">
-            {cats.map((c, i) => (
+            {cats.map((c, index) => (
               <CategoryCard
                 key={c.slug}
                 to={`/shop/${c.slug}`}
                 name={pick(c.name)}
                 image={c.image}
-                eager={i === 0}
+                eager={index === 0}
               />
             ))}
           </div>

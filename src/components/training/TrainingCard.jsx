@@ -5,7 +5,7 @@ import SmartImage from '../common/SmartImage';
 import Price from '../common/Price';
 import Badge from '../common/Badge';
 
-export default function TrainingCard({ program }) {
+export default function TrainingCard({ program, eager = false }) {
   const { t, pick } = useLanguage();
   const to = `/online-training/${program.slug}`;
   return (
@@ -14,8 +14,11 @@ export default function TrainingCard({ program }) {
         <SmartImage
           src={program.coverImage}
           alt={pick(program.title)}
+          width={1312}
+          height={816}
+          sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="training-card-img"
-          eager
+          eager={eager}
         />
         <span className="training-card-play" aria-hidden="true">
           <Icon name="play" size={20} />

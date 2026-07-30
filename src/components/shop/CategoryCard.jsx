@@ -8,7 +8,15 @@ export default function CategoryCard({ to, name, image, eager = false }) {
   return (
     <Link to={to} className="category-card">
       <div className="category-card-media">
-        <SmartImage src={image} alt={pick(name)} className="category-card-img" eager={eager} />
+        <SmartImage
+          src={image}
+          alt={pick(name)}
+          width={1312}
+          height={820}
+          sizes="(min-width: 700px) 50vw, 100vw"
+          className="category-card-img"
+          eager={eager}
+        />
       </div>
       <span className="category-card-name">
         {pick(name)} <Icon name="arrow" size={18} />

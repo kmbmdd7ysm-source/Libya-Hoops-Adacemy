@@ -7,7 +7,7 @@ export const categories = [
   {
     slug: 'clothing',
     name: { en: 'Clothing', ar: 'الملابس' },
-    image: '/images/categories/clothing-hero-player.jpeg',
+    image: '/images/categories/clothing-hero-player.webp',
     subcategories: [
       {
         slug: 't-shirts',
@@ -50,7 +50,7 @@ export const categories = [
   {
     slug: 'accessories',
     name: { en: 'Accessories', ar: 'الإكسسوارات' },
-    image: '/images/categories/accessories-hero-player.jpeg',
+    image: '/images/categories/accessories-hero-player.webp',
     subcategories: [
       { slug: 'bags', name: { en: 'Bags', ar: 'حقائب' }, image: '/images/categories/bags.jpg' },
       { slug: 'socks', name: { en: 'Socks', ar: 'جوارب' }, image: '/images/products/performance-socks-black-white.webp' },

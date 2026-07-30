@@ -7,6 +7,7 @@ import Seo from '../components/common/Seo';
 import Price from '../components/common/Price';
 import { getCompareAction } from '../utils/productOptions';
 import Icon from '../components/icons/Icon';
+import SmartImage from '../components/common/SmartImage';
 export default function ComparePage() {
   const c = useCompare(),
     { pick } = useLanguage(),
@@ -72,7 +73,13 @@ export default function ComparePage() {
                         >
                           <Icon name="close" size={20} />
                         </button>
-                        <img src={p.image} alt={pick(p.name)} />
+                        <SmartImage
+                          src={p.image}
+                          alt={pick(p.name)}
+                          width={1000}
+                          height={1250}
+                          sizes="(min-width: 900px) 260px, 62vw"
+                        />
                         <Link to={`/products/${p.slug}`}>{pick(p.name)}</Link>
                         <Price amount={p.price} compareAt={p.compareAt} />
                         {(() => {

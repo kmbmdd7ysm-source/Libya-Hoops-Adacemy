@@ -10,7 +10,7 @@ import Seo from '../components/common/Seo';
 import AddressesSection from '../components/account/AddressesSection';
 import CurrencySelector from '../components/common/CurrencySelector';
 import Avatar from '../components/common/Avatar';
-import { errorText } from '../utils/errors';
+import { errorText, mapError } from '../utils/errors';
 import { createProfileImageDataUrl, validateProfileImage } from '../utils/profileImage';
 import { getMyOrders } from '../services/orders';
 import { safeInternalReturnPath } from '../utils/safeReturnPath';
@@ -44,15 +44,18 @@ export default function AccountPage() {
   const initialSection = ACCOUNT_SECTIONS.includes(requestedSection)
     ? requestedSection
     : 'overview';
-  const [mode, setMode] = useState(
-      params.get('mode') === 'reset-password' ? 'reset-password' : 'signin',
-    ),
+  const requestedMode = params.get('mode');
+  const initialMode = ['signin', 'signup', 'reset', 'reset-password'].includes(requestedMode)
+    ? requestedMode
+    : 'signin';
+  const [mode, setMode] = useState(initialMode),
     [section, setSection] = useState(initialSection),
     [email, setEmail] = useState(''),
     [password, setPassword] = useState(''),
     [fullName, setFullName] = useState(''),
     [confirmPassword, setConfirmPassword] = useState(''),
     [photoPreview, setPhotoPreview] = useState(''),
+    [verificationEmail, setVerificationEmail] = useState(''),
     [accountEmail, setAccountEmail] = useState(auth.user?.email || ''),
     [show, setShow] = useState(false),
     [busy, setBusy] = useState(false),
@@ -99,6 +102,30 @@ export default function AccountPage() {
       : 'overview';
     setSection(nextSection);
   }, [params]);
+  useEffect(() => {
+    const nextMode = params.get('mode');
+    if (['signin', 'signup', 'reset', 'reset-password'].includes(nextMode)) setMode(nextMode);
+  }, [params]);
+  useEffect(() => {
+    if (auth.loading || params.get('verified') !== '1') return;
+    setMode('signin');
+    setVerificationEmail(auth.user?.email || '');
+    setMsg(
+      auth.user
+        ? pick({
+            en: 'Email verified successfully. Your account is ready on every device.',
+            ar: 'تم تأكيد البريد بنجاح. حسابك جاهز لتسجيل الدخول من أي جهاز.',
+          })
+        : pick({
+            en: 'Email verified successfully. Sign in with your email and password on this or any other device.',
+            ar: 'تم تأكيد البريد بنجاح. سجّل الدخول ببريدك وكلمة المرور من هذا الجهاز أو أي جهاز آخر.',
+          }),
+    );
+    const nextParams = new URLSearchParams(params);
+    nextParams.delete('verified');
+    nextParams.delete('mode');
+    setParams(nextParams, { replace: true });
+  }, [auth.loading, auth.user?.id, params, pick, setParams]);
   useEffect(() => {
     if (!auth.user) return;
     setAccountEmail(auth.user.email || '');
@@ -218,6 +245,12 @@ export default function AccountPage() {
       else if (mode === 'reset-password') r = await auth.updatePassword(password);
       else r = await auth.signIn(normalizedEmail, password);
       if (r?.error) throw r.error;
+      if (mode === 'reset-password') setMode('signin');
+      if (mode === 'signup' && !r?.data?.session && auth.cloudConfigured) {
+        setVerificationEmail(normalizedEmail);
+      } else if (mode !== 'signin') {
+        setVerificationEmail('');
+      }
       setMsg(
         pick({
           en:
@@ -245,13 +278,15 @@ export default function AccountPage() {
       if (returnTo && mode === 'signin') navigate(returnTo, { replace: true });
       if (returnTo && mode === 'signup' && r?.data?.session) navigate(returnTo, { replace: true });
     } catch (x) {
-      setMsg(errorText(x, lang));
+      const mapped = mapError(x);
+      if (mapped.code === 'auth_unverified') setVerificationEmail(email.trim().toLowerCase());
+      setMsg(mapped.message[lang] || mapped.message.en);
       focusField(x.fieldRef);
     } finally {
       setBusy(false);
     }
   };
-  if (!auth.user)
+  if (!auth.user || mode === 'reset-password')
     return (
       <>
         <Seo title="Account" path="/account" />
@@ -335,6 +370,9 @@ export default function AccountPage() {
                     <img
                       src={photoPreview}
                       alt={pick({ en: 'Profile preview', ar: 'معاينة الصورة الشخصية' })}
+                      width="320"
+                      height="320"
+                      decoding="async"
                     />
                     <button type="button" onClick={clearPhotoPreview}>
                       {pick({ en: 'Remove', ar: 'إزالة' })}
@@ -414,19 +452,67 @@ export default function AccountPage() {
                 {msg}
               </p>
             )}
+            {verificationEmail && auth.cloudConfigured && !auth.user && (
+              <div className="account-verification-panel" role="status" aria-live="polite">
+                <strong>{pick({ en: 'Verify your email', ar: 'أكد بريدك الإلكتروني' })}</strong>
+                <p>
+                  {pick({
+                    en: `We sent a verification link to ${verificationEmail}. Open it, then you can sign in on any device.`,
+                    ar: `أرسلنا رابط التأكيد إلى ${verificationEmail}. افتحه وبعدها تقدر تسجل الدخول من أي جهاز.`,
+                  })}
+                </p>
+                <div className="account-verification-actions">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={busy}
+                    onClick={async () => {
+                      setBusy(true);
+                      try {
+                        const result = await auth.resendVerification(verificationEmail);
+                        if (result?.error) throw result.error;
+                        setMsg(
+                          pick({
+                            en: 'Verification email sent again. Check your inbox and spam folder.',
+                            ar: 'تم إرسال رابط التأكيد من جديد. راجع الوارد والرسائل غير المرغوب فيها.',
+                          }),
+                        );
+                      } catch (error) {
+                        setMsg(errorText(error, lang));
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    {pick({ en: 'Resend verification', ar: 'إعادة إرسال التأكيد' })}
+                  </button>
+                  <button
+                    type="button"
+                    className="account-verification-signin"
+                    onClick={() => {
+                      setMode('signin');
+                      setEmail(verificationEmail);
+                      setPassword('');
+                    }}
+                  >
+                    {pick({ en: 'Go to sign in', ar: 'الذهاب لتسجيل الدخول' })}
+                  </button>
+                </div>
+              </div>
+            )}
             <div className="account-switch">
               {mode !== 'signin' && (
-                <button type="button" onClick={() => setMode('signin')}>
+                <button type="button" onClick={() => { setMode('signin'); setVerificationEmail(''); setMsg(''); }}>
                   {pick({ en: 'Sign in', ar: 'تسجيل الدخول' })}
                 </button>
               )}
               {mode !== 'signup' && (
-                <button type="button" onClick={() => setMode('signup')}>
+                <button type="button" onClick={() => { setMode('signup'); setVerificationEmail(''); setMsg(''); }}>
                   {pick({ en: 'Create account', ar: 'إنشاء حساب' })}
                 </button>
               )}
               {mode === 'signin' && (
-                <button type="button" onClick={() => setMode('reset')}>
+                <button type="button" onClick={() => { setMode('reset'); setVerificationEmail(''); setMsg(''); }}>
                   {pick({ en: 'Forgot password?', ar: 'نسيت كلمة المرور؟' })}
                 </button>
               )}

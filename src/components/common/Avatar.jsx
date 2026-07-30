@@ -9,11 +9,14 @@ export function getInitials(name = '') {
   return `${first}${last}`.toLocaleUpperCase();
 }
 
+const AVATAR_DIMENSIONS = { small: 32, medium: 48, large: 72 };
+
 export default function Avatar({ name, src, size = 'medium', className = '' }) {
   const { pick } = useLanguage();
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [src]);
   const initials = useMemo(() => getInitials(name), [name]);
+  const dimension = AVATAR_DIMENSIONS[size] || AVATAR_DIMENSIONS.medium;
   const label = pick({
     en: `${name || 'User'} profile photo`,
     ar: `الصورة الشخصية لـ ${name || 'المستخدم'}`,
@@ -21,7 +24,14 @@ export default function Avatar({ name, src, size = 'medium', className = '' }) {
   return (
     <span className={`avatar avatar-${size} ${className}`.trim()} role="img" aria-label={label}>
       {src && !failed ? (
-        <img src={src} alt="" onError={() => setFailed(true)} />
+        <img
+          src={src}
+          alt=""
+          width={dimension}
+          height={dimension}
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
       ) : (
         <span aria-hidden="true">{initials}</span>
       )}

@@ -6,7 +6,7 @@ import SmartImage from '../common/SmartImage';
 import Badge from '../common/Badge';
 import Price from '../common/Price';
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, eager = false }) {
   const { t, pick, lang } = useLanguage();
   const to = `/events/${event.slug}`;
   const comingSoon = event.comingSoon === true;
@@ -15,7 +15,15 @@ export default function EventCard({ event }) {
   return (
     <article className="event-card">
       <Link to={to} className="event-card-media" aria-label={pick(event.title)}>
-        <SmartImage src={event.coverImage} alt={pick(event.title)} className="event-card-img" eager />
+        <SmartImage
+          src={event.coverImage}
+          alt={pick(event.title)}
+          width={1312}
+          height={816}
+          sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="event-card-img"
+          eager={eager}
+        />
         <div className="event-card-badges">
           {comingSoon && <Badge tone="limited">{pick({ en: 'Coming Soon', ar: 'قريباً' })}</Badge>}
           {!comingSoon && ended && <Badge tone="sold">{t.events.ended}</Badge>}

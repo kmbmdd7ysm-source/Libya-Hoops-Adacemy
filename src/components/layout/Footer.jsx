@@ -78,16 +78,18 @@ export default function Footer() {
       <div className="container footer-mid">
         <div className="footer-payments" aria-label={t.footer.payments}>
           {[
-            ['visa', 'Visa'],
-            ['mastercard', 'Mastercard'],
-            ['apple-pay', 'Apple Pay'],
-            ['google-pay', 'Google Pay'],
-            ['samsung-pay', 'Samsung Pay'],
-          ].map(([key, label]) => (
+            ['visa', 'Visa', 443, 148],
+            ['mastercard', 'Mastercard', 435, 260],
+            ['apple-pay', 'Apple Pay', 512, 216],
+            ['google-pay', 'Google Pay', 535, 260],
+            ['samsung-pay', 'Samsung Pay', 602, 103],
+          ].map(([key, label, width, height]) => (
             <img
               key={key}
               src={`/images/payments/${key}.png`}
               alt={label}
+              width={width}
+              height={height}
               className={`payment-logo payment-logo--${key}`}
               loading="lazy"
             />
