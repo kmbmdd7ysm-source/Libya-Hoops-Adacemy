@@ -4,6 +4,7 @@ const STORAGE_KEY = 'lha-orders-v3';
 const LEGACY_KEYS = ['lha-orders-v2'];
 const MAX_ORDERS = 50;
 const SCHEMA_VERSION = 3;
+const CLOUD_ORDER_HISTORY_KEY = 'orderHistory';
 const clean = (value = '') => String(value).trim();
 const emailKey = (value = '') => clean(value).toLowerCase();
 const safeNumber = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
@@ -208,6 +209,112 @@ async function invokeOrderFunction(name, body) {
   return { data, error: error || null };
 }
 
+function orderIdentity(order) {
+  return clean(
+    order?.idempotencyKey ||
+      order?.idempotency_key ||
+      order?.orderNumber ||
+      order?.order_number,
+  );
+}
+
+function mergeOrderLists(...groups) {
+  const merged = new Map();
+  groups.flat().filter(Boolean).forEach((raw) => {
+    const order = normalizeOrder(raw);
+    const key = orderIdentity(order) || order.id;
+    const current = merged.get(key);
+    const orderTime = Number(new Date(order.updatedAt || order.createdAt));
+    const currentTime = current
+      ? Number(new Date(current.updatedAt || current.createdAt))
+      : Number.NEGATIVE_INFINITY;
+    const orderIsSynced = order.syncState === 'synced' || order.source === 'cloud';
+    const currentIsSynced = current?.syncState === 'synced' || current?.source === 'cloud';
+    if (
+      !current ||
+      orderTime > currentTime ||
+      (orderTime === currentTime && orderIsSynced && !currentIsSynced)
+    ) {
+      merged.set(key, order);
+    }
+  });
+  return [...merged.values()]
+    .sort((a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt)))
+    .slice(0, MAX_ORDERS);
+}
+
+async function readCloudOrderHistory(userId) {
+  const supabase = await getSupabase();
+  if (!supabase || !userId) throw new Error('cloud_unconfigured');
+  const { data, error } = await supabase
+    .from('user_state')
+    .select('preferences')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  const preferences =
+    data?.preferences && typeof data.preferences === 'object' ? data.preferences : {};
+  const orders = Array.isArray(preferences[CLOUD_ORDER_HISTORY_KEY])
+    ? preferences[CLOUD_ORDER_HISTORY_KEY]
+    : [];
+  return orders.map((order) =>
+    normalizeOrder({ ...order, userId, source: 'cloud', syncState: 'synced' }),
+  );
+}
+
+async function writeCloudOrderHistory(userId, orders) {
+  const supabase = await getSupabase();
+  if (!supabase || !userId) throw new Error('cloud_unconfigured');
+  const { data: current, error: readError } = await supabase
+    .from('user_state')
+    .select('preferences')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (readError) throw readError;
+  const existingPreferences =
+    current?.preferences && typeof current.preferences === 'object' ? current.preferences : {};
+  const preferences = {
+    ...existingPreferences,
+    [CLOUD_ORDER_HISTORY_KEY]: mergeOrderLists(orders).map((order) => ({
+      ...order,
+      source: 'cloud',
+      syncState: 'synced',
+    })),
+  };
+  let query;
+  if (current) {
+    query = supabase
+      .from('user_state')
+      .update({ preferences, updated_at: new Date().toISOString() })
+      .eq('user_id', userId);
+  } else {
+    query = supabase.from('user_state').upsert(
+      {
+        user_id: userId,
+        cart: [],
+        wishlist: [],
+        compare: [],
+        recently_viewed: [],
+        preferences,
+        version: 1,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' },
+    );
+  }
+  const { error } = await query;
+  if (error) throw error;
+  return preferences[CLOUD_ORDER_HISTORY_KEY];
+}
+
+async function saveCloudHistoryOrder(order) {
+  if (!order.userId) throw new Error('user_required');
+  const existing = await readCloudOrderHistory(order.userId);
+  const synced = normalizeOrder({ ...order, source: 'cloud', syncState: 'synced' });
+  await writeCloudOrderHistory(order.userId, mergeOrderLists(synced, existing));
+  return synced;
+}
+
 export async function createOrder(input, options = {}) {
   const candidate = normalizeOrder({
     ...input,
@@ -235,11 +342,45 @@ export async function createOrder(input, options = {}) {
       payload,
     );
     if (!cloud.error && cloud.data?.order) {
-      const order = normalizeOrder({ ...cloud.data.order, source: 'cloud', syncState: 'synced' });
-      if (isCash) saveLocal(order);
+      const serverOrder = cloud.data.order;
+      const order = normalizeOrder({
+        ...candidate,
+        ...serverOrder,
+        orderNumber: serverOrder.order_number || serverOrder.orderNumber || candidate.orderNumber,
+        idempotencyKey:
+          serverOrder.idempotency_key || serverOrder.idempotencyKey || candidate.idempotencyKey,
+        items: serverOrder.order_items || serverOrder.items_snapshot || candidate.items,
+        displayCurrency: candidate.displayCurrency,
+        displaySubtotal: candidate.displaySubtotal,
+        displayShippingTotal: candidate.displayShippingTotal,
+        displayTotal: candidate.displayTotal,
+        customer: candidate.customer,
+        shipping: serverOrder.shipping_summary || candidate.shipping,
+        shippingRate: candidate.shippingRate,
+        source: 'cloud',
+        syncState: 'synced',
+      });
+      saveLocal(order);
+      if (candidate.userId) {
+        try {
+          await saveCloudHistoryOrder(order);
+        } catch {}
+      }
       return { order, source: 'cloud', duplicate: Boolean(cloud.data.duplicate), warning: null };
     }
     if (!isCash) throw new Error('cloud_order_creation_failed', { cause: cloud.error });
+    if (candidate.userId) {
+      try {
+        const order = await saveCloudHistoryOrder(candidate);
+        saveLocal(order);
+        return {
+          order,
+          source: 'cloud',
+          duplicate: false,
+          warning: cloud.error ? 'order_api_unavailable_history_synced' : null,
+        };
+      } catch {}
+    }
     const local = saveLocal({ ...candidate, source: 'local', syncState: 'local-only' });
     return {
       order: local.order,
@@ -268,6 +409,10 @@ function mapCloudOrder(row) {
     email: row.customer_email,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    displayCurrency: row.display_currency || row.displayCurrency || row.currency,
+    displaySubtotal: row.display_subtotal ?? row.displaySubtotal,
+    displayShippingTotal: row.display_shipping_total ?? row.displayShippingTotal,
+    displayTotal: row.display_total ?? row.displayTotal,
     shippingTotal: row.shipping_total,
     taxTotal: row.tax_total,
     discountTotal: row.discount_total,
@@ -275,6 +420,7 @@ function mapCloudOrder(row) {
     paymentStatus: row.payment_status,
     orderStatus: row.order_status,
     fulfillmentStatus: row.fulfillment_status,
+    customer: row.customer_summary || row.customer || {},
     shipping: row.shipping_summary,
     items: row.order_items || row.items_snapshot || [],
     source: 'cloud',
@@ -294,37 +440,71 @@ export async function getMyOrders(userId) {
       source: 'local',
       error: local.error || (localOrders.length ? new Error('cloud_unconfigured') : null),
     };
+
+  let tableOrders = [];
+  let historyOrders = [];
+  let tableError = null;
+  let historyError = null;
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(*)')
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) throw error;
-    const cloudOrders = (data || []).map(mapCloudOrder);
-    const merged = [
-      ...cloudOrders,
-      ...localOrders.filter(
-        (localOrder) =>
-          !cloudOrders.some(
-            (cloudOrder) => cloudOrder.idempotencyKey === localOrder.idempotencyKey,
-          ),
-      ),
-    ];
-    return {
-      state: local.error ? 'partial' : 'success',
-      orders: merged,
-      source: localOrders.length ? 'mixed' : 'cloud',
-      error: local.error,
-    };
+    tableOrders = (data || []).map(mapCloudOrder);
   } catch (error) {
-    return {
-      state: localOrders.length ? 'partial' : 'error',
-      orders: localOrders,
-      source: 'local',
-      error,
-    };
+    tableError = error;
   }
+  try {
+    historyOrders = await readCloudOrderHistory(userId);
+  } catch (error) {
+    historyError = error;
+  }
+
+  let cloudOrders = mergeOrderLists(tableOrders, historyOrders);
+  const localOnly = localOrders.filter(
+    (localOrder) =>
+      !cloudOrders.some(
+        (cloudOrder) =>
+          cloudOrder.idempotencyKey === localOrder.idempotencyKey ||
+          (localOrder.orderNumber && cloudOrder.orderNumber === localOrder.orderNumber),
+      ),
+  );
+
+  if (!historyError && localOnly.length) {
+    try {
+      const promoted = localOnly.map((order) =>
+        normalizeOrder({ ...order, userId, source: 'cloud', syncState: 'synced' }),
+      );
+      await writeCloudOrderHistory(userId, mergeOrderLists(promoted, cloudOrders));
+      cloudOrders = mergeOrderLists(promoted, cloudOrders);
+      const allLocal = readLocalOrders();
+      if (!allLocal.error) {
+        const promotedKeys = new Set(promoted.map((order) => orderIdentity(order)));
+        writeLocalOrders(
+          allLocal.orders.map((order) =>
+            promotedKeys.has(orderIdentity(order))
+              ? normalizeOrder({ ...order, source: 'cloud', syncState: 'synced' })
+              : order,
+          ),
+        );
+      }
+    } catch (error) {
+      historyError = error;
+    }
+  }
+
+  const merged = mergeOrderLists(cloudOrders, localOrders);
+  const cloudAvailable = !historyError || !tableError;
+  const cloudHasData = cloudOrders.length > 0;
+  const error = local.error || (cloudAvailable ? null : historyError || tableError);
+  return {
+    state: error ? (merged.length ? 'partial' : 'error') : 'success',
+    orders: merged,
+    source: cloudHasData ? (localOrders.length ? 'mixed' : 'cloud') : 'local',
+    error,
+  };
 }
 
 export async function lookupGuestOrder(orderNumber, email) {

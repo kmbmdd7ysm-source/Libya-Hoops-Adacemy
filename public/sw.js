@@ -1,7 +1,7 @@
 /* LHA service worker: public content only. Private/auth/payment requests are always network-only. */
-const VERSION='lha-v5-20260729-performance-auth',STATIC=`${VERSION}-static`,MEDIA=`${VERSION}-media`,PAGES=`${VERSION}-pages`;
+const VERSION='lha-v6-20260730-order-sync-route',STATIC=`${VERSION}-static`,MEDIA=`${VERSION}-media`,PAGES=`${VERSION}-pages`;
 const CORE=['/','/offline','/favicon.svg','/site.webmanifest','/brand/lha-mark-black.png','/brand/lha-mark-white.png','/brand/lha-wordmark-black.svg','/brand/lha-wordmark-white.svg','/media/hero/lha-hero-poster.webp'];
-const PRIVATE=/\/auth\b|\/account\b|\/checkout\b|supabase\.co\/auth|\/rest\/v1\/(profiles|user_state|addresses)/i;
+const PRIVATE=/\/auth\b|\/account\b|\/checkout\b|\/order-tracking\b|supabase\.co\/auth|\/rest\/v1\/(profiles|user_state|addresses)/i;
 const limit=async(name,max)=>{const c=await caches.open(name),keys=await c.keys();await Promise.all(keys.slice(0,Math.max(0,keys.length-max)).map(k=>c.delete(k)))};
 self.addEventListener('install',e=>e.waitUntil(caches.open(STATIC).then(c=>c.addAll(CORE))));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(![STATIC,MEDIA,PAGES].includes(k))await caches.delete(k);await self.clients.claim()})()));

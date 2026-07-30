@@ -105,10 +105,17 @@ export function UserDataProvider({ children }) {
     setStatus('syncing');
     (async () => {
       try {
-        const [cloud, p] = await Promise.all([fetchCloudState(uid), fetchProfile(uid)]);
+        const [cloudResult, profileResult] = await Promise.allSettled([
+          fetchCloudState(uid),
+          fetchProfile(uid),
+        ]);
+        if (cloudResult.status === 'rejected') throw cloudResult.reason;
         if (abort.current.signal.aborted) return;
-        const { state, notices: nextNotices } = reconcileState(local, cloud || {});
-        apply({ ...state, profile: p || {} });
+        const cloud = cloudResult.value || {};
+        const profileResultValue =
+          profileResult.status === 'fulfilled' ? profileResult.value || {} : {};
+        const { state, notices: nextNotices } = reconcileState(local, cloud);
+        apply({ ...state, profile: profileResultValue });
         setNotices(nextNotices);
         await upsertCloudState(uid, { ...state, version: state.version });
         version.current = state.version;

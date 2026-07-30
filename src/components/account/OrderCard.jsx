@@ -43,7 +43,7 @@ export default function OrderCard({ order, compact = false }) {
         <div>
           <dt>{pick({ en: 'Total', ar: 'الإجمالي' })}</dt>
           <dd>
-            {order.total.toFixed(2)} {order.displayCurrency}
+            {(order.displayTotal ?? order.total).toFixed(2)} {order.displayCurrency}
           </dd>
         </div>
       </dl>

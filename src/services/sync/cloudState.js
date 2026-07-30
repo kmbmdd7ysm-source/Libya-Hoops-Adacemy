@@ -13,13 +13,21 @@ export async function fetchCloudState(userId) {
 export async function upsertCloudState(userId, state) {
   const s = await getSupabase();
   if (!s || !userId) return null;
+  const { data: current, error: readError } = await s
+    .from('user_state')
+    .select('preferences')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (readError) throw readError;
+  const existingPreferences =
+    current?.preferences && typeof current.preferences === 'object' ? current.preferences : {};
   const payload = {
     user_id: userId,
     cart: state.cart || [],
     wishlist: state.wishlist || [],
     compare: state.compare || [],
     recently_viewed: state.recentlyViewed || [],
-    preferences: state.preferences || {},
+    preferences: { ...existingPreferences, ...(state.preferences || {}) },
     version: Number(state.version || 1),
     updated_at: new Date().toISOString(),
   };
