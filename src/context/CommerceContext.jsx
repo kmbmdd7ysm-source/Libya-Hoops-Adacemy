@@ -59,6 +59,15 @@ export function CommerceProvider({ children }) {
   const explicitCountry = useRef(false);
 
   useEffect(() => {
+    // USD visitors already have every amount they need. Avoid booting the
+    // cloud client on the anonymous home page; fetch the authoritative rate
+    // only when LYD is actually selected or an authenticated profile needs it.
+    if (currency !== 'LYD' && !userId) {
+      setUsdToLydRate(SAFE_USD_TO_LYD_FALLBACK);
+      setRateStatus('fallback');
+      return undefined;
+    }
+
     let active = true;
     setRateStatus('loading');
     fetchUsdToLydRate()
@@ -75,7 +84,7 @@ export function CommerceProvider({ children }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [currency, userId]);
 
   useEffect(() => {
     channel.current = createChannel('lha-commerce', (message) => {
@@ -126,20 +135,55 @@ export function CommerceProvider({ children }) {
 
   useEffect(() => {
     // Geo defaults apply only before the visitor has made an explicit choice.
-    if (hasCountryPreference(userId) || hasCurrencyPreference(userId)) return;
+    if (hasCountryPreference(userId) || hasCurrencyPreference(userId)) return undefined;
     let active = true;
-    const controller = new AbortController();
-    fetch('/api/geo', { cache: 'no-store', signal: controller.signal })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((geo) => {
-        if (!active || geo?.country !== 'LY' || explicitCurrency.current || explicitCountry.current) return;
-        setCountryState('LY');
-        setCurrencyState('LYD');
-        writeCountryPreference(userId, 'LY');
-        writeCurrencyPreference(userId, 'LYD');
-      })
-      .catch(() => {});
-    return () => { active = false; controller.abort(); };
+    let started = false;
+    let controller;
+
+    const removeListeners = () => {
+      globalThis.removeEventListener?.('pointerdown', startGeoLookup);
+      globalThis.removeEventListener?.('touchstart', startGeoLookup);
+      globalThis.removeEventListener?.('keydown', startGeoLookup);
+    };
+
+    function startGeoLookup() {
+      if (started || !active) return;
+      started = true;
+      removeListeners();
+      controller = new AbortController();
+      fetch('/api/geo', { cache: 'no-store', signal: controller.signal })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((geo) => {
+          if (
+            !active ||
+            geo?.country !== 'LY' ||
+            explicitCurrency.current ||
+            explicitCountry.current
+          )
+            return;
+          setCountryState('LY');
+          setCurrencyState('LYD');
+          writeCountryPreference(userId, 'LY');
+          writeCurrencyPreference(userId, 'LYD');
+        })
+        .catch(() => {});
+    }
+
+    const needsImmediateGeo = /^\/checkout(?:\/|$)/.test(globalThis.location?.pathname || '');
+    if (needsImmediateGeo) {
+      startGeoLookup();
+    } else {
+      const options = { once: true, passive: true };
+      globalThis.addEventListener?.('pointerdown', startGeoLookup, options);
+      globalThis.addEventListener?.('touchstart', startGeoLookup, options);
+      globalThis.addEventListener?.('keydown', startGeoLookup, { once: true });
+    }
+
+    return () => {
+      active = false;
+      removeListeners();
+      controller?.abort();
+    };
   }, [userId]);
 
   const persistCloud = useCallback(

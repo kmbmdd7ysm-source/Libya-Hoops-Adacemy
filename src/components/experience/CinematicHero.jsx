@@ -6,6 +6,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
 export default function CinematicHero() {
   const { t, pick } = useLanguage();
   const video = useRef(null);
+  const enableTimer = useRef(null);
   const [failed, setFailed] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
   const reduced = useReducedMotion();
@@ -15,14 +16,23 @@ export default function CinematicHero() {
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (connection?.saveData) return undefined;
 
-    const enable = () => setVideoEnabled(true);
+    // Phones keep the lightweight poster. The cinematic video is an optional
+    // desktop enhancement and never competes with mobile LCP or data usage.
+    const capable = globalThis.matchMedia?.(
+      '(min-width: 900px) and (hover: hover) and (pointer: fine)',
+    );
+    if (!capable?.matches) return undefined;
+
+    const enable = () => {
+      clearTimeout(enableTimer.current);
+      enableTimer.current = setTimeout(() => setVideoEnabled(true), 900);
+    };
     const options = { once: true, passive: true };
     window.addEventListener('pointerdown', enable, options);
-    window.addEventListener('touchstart', enable, options);
     window.addEventListener('keydown', enable, { once: true });
     return () => {
+      clearTimeout(enableTimer.current);
       window.removeEventListener('pointerdown', enable);
-      window.removeEventListener('touchstart', enable);
       window.removeEventListener('keydown', enable);
     };
   }, [reduced]);
@@ -35,15 +45,18 @@ export default function CinematicHero() {
   return (
     <section className="hero cinematic-hero">
       <div className="hero-media" aria-hidden="true">
-        <img
-          className="hero-poster"
-          src="/media/hero/lha-hero-poster.webp"
-          alt=""
-          width="1940"
-          height="1024"
-          fetchPriority="high"
-          decoding="async"
-        />
+        <picture className="hero-poster-picture">
+          <source media="(max-width: 767px)" srcSet="/media/hero/lha-hero-poster-mobile.webp" />
+          <img
+            className="hero-poster"
+            src="/media/hero/lha-hero-poster.webp"
+            alt=""
+            width="1940"
+            height="1024"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         {videoEnabled && !failed && (
           <video
             ref={video}
@@ -67,14 +80,30 @@ export default function CinematicHero() {
         </p>
         <h1 className="hero-title display-title">
           {pick({
-            en: <><span>OWN THE</span><br /><span className="outline">GAME.</span></>,
-            ar: <><span>امتلك</span><br /><span className="outline">اللعبة.</span></>,
+            en: (
+              <>
+                <span>OWN THE</span>
+                <br />
+                <span className="outline">GAME.</span>
+              </>
+            ),
+            ar: (
+              <>
+                <span>امتلك</span>
+                <br />
+                <span className="outline">اللعبة.</span>
+              </>
+            ),
           })}
         </h1>
         <p className="hero-text">{t.home.heroText}</p>
         <div className="hero-actions">
-          <Link to="/programs" className="btn-primary block">{t.common.explorePrograms}</Link>
-          <Link to="/shop" className="btn-secondary block">{t.common.shopNow}</Link>
+          <Link to="/programs" className="btn-primary block">
+            {t.common.explorePrograms}
+          </Link>
+          <Link to="/shop" className="btn-secondary block">
+            {t.common.shopNow}
+          </Link>
         </div>
       </div>
       <a className="hero-scroll" href="#home-story">

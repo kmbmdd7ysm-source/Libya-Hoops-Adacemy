@@ -59,8 +59,19 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let sub;
     let alive = true;
+    let started = false;
 
-    (async () => {
+    const removeBootstrapListeners = () => {
+      globalThis.removeEventListener?.('pointerdown', startBootstrap);
+      globalThis.removeEventListener?.('touchstart', startBootstrap);
+      globalThis.removeEventListener?.('keydown', startBootstrap);
+      globalThis.removeEventListener?.('lha:auth-needed', startBootstrap);
+    };
+
+    async function startBootstrap() {
+      if (started || !alive) return;
+      started = true;
+      removeBootstrapListeners();
       try {
         const s = await getSupabase();
         if (!alive) return;
@@ -99,10 +110,41 @@ export function AuthProvider({ children }) {
       } finally {
         if (alive) setLoading(false);
       }
-    })();
+    }
+
+    const location = globalThis.location;
+    const path = location?.pathname || '/';
+    const directAuthRoute = /^\/(account|checkout|orders|order-tracking)(?:\/|$)/.test(path);
+    const authCallback = Boolean(
+      location &&
+        (/[#?](?:access_token|refresh_token|code|token_hash|error)=/.test(
+          `${location.search}${location.hash}`,
+        ) || new URLSearchParams(location.search).has('verified')),
+    );
+    let storedCloudSession = false;
+    try {
+      storedCloudSession = Boolean(globalThis.localStorage?.getItem('lha-auth-session-v1'));
+    } catch {
+      storedCloudSession = false;
+    }
+
+    if (directAuthRoute || authCallback || storedCloudSession) {
+      void startBootstrap();
+    } else {
+      // Anonymous visitors do not need the authentication SDK or its network
+      // requests for the first home-page paint. The first real interaction
+      // starts it before any account navigation can complete.
+      setLoading(false);
+      const options = { once: true, passive: true };
+      globalThis.addEventListener?.('pointerdown', startBootstrap, options);
+      globalThis.addEventListener?.('touchstart', startBootstrap, options);
+      globalThis.addEventListener?.('keydown', startBootstrap, { once: true });
+      globalThis.addEventListener?.('lha:auth-needed', startBootstrap, { once: true });
+    }
 
     return () => {
       alive = false;
+      removeBootstrapListeners();
       sub?.unsubscribe();
     };
   }, []);

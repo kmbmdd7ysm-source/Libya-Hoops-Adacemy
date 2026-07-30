@@ -13,20 +13,24 @@ export default function ViewportGuard() {
 
   useEffect(() => {
     const resetDocumentX = () => {
+      const rootX = document.documentElement.scrollLeft;
+      const bodyX = document.body.scrollLeft;
+      if (window.scrollX === 0 && rootX === 0 && bodyX === 0) return false;
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
       if (window.scrollX !== 0) window.scrollTo({ left: 0, top: window.scrollY, behavior: 'auto' });
+      return true;
     };
 
-    resetDocumentX();
-    const frame = requestAnimationFrame(resetDocumentX);
+    const corrected = resetDocumentX();
+    const frame = corrected ? requestAnimationFrame(resetDocumentX) : 0;
     const visualViewport = window.visualViewport;
     window.addEventListener('resize', resetDocumentX, { passive: true });
     window.addEventListener('orientationchange', resetDocumentX, { passive: true });
     visualViewport?.addEventListener('resize', resetDocumentX, { passive: true });
 
     return () => {
-      cancelAnimationFrame(frame);
+      if (frame) cancelAnimationFrame(frame);
       window.removeEventListener('resize', resetDocumentX);
       window.removeEventListener('orientationchange', resetDocumentX);
       visualViewport?.removeEventListener('resize', resetDocumentX);

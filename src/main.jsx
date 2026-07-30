@@ -13,8 +13,6 @@ import App from './App';
 import './styles/global.css';
 import './styles/premium.css';
 import './styles/account-sync.css';
-import { registerPwa } from './utils/registerPwa';
-import { retryPendingFormspree } from './services/formspree';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -41,15 +39,31 @@ createRoot(document.getElementById('root')).render(
 );
 
 if (typeof window !== 'undefined') {
+  let backgroundStarted = false;
+  let backgroundTimer;
   const startBackgroundTasks = () => {
-    const run = () => {
-      registerPwa();
-      retryPendingFormspree().catch(() => {});
-    };
-    if ('requestIdleCallback' in window) window.requestIdleCallback(run, { timeout: 2000 });
-    else window.setTimeout(run, 400);
+    if (backgroundStarted) return;
+    backgroundStarted = true;
+    clearTimeout(backgroundTimer);
+    window.removeEventListener('pointerdown', startBackgroundTasks);
+    window.removeEventListener('keydown', startBackgroundTasks);
+    Promise.all([import('./utils/registerPwa'), import('./services/formspree')])
+      .then(([pwa, formspree]) => {
+        pwa.registerPwa();
+        return formspree.retryPendingFormspree();
+      })
+      .catch(() => {});
   };
-  if (document.readyState === 'complete') startBackgroundTasks();
-  else window.addEventListener('load', startBackgroundTasks, { once: true });
-  window.addEventListener('online', () => retryPendingFormspree().catch(() => {}));
+
+  // Service-worker installation downloads the offline shell. Keep it out of the
+  // mobile critical path, then start it on real use or after the page has been
+  // comfortably interactive.
+  window.addEventListener('pointerdown', startBackgroundTasks, { once: true, passive: true });
+  window.addEventListener('keydown', startBackgroundTasks, { once: true });
+  backgroundTimer = window.setTimeout(startBackgroundTasks, 20000);
+  window.addEventListener('online', () => {
+    import('./services/formspree')
+      .then(({ retryPendingFormspree }) => retryPendingFormspree())
+      .catch(() => {});
+  });
 }

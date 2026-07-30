@@ -1915,3 +1915,40 @@ main,
 .event-card-img,
 .training-card-img,
 .coach-card-img { display: block; }
+
+/* Mobile performance hardening: preserve the visual design while keeping the
+   first paint limited to the poster and above-the-fold content. */
+.hero-poster-picture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hero-poster-picture > .hero-poster {
+  width: 100%;
+  height: 100%;
+}
+.home-deferred-anchor {
+  min-height: clamp(720px, 100vh, 980px);
+}
+.home-deferred-anchor.is-ready {
+  min-height: 0;
+}
+
+@media (max-width: 767px) {
+  .cinematic-hero .hero-title,
+  .cinematic-hero .hero-kicker,
+  .cinematic-hero .hero-text,
+  .cinematic-hero .hero-actions {
+    animation: none !important;
+    will-change: auto;
+  }
+}
+.deferred-footer {
+  min-height: min(560px, 70vh);
+}
+.deferred-footer.is-ready {
+  min-height: 0;
+}

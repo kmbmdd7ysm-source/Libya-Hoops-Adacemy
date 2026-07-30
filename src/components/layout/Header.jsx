@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { SITE } from '../../config';
 import { useLanguage } from '../../context/LanguageContext';
@@ -9,10 +9,11 @@ import { useWishlist } from '../../hooks/useWishlist';
 import { trackEvent } from '../../utils/analytics';
 import { mainNav, megaMenu } from '../../data/navigation';
 import AnnouncementBar from './AnnouncementBar';
-import SearchOverlay from './SearchOverlay';
 import CurrencySelector from '../common/CurrencySelector';
 
 import Icon from '../icons/Icon';
+
+const SearchOverlay = lazy(() => import('./SearchOverlay'));
 
 export default function Header() {
   const { t, pick, lang, setLang } = useLanguage();
@@ -232,7 +233,7 @@ export default function Header() {
         aria-hidden={!mobileOpen}
       >
         <div className="mobile-menu-head">
-          <Link to="/" className="brand" onClick={close}>
+          <Link to="/" className="brand" onClick={close} aria-label={SITE.name}>
             <img src={SITE.logo} alt="" width="415" height="482" className="brand-logo brand-logo--header" />
           </Link>
           <button className="icon-btn" onClick={close} aria-label={t.a11y.closeMenu}>
@@ -347,11 +348,15 @@ export default function Header() {
           </button>
         </div>
       </nav>
-      <SearchOverlay
-        open={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        triggerRef={searchButton}
-      />
+      {searchOpen && (
+        <Suspense fallback={null}>
+          <SearchOverlay
+            open
+            onClose={() => setSearchOpen(false)}
+            triggerRef={searchButton}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

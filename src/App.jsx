@@ -2,9 +2,9 @@ import { lazy, Suspense } from 'react';
 import Home from './pages/HomePage';
 import { Navigate, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
+import DeferredFooter from './components/layout/DeferredFooter';
 import CookieBanner from './components/layout/CookieBanner';
-import CartDrawer from './components/layout/CartDrawer';
+import DeferredCartDrawer from './components/layout/DeferredCartDrawer';
 import ScrollToTop from './components/layout/ScrollToTop';
 import ViewportGuard from './components/layout/ViewportGuard';
 import LoadingScreen from './components/common/LoadingScreen';
@@ -90,8 +90,8 @@ export default function App() {
           </Suspense>
         </RouteExperience>
       </main>
-      <Footer />
-      <CartDrawer />
+      <DeferredFooter />
+      <DeferredCartDrawer />
       <CookieBanner />
       <PwaPrompt />
     </>
