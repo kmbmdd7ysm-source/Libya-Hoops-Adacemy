@@ -19,12 +19,10 @@ export default function CinematicHero() {
     const options = { once: true, passive: true };
     window.addEventListener('pointerdown', enable, options);
     window.addEventListener('touchstart', enable, options);
-    window.addEventListener('scroll', enable, options);
     window.addEventListener('keydown', enable, { once: true });
     return () => {
       window.removeEventListener('pointerdown', enable);
       window.removeEventListener('touchstart', enable);
-      window.removeEventListener('scroll', enable);
       window.removeEventListener('keydown', enable);
     };
   }, [reduced]);
@@ -53,7 +51,7 @@ export default function CinematicHero() {
             loop
             playsInline
             autoPlay
-            preload="metadata"
+            preload="none"
             poster="/media/hero/lha-hero-poster.webp"
             width="1940"
             height="1024"
@@ -79,7 +77,12 @@ export default function CinematicHero() {
           <Link to="/shop" className="btn-secondary block">{t.common.shopNow}</Link>
         </div>
       </div>
-      <a className="hero-scroll" href="#home-story" aria-label="Scroll to content"><span /></a>
+      <a className="hero-scroll" href="#home-story">
+        <span className="sr-only">
+          {pick({ en: 'Scroll to academy content', ar: 'انتقل إلى محتوى الأكاديمية' })}
+        </span>
+        <span className="hero-scroll-dot" aria-hidden="true" />
+      </a>
     </section>
   );
 }

@@ -596,7 +596,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 20px;
 }
-.hero-scroll span {
+.hero-scroll-dot {
   display: block;
   width: 4px;
   height: 8px;

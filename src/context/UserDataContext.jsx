@@ -50,14 +50,20 @@ export function UserDataProvider({ children }) {
     channel = useRef(null),
     version = useRef(0);
   const snapshot = useCallback(
-    () => ({
-      cart: cart.items,
-      wishlist,
-      compare: normalizeIds(compare.ids),
-      recentlyViewed: recent,
-      preferences: profile,
-      version: version.current,
-    }),
+    () => {
+      // The avatar is stored in public.profiles and auth metadata. Keeping the base64
+      // image out of user_state prevents large repeat sync payloads on every cart or
+      // wishlist change while preserving all normal preferences.
+      const { avatarUrl: _avatarUrl, avatar_url: _avatar_url, ...syncPreferences } = profile;
+      return {
+        cart: cart.items,
+        wishlist,
+        compare: normalizeIds(compare.ids),
+        recentlyViewed: recent,
+        preferences: syncPreferences,
+        version: version.current,
+      };
+    },
     [cart.items, wishlist, compare.ids, recent, profile],
   );
   const apply = useCallback(

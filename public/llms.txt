@@ -1,0 +1,23 @@
+# Libya Hoops Academy
+
+> Libya Hoops Academy (LHA) provides basketball development programs, online training, events, coaching profiles, and academy sportswear in English and Arabic.
+
+## Main pages
+
+- [Home](https://www.libyahoopsacademy.com/): Academy overview and featured programs, training, events, coaches, and products.
+- [Programs](https://www.libyahoopsacademy.com/programs): In-person basketball development programs.
+- [Online Training](https://www.libyahoopsacademy.com/online-training): Remote basketball and athletic performance plans.
+- [Events](https://www.libyahoopsacademy.com/events): Upcoming LHA events and registration information.
+- [Coaches](https://www.libyahoopsacademy.com/coaches): Coaching profiles and experience.
+- [Shop](https://www.libyahoopsacademy.com/shop): LHA clothing and accessories.
+- [Account](https://www.libyahoopsacademy.com/account): Secure account access, profile, saved items, addresses, and orders.
+- [Order Tracking](https://www.libyahoopsacademy.com/order-tracking): Order lookup and status details.
+- [Contact](https://www.libyahoopsacademy.com/contact): Contact and support form.
+
+## Policies and help
+
+- [Help](https://www.libyahoopsacademy.com/help): Customer support information.
+- [FAQ](https://www.libyahoopsacademy.com/faq): Frequently asked questions.
+- [Shipping and Returns](https://www.libyahoopsacademy.com/shipping-returns): Delivery and return information.
+- [Privacy Policy](https://www.libyahoopsacademy.com/privacy-policy): Privacy practices.
+- [Terms](https://www.libyahoopsacademy.com/terms): Website terms.

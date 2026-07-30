@@ -78,9 +78,9 @@ export default function AccountPage() {
       marketingConsent: Boolean(data?.profile?.marketing_consent),
       phone: auth.user?.user_metadata?.phone || '',
       avatarUrl:
-        auth.user?.user_metadata?.avatar_url ||
         data?.profile?.avatar_url ||
         data?.profile?.avatarUrl ||
+        auth.user?.user_metadata?.avatar_url ||
         '',
     }));
   const nameRef = useRef(null),
@@ -141,9 +141,9 @@ export default function AccountPage() {
       phone: auth.user.user_metadata?.phone || current.phone || '',
       avatarUrl:
         current.avatarUrl ||
-        auth.user.user_metadata?.avatar_url ||
         data?.profile?.avatar_url ||
         data?.profile?.avatarUrl ||
+        auth.user.user_metadata?.avatar_url ||
         '',
     }));
   }, [auth.user?.id, auth.user?.user_metadata, data?.profile]);
@@ -576,42 +576,72 @@ export default function AccountPage() {
                   `${profile.firstName} ${profile.lastName}` ||
                   auth.user.email
                 }
-                src={profile.avatarUrl}
+                src={photoPreview || profile.avatarUrl}
                 size="large"
               />
               <span>{pick({ en: 'Change photo', ar: 'تغيير الصورة' })}</span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                accept="image/*"
+                disabled={busy}
                 aria-label={pick({ en: 'Choose profile photo', ar: 'اختر صورة شخصية' })}
                 onChange={async (event) => {
-                  const file = event.target.files?.[0];
+                  const input = event.currentTarget;
+                  const file = input.files?.[0];
                   if (!file) return;
+
+                  const previousAvatar = profile.avatarUrl;
+                  const previewUrl = URL.createObjectURL(file);
+                  clearPhotoPreview();
+                  setPhotoPreview(previewUrl);
                   setBusy(true);
+                  setMsg(pick({ en: 'Saving profile photo…', ar: 'جارٍ حفظ الصورة الشخصية…' }));
+
                   try {
                     const validation = await validateProfileImage(file);
                     if (!validation.valid) throw new Error('invalid_profile_image');
                     const avatarUrl = await createProfileImageDataUrl(file);
-                    setProfile((current) => ({ ...current, avatarUrl }));
-                    const [metadataResult] = await Promise.all([
+                    const nextProfile = {
+                      ...profile,
+                      avatarUrl,
+                      avatar_url: avatarUrl,
+                    };
+
+                    // Save to both durable profile storage and auth metadata. Either source can
+                    // restore the avatar on another device, and the UI updates immediately.
+                    const [profileResult, metadataResult] = await Promise.allSettled([
+                      data.saveProfile(nextProfile),
                       auth.updateMetadata({ avatar_url: avatarUrl }),
-                      data.saveProfile({ ...profile, avatarUrl, avatar_url: avatarUrl }),
                     ]);
-                    if (metadataResult?.error) throw metadataResult.error;
+                    if (profileResult.status === 'rejected' && metadataResult.status === 'rejected') {
+                      throw profileResult.reason || metadataResult.reason;
+                    }
+                    if (metadataResult.status === 'fulfilled' && metadataResult.value?.error) {
+                      if (profileResult.status === 'rejected') throw metadataResult.value.error;
+                    }
+
                     setProfile((current) => ({ ...current, avatarUrl }));
-                    setMsg(pick({ en: 'Profile photo updated and saved.', ar: 'تم تحديث الصورة الشخصية وحفظها.' }));
+                    clearPhotoPreview();
+                    setMsg(
+                      pick({
+                        en: 'Profile photo updated and saved on every device.',
+                        ar: 'تم تحديث الصورة الشخصية وحفظها على جميع الأجهزة.',
+                      }),
+                    );
                   } catch (error) {
+                    setProfile((current) => ({ ...current, avatarUrl: previousAvatar }));
+                    clearPhotoPreview();
                     setMsg(
                       error?.message === 'invalid_profile_image'
                         ? pick({
-                            en: 'Choose a valid JPG, PNG, WebP, HEIC, or HEIF image under 8 MB.',
-                            ar: 'اختر صورة صالحة أقل من 8 ميجابايت.',
+                            en: 'Choose a valid photo under 8 MB. JPG, PNG, WebP, HEIC, and HEIF are supported by compatible devices.',
+                            ar: 'اختر صورة صالحة أقل من 8 ميجابايت. يدعم الجهاز الصيغ المتوافقة مثل JPG وPNG وWebP وHEIC وHEIF.',
                           })
                         : errorText(error, lang),
                     );
                   } finally {
                     setBusy(false);
-                    event.target.value = '';
+                    input.value = '';
                   }
                 }}
               />
@@ -811,14 +841,41 @@ export default function AccountPage() {
                     <button
                       type="button"
                       className="btn-secondary"
+                      disabled={busy}
                       onClick={async () => {
-                        const result = await auth.updateMetadata({ avatar_url: null });
-                        if (result?.error) {
-                          setMsg(errorText(result.error, lang));
-                          return;
+                        setBusy(true);
+                        try {
+                          const nextProfile = { ...profile, avatarUrl: '', avatar_url: null };
+                          const [profileResult, metadataResult] = await Promise.allSettled([
+                            data.saveProfile(nextProfile),
+                            auth.updateMetadata({ avatar_url: null }),
+                          ]);
+                          if (
+                            profileResult.status === 'rejected' &&
+                            metadataResult.status === 'rejected'
+                          ) {
+                            throw profileResult.reason || metadataResult.reason;
+                          }
+                          if (
+                            metadataResult.status === 'fulfilled' &&
+                            metadataResult.value?.error &&
+                            profileResult.status === 'rejected'
+                          ) {
+                            throw metadataResult.value.error;
+                          }
+                          clearPhotoPreview();
+                          setProfile((current) => ({ ...current, avatarUrl: '' }));
+                          setMsg(
+                            pick({
+                              en: 'Profile photo removed on every device.',
+                              ar: 'تمت إزالة الصورة الشخصية من جميع الأجهزة.',
+                            }),
+                          );
+                        } catch (error) {
+                          setMsg(errorText(error, lang));
+                        } finally {
+                          setBusy(false);
                         }
-                        setProfile((current) => ({ ...current, avatarUrl: '' }));
-                        setMsg(pick({ en: 'Profile photo removed.', ar: 'تمت إزالة الصورة.' }));
                       }}
                     >
                       {pick({ en: 'Remove profile photo', ar: 'إزالة الصورة الشخصية' })}

@@ -54,6 +54,8 @@ export async function upsertProfile(userId, profile) {
     first_name: profile.firstName ?? profile.first_name ?? null,
     last_name: profile.lastName ?? profile.last_name ?? null,
     display_name: profile.displayName ?? profile.display_name ?? null,
+    avatar_url: profile.avatarUrl ?? profile.avatar_url ?? null,
+    phone: profile.phone ?? null,
     preferred_language: profile.preferredLanguage || profile.preferred_language || 'en',
     preferred_currency: profile.preferredCurrency || profile.preferred_currency || 'USD',
     preferred_country: profile.preferredCountry || profile.preferred_country || 'LY',
