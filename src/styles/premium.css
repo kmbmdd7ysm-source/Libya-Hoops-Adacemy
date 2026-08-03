@@ -1952,3 +1952,23 @@ main,
 .deferred-footer.is-ready {
   min-height: 0;
 }
+
+/* Final hero reliability fix: disabling motion must never hide the content. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .cinematic-hero .hero-kicker,
+  .cinematic-hero .hero-title,
+  .cinematic-hero .hero-text,
+  .cinematic-hero .hero-actions {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+}
+
+/* The poster remains the fallback, while the muted inline video sits above it. */
+.cinematic-hero .hero-media > video {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}

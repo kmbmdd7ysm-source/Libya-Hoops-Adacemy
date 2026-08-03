@@ -6,40 +6,35 @@ import { useReducedMotion } from '../../hooks/useReducedMotion';
 export default function CinematicHero() {
   const { t, pick } = useLanguage();
   const video = useRef(null);
-  const enableTimer = useRef(null);
-  const [failed, setFailed] = useState(false);
-  const [videoEnabled, setVideoEnabled] = useState(false);
   const reduced = useReducedMotion();
+  const [failed, setFailed] = useState(false);
+  const [videoEnabled, setVideoEnabled] = useState(true);
 
   useEffect(() => {
-    if (reduced) return undefined;
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    if (connection?.saveData) return undefined;
-
-    // Phones keep the lightweight poster. The cinematic video is an optional
-    // desktop enhancement and never competes with mobile LCP or data usage.
-    const capable = globalThis.matchMedia?.(
-      '(min-width: 900px) and (hover: hover) and (pointer: fine)',
-    );
-    if (!capable?.matches) return undefined;
-
-    const enable = () => {
-      clearTimeout(enableTimer.current);
-      enableTimer.current = setTimeout(() => setVideoEnabled(true), 900);
-    };
-    const options = { once: true, passive: true };
-    window.addEventListener('pointerdown', enable, options);
-    window.addEventListener('keydown', enable, { once: true });
-    return () => {
-      clearTimeout(enableTimer.current);
-      window.removeEventListener('pointerdown', enable);
-      window.removeEventListener('keydown', enable);
-    };
+    setVideoEnabled(!reduced && !connection?.saveData);
   }, [reduced]);
 
   useEffect(() => {
-    if (!videoEnabled || failed) return;
-    video.current?.play().catch(() => {});
+    if (!videoEnabled || failed) return undefined;
+
+    const element = video.current;
+    if (!element) return undefined;
+
+    const startPlayback = () => {
+      element.play().catch(() => {
+        // iOS can briefly reject autoplay while the page is settling.
+        // Retry once on the first user interaction without showing controls.
+        const retry = () => element.play().catch(() => {});
+        window.addEventListener('touchstart', retry, { once: true, passive: true });
+        window.addEventListener('pointerdown', retry, { once: true, passive: true });
+      });
+    };
+
+    if (element.readyState >= 2) startPlayback();
+    else element.addEventListener('canplay', startPlayback, { once: true });
+
+    return () => element.removeEventListener('canplay', startPlayback);
   }, [videoEnabled, failed]);
 
   return (
@@ -64,7 +59,7 @@ export default function CinematicHero() {
             loop
             playsInline
             autoPlay
-            preload="none"
+            preload="metadata"
             poster="/media/hero/lha-hero-poster.webp"
             width="1940"
             height="1024"
