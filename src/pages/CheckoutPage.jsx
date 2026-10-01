@@ -346,6 +346,7 @@ export default function CheckoutPage() {
           { idempotencyKey: idempotencyRef.current },
         );
         const confirmedNumber = result?.order?.orderNumber || orderNumber;
+        let canonicalNumber = confirmedNumber;
         const orderMessage = [
           `Order number: ${confirmedNumber}`,
           `Customer: ${payload.customer.name}`,
@@ -374,7 +375,7 @@ export default function CheckoutPage() {
           `Total: ${displayTotal.toFixed(2)} ${currency}`,
         ].join('\n');
         try {
-          await sendFormspree(
+          const notification = await sendFormspree(
             {
               formType: 'order',
               message: orderMessage,
@@ -397,19 +398,37 @@ export default function CheckoutPage() {
               canonicalCurrency: SITE.currency,
               language: lang,
               createdAt: new Date().toISOString(),
+              syncPayload: {
+                idempotencyKey: idempotencyRef.current,
+                email: payload.customer.email,
+                currency: SITE.currency,
+                paymentMethod: 'cash_on_delivery',
+                shipping: {
+                  ...(payload.shipping || {}),
+                  phone: payload.customer.phone || undefined,
+                  locale: lang,
+                },
+                items: payload.items.map((item) => ({
+                  productId: item.id,
+                  variantId: item.sku ? `${item.id}:${item.sku}` : `${item.type}:${item.id}`,
+                  quantity: item.quantity,
+                  registrationId: item.registrationId || null,
+                })),
+              },
             },
             `New LHA order ${confirmedNumber}`,
           );
+          canonicalNumber = notification?.orderNumber || confirmedNumber;
         } catch (notificationError) {
           console.error('Order email notification failed', notificationError);
           setFailed(
             lang === 'ar'
-              ? `تم حفظ الطلب ${confirmedNumber}، لكن تعذر إرسال تفاصيله إلى المتجر. اضغط تنفيذ الطلب مرة أخرى لإعادة الإرسال.`
-              : `Order ${confirmedNumber} was saved, but its details could not be emailed to the store. Press Place Order again to retry delivery.`,
+              ? 'تعذر تأكيد ومزامنة الطلب مع نظام المتجر. لم نعتبر الطلب مكتملاً بعد. اضغط تنفيذ الطلب مرة أخرى بنفس السلة.'
+              : 'The order could not be fully confirmed and synchronized with store operations yet. Please press Place Order again with the same cart.',
           );
           return;
         }
-        setOrderConfirmed(confirmedNumber);
+        setOrderConfirmed(canonicalNumber);
         clearCart();
         sessionStorage.removeItem('lha-checkout-idempotency');
         return;
