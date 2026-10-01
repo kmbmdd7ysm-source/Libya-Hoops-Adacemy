@@ -91,11 +91,11 @@ export async function sendFormspree(payload, subject = 'Libya Hoops Academy webs
   const errors = [];
   const isOrder = body.form_type === 'order';
 
-  // Server-side delivery is the primary path for orders: no browser CORS,
-  // ad-blocker, Safari privacy, or page-navigation interruption can swallow it.
+  // Orders must complete through the authoritative server route. Do not
+  // fall back to plain Formspree delivery, because an emailed order that never
+  // reaches Supabase + Center Vision is not considered operationally complete.
   if (isOrder) {
-    try { return await retry(() => postJson('/api/order-notification', body), 3); }
-    catch (error) { errors.push(error); }
+    return retry(() => postJson('/api/order-notification', body), 3);
   }
   try { return await retry(() => postJson('/api/formspree', body), 3); }
   catch (error) { errors.push(error); }
