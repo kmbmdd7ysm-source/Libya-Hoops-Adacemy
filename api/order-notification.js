@@ -15,84 +15,58 @@ function parseObject(value) {
   }
 }
 
-function supabasePublicConfig() {
-  const url = clean(
-    process.env.VITE_SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.PUBLIC_SUPABASE_URL ||
-    process.env.SUPABASE_URL
-  ).replace(/\/$/, '');
-  const key = clean(
-    process.env.VITE_SUPABASE_ANON_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
-    process.env.PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_KEY ||
-    process.env.SUPABASE_PUBLISHABLE_DEFAULT_KEY
-  );
-  return url && key ? { url, key } : null;
-}
-
-async function invokeSupabaseFunction(name, body) {
-  const config = supabasePublicConfig();
-  if (!config) throw new Error('supabase_public_config_missing');
-  const response = await fetch(`${config.url}/functions/v1/${name}`, {
-    method: 'POST',
-    headers: {
-      apikey: config.key,
-      authorization: `Bearer ${config.key}`,
-      accept: 'application/json',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(15000),
-  });
-  const text = await response.text().catch(() => '');
-  let payload = null;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    payload = null;
+function normalizeLines(syncPayload) {
+  if (!Array.isArray(syncPayload?.items) || !syncPayload.items.length) {
+    throw new Error('order_lines_missing');
   }
-  if (!response.ok) throw new Error(`supabase_function_${name}_${response.status}:${text.slice(0, 300)}`);
-  return payload;
+  return syncPayload.items.map((item) => {
+    const sku = clean(item?.sku).toUpperCase();
+    const quantity = Number(item?.quantity);
+    if (!sku || !Number.isInteger(quantity) || quantity < 1) {
+      throw new Error('invalid_order_line');
+    }
+    return { sku, quantity };
+  });
 }
 
-async function verifyCloudOrder(syncPayload, requestedOrderNumber) {
+async function syncCenterVision(syncPayload, input) {
   const idempotencyKey = clean(syncPayload?.idempotencyKey);
   const email = clean(syncPayload?.email).toLowerCase();
-  const orderNumber = clean(requestedOrderNumber).toUpperCase();
+  const currencyCode = clean(syncPayload?.currency || input.canonicalCurrency || 'USD').toUpperCase();
+  const fullName = clean(input.customerName || input.name || 'LHA customer');
+  const phone = clean(input.customerPhone);
+  const shippingAddress = parseObject(syncPayload?.shipping) || {};
+  const lines = normalizeLines(syncPayload);
 
   if (!/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new Error('invalid_idempotency_key');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('invalid_customer_email');
-  if (!/^LHA-\d{8}-\d{7}$/.test(orderNumber)) throw new Error('invalid_canonical_order_number');
+  if (!/^[A-Z]{3}$/.test(currencyCode)) throw new Error('invalid_currency');
 
-  const result = await invokeSupabaseFunction('lookup-guest-order', { orderNumber, email });
-  const order = result?.order;
-  const verifiedNumber = clean(order?.order_number || order?.orderNumber).toUpperCase();
-  if (!order || verifiedNumber !== orderNumber) throw new Error('cloud_order_verification_failed');
-
-  return { orderNumber: verifiedNumber, email, duplicate: true };
-}
-
-async function syncCenterVision(orderNumber, ticket, email) {
   let lastError;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const response = await fetch(`${CENTER_VISION_API}/v1/public/store/lha/sync-order`, {
+      const response = await fetch(`${CENTER_VISION_API}/v1/public/store/lha/cod-order`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify({ orderNumber, ticket, email }),
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone: phone || undefined,
+          locale: clean(shippingAddress.locale || input.language || 'en').toLowerCase(),
+          currencyCode,
+          idempotencyKey,
+          sourceOrderNumber: clean(input.orderNumber) || undefined,
+          shippingTotal: clean(input.canonicalShippingTotal || '0'),
+          shippingAddress,
+          lines,
+        }),
         signal: AbortSignal.timeout(15000),
       });
       const text = await response.text().catch(() => '');
-      if (!response.ok) throw new Error(`center_vision_${response.status}:${text.slice(0, 240)}`);
-      return text ? JSON.parse(text) : {};
+      if (!response.ok) throw new Error(`center_vision_${response.status}:${text.slice(0, 300)}`);
+      const payload = text ? JSON.parse(text) : {};
+      if (!payload?.publicId) throw new Error('center_vision_order_id_missing');
+      return payload;
     } catch (error) {
       lastError = error;
       if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 350 * 2 ** attempt));
@@ -145,26 +119,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'missing_order_sync_payload' });
   }
 
-  let stage = 'supabase';
+  let stage = 'center_vision';
   try {
-    const cloud = await verifyCloudOrder(syncPayload, input.orderNumber);
-    const ticket = clean(syncPayload.idempotencyKey);
-
-    stage = 'center_vision';
-    const centerVision = await syncCenterVision(cloud.orderNumber, ticket, cloud.email);
+    const centerVision = await syncCenterVision(syncPayload, input);
+    const canonicalOrderNumber = centerVision.publicId;
 
     stage = 'notification';
     let notification = 'sent';
-    try { await notifyFormspree(input, cloud.orderNumber); }
+    try { await notifyFormspree(input, canonicalOrderNumber); }
     catch { notification = 'pending'; }
 
     return res.status(200).json({
       ok: true,
-      provider: 'center-vision+supabase',
-      orderNumber: cloud.orderNumber,
-      duplicate: cloud.duplicate,
+      provider: 'center-vision',
+      orderNumber: canonicalOrderNumber,
+      duplicate: Boolean(centerVision.duplicate),
       centerVision: 'synced',
-      centerVisionOrderPublicId: centerVision?.publicId || null,
+      centerVisionOrderPublicId: canonicalOrderNumber,
       notification,
     });
   } catch (error) {
