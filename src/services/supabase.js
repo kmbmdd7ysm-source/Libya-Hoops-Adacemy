@@ -49,7 +49,7 @@ async function readRuntimeConfig() {
 }
 
 async function resolveConfig() {
-  const env = import.meta.env || {};
+  const env = /** @type {Record<string, string | undefined>} */ (import.meta.env || {});
   const buildUrl = first(
     env.VITE_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_URL,
