@@ -8,7 +8,7 @@ describe('phase 1 order synchronization invariants', () => {
     const notification = read('api/order-notification.js');
     const checkout = read('src/pages/CheckoutPage.jsx');
 
-    expect(notification).toContain('/v1/public/store/lha/sync-order');
+    expect(notification).toContain('/v1/public/store/lha/cod-order');
     expect(notification).toContain("centerVision: 'synced'");
     expect(notification).toContain("error: 'order_sync_failed'");
     expect(notification).toContain("stage = 'center_vision'");
@@ -17,27 +17,27 @@ describe('phase 1 order synchronization invariants', () => {
     );
   });
 
-  it('verifies the canonical Supabase order without a Vercel service-role key', () => {
+  it('sends SKU lines to Center Vision and persists its canonical order ID', () => {
     const notification = read('api/order-notification.js');
-    const orderExport = read('api/center-vision-order-export.js');
+    const checkout = read('src/pages/CheckoutPage.jsx');
+    const orders = read('src/services/orders.js');
 
-    expect(notification).toContain("invokeSupabaseFunction('lookup-guest-order'");
-    expect(notification).toContain(
-      'syncCenterVision(cloud.orderNumber, ticket, cloud.email)',
-    );
-    expect(orderExport).toContain('/functions/v1/lookup-guest-order');
-    expect(orderExport).toContain('const email = clean(body.email).toLowerCase()');
-    expect(notification).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
-    expect(orderExport).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    expect(notification).toContain('const sku = clean(item?.sku).toUpperCase()');
+    expect(notification).toContain('idempotencyKey');
+    expect(checkout).toContain('sku: item.sku || null');
+    expect(checkout).toContain('updateLocalOrderNumber(idempotencyRef.current, canonicalNumber)');
+    expect(orders).toContain("source: 'center-vision'");
   });
 
-  it('keeps the readiness probe secret-free and checks both dependencies', () => {
+  it('uses Center Vision for order readiness and guest lookup', () => {
     const health = read('api/order-sync-health.js');
+    const lookup = read('api/center-vision-order-lookup.js');
+    const orders = read('src/services/orders.js');
 
-    expect(health).toContain('/functions/v1/create-guest-order');
-    expect(health).toContain("reason: 'public_config_missing'");
-    expect(health).toContain('/v1/health/live');
-    expect(health).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    expect(health).toContain("orderAuthority: 'center-vision'");
+    expect(health).toContain('/v1/health/ready');
+    expect(lookup).toContain('/v1/public/store/lha/order-lookup');
+    expect(orders).toContain('/api/center-vision-order-lookup');
   });
 
   it('keeps order synchronization retryable and idempotent', () => {
