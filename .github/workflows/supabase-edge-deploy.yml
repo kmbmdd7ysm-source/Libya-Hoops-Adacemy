@@ -1,0 +1,42 @@
+name: Deploy LHA Supabase Edge Functions
+
+on:
+  push:
+    branches:
+      - main
+      - fix/phase1-order-sync
+    paths:
+      - 'supabase/functions/**'
+      - '.github/workflows/supabase-edge-deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: lha-supabase-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      EDGE_RATE_LIMIT_SALT: ${{ secrets.EDGE_RATE_LIMIT_SALT }}
+      PROJECT_REF: yyzvpkythdlqkemyzsky
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Validate deployment credential
+        run: test -n "$SUPABASE_ACCESS_TOKEN"
+      - name: Ensure edge rate-limit salt
+        run: |
+          salt="$EDGE_RATE_LIMIT_SALT"
+          if [ -z "$salt" ]; then
+            salt="$(openssl rand -hex 32)"
+          fi
+          supabase secrets set EDGE_RATE_LIMIT_SALT="$salt" --project-ref "$PROJECT_REF"
+      - name: Deploy order functions
+        run: |
+          supabase functions deploy create-guest-order --project-ref "$PROJECT_REF" --no-verify-jwt
+          supabase functions deploy create-order --project-ref "$PROJECT_REF" --no-verify-jwt
+          supabase functions deploy lookup-guest-order --project-ref "$PROJECT_REF" --no-verify-jwt
