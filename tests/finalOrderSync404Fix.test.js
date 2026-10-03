@@ -51,8 +51,20 @@ describe('final cross-device order, total, and refresh fixes', () => {
   it('provides a secret-free order synchronization readiness probe', () => {
     const health = read('api/order-sync-health.js');
     expect(health).toContain("status: 'ready'");
-    expect(health).toContain("reason: 'server_config_missing'");
+    expect(health).toContain("reason: 'public_config_missing'");
+    expect(health).toContain('/functions/v1/create-guest-order');
     expect(health).toContain('/v1/health/live');
-    expect(health).not.toContain('serviceKey }');
+    expect(health).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+  });
+
+  it('verifies existing cloud orders without requiring a Vercel service-role key', () => {
+    const notification = read('api/order-notification.js');
+    const orderExport = read('api/center-vision-order-export.js');
+    expect(notification).toContain("lookup-guest-order");
+    expect(notification).toContain("syncCenterVision(cloud.orderNumber, ticket, cloud.email)");
+    expect(orderExport).toContain("lookup-guest-order");
+    expect(orderExport).toContain("const email = clean(body.email).toLowerCase()");
+    expect(notification).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    expect(orderExport).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
   });
 });
