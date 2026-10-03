@@ -46,4 +46,13 @@ describe('final cross-device order, total, and refresh fixes', () => {
     expect(notification).toContain("stage = 'center_vision'");
     expect(checkout).toContain('The order could not be fully confirmed and synchronized with store operations yet.');
   });
+
+
+  it('provides a secret-free order synchronization readiness probe', () => {
+    const health = read('api/order-sync-health.js');
+    expect(health).toContain("status: 'ready'");
+    expect(health).toContain("reason: 'server_config_missing'");
+    expect(health).toContain('/v1/health/live');
+    expect(health).not.toContain('serviceKey }');
+  });
 });
