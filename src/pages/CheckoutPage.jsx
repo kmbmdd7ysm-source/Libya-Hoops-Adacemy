@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { createIdempotencyKey, createOrder } from '../services/orders';
+import { createIdempotencyKey, createOrder, updateLocalOrderNumber } from '../services/orders';
 import { SITE } from '../config';
 import { resolveShipping, SHIPPING_MESSAGES } from '../config/shipping';
 import { useCommerce } from '../context/CommerceContext';
@@ -411,6 +411,7 @@ export default function CheckoutPage() {
                 items: payload.items.map((item) => ({
                   productId: item.id,
                   variantId: item.sku ? `${item.id}:${item.sku}` : `${item.type}:${item.id}`,
+                  sku: item.sku || null,
                   quantity: item.quantity,
                   registrationId: item.registrationId || null,
                 })),
@@ -419,6 +420,7 @@ export default function CheckoutPage() {
             `New LHA order ${confirmedNumber}`,
           );
           canonicalNumber = notification?.orderNumber || confirmedNumber;
+          updateLocalOrderNumber(idempotencyRef.current, canonicalNumber);
         } catch (notificationError) {
           console.error('Order email notification failed', notificationError);
           setFailed(

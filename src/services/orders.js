@@ -202,6 +202,28 @@ function saveLocal(order) {
   return { order, duplicate: false, error: write.error || current.error };
 }
 
+export function updateLocalOrderNumber(idempotencyKey, orderNumber) {
+  const key = clean(idempotencyKey);
+  const number = clean(orderNumber).toUpperCase();
+  if (!key || !number) return { ok: false, error: new Error('invalid_order_identity') };
+  const current = readLocalOrders();
+  if (current.error && !current.orders.length) return { ok: false, error: current.error };
+  let changed = false;
+  const orders = current.orders.map((order) => {
+    if (order.idempotencyKey !== key) return order;
+    changed = true;
+    return normalizeOrder({
+      ...order,
+      orderNumber: number,
+      source: 'center-vision',
+      syncState: 'synced',
+      updatedAt: new Date().toISOString(),
+    });
+  });
+  if (!changed) return { ok: false, error: new Error('order_not_found') };
+  return writeLocalOrders(orders);
+}
+
 async function invokeOrderFunction(name, body) {
   const supabase = await getSupabase();
   if (!supabase) return { data: null, error: new Error('cloud_unconfigured') };
@@ -507,11 +529,71 @@ export async function getMyOrders(userId) {
   };
 }
 
+async function lookupCenterVisionOrder(orderNumber, email) {
+  const response = await fetch('/api/center-vision-order-lookup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ orderNumber, email }),
+    credentials: 'same-origin',
+    cache: 'no-store',
+  });
+  const text = await response.text().catch(() => '');
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`center_vision_lookup_${response.status}`);
+  const payload = text ? JSON.parse(text) : null;
+  const row = payload?.order;
+  if (!row?.publicId) throw new Error('center_vision_lookup_invalid');
+  return normalizeOrder({
+    orderNumber: row.publicId,
+    email,
+    createdAt: row.orderDate,
+    updatedAt: row.orderDate,
+    currency: row.currencyCode,
+    subtotal: row.subtotal,
+    shippingTotal: row.shippingTotal,
+    total: row.total,
+    paymentMethod: 'cash_on_delivery',
+    paymentStatus: row.paymentStatus,
+    orderStatus: row.status,
+    fulfillmentStatus: row.fulfillmentStatus,
+    shipping: row.shippingAddress,
+    items: Array.isArray(row.lines)
+      ? row.lines.map((line) => ({
+          id: line.sku,
+          sku: line.sku,
+          name: line.description,
+          quantity: Number(line.quantity),
+          unitPrice: Number(line.unitPrice),
+          lineTotal: Number(line.lineTotal),
+        }))
+      : [],
+    source: 'center-vision',
+    syncState: 'synced',
+  });
+}
+
 export async function lookupGuestOrder(orderNumber, email) {
   const number = clean(orderNumber).toUpperCase();
   const normalizedEmail = emailKey(email);
   if (!number || !normalizedEmail)
     return { state: 'invalid', order: null, source: 'none', error: null };
+
+  let centerVisionError = null;
+  try {
+    const centerVisionOrder = await lookupCenterVisionOrder(number, normalizedEmail);
+    if (centerVisionOrder) {
+      saveLocal(centerVisionOrder);
+      return {
+        state: 'success',
+        order: centerVisionOrder,
+        source: 'center-vision',
+        error: null,
+      };
+    }
+  } catch (error) {
+    centerVisionError = error;
+  }
+
   const cloud = await invokeOrderFunction('lookup-guest-order', {
     orderNumber: number,
     email: normalizedEmail,
@@ -521,8 +603,9 @@ export async function lookupGuestOrder(orderNumber, email) {
       state: 'success',
       order: normalizeOrder({ ...cloud.data.order, source: 'cloud', syncState: 'synced' }),
       source: 'cloud',
-      error: null,
+      error: centerVisionError,
     };
+
   const local = readLocalOrders();
   const order =
     local.orders.find(
@@ -530,16 +613,19 @@ export async function lookupGuestOrder(orderNumber, email) {
         clean(item.orderNumber).toUpperCase() === number &&
         emailKey(item.email) === normalizedEmail,
     ) || null;
-  if (order)
+  if (order) {
+    const error = centerVisionError || cloud.error || local.error;
     return {
-      state: cloud.error ? 'partial' : 'success',
+      state: error ? 'partial' : 'success',
       order,
       source: 'local',
-      error: cloud.error || local.error,
+      error,
     };
-  if (local.error && cloud.error)
-    return { state: 'error', order: null, source: 'none', error: cloud.error };
-  return { state: 'not-found', order: null, source: 'none', error: cloud.error || null };
+  }
+
+  const error = centerVisionError || cloud.error || local.error || null;
+  if (error && local.error) return { state: 'error', order: null, source: 'none', error };
+  return { state: 'not-found', order: null, source: 'none', error };
 }
 
 export async function getOrderDetails({ orderNumber, userId, email }) {
@@ -549,7 +635,9 @@ export async function getOrderDetails({ orderNumber, userId, email }) {
     const result = await getMyOrders(userId);
     const order =
       result.orders.find((item) => clean(item.orderNumber).toUpperCase() === number) || null;
-    return { ...result, state: order ? result.state : 'not-found', order };
+    if (order) return { ...result, order };
+    if (email) return lookupGuestOrder(number, email);
+    return { ...result, state: 'not-found', order: null };
   }
   if (!email) return { state: 'verification-required', order: null, error: null };
   return lookupGuestOrder(number, email);

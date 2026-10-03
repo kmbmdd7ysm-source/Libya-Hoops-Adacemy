@@ -35,4 +35,31 @@ describe('final cross-device order, total, and refresh fixes', () => {
     expect(worker).toContain('\\/order-tracking\\b');
     expect(worker).toContain('lha-v6-20260730-order-sync-route');
   });
+
+
+  it('requires Center Vision synchronization before checkout success', () => {
+    const notification = read('api/order-notification.js');
+    const checkout = read('src/pages/CheckoutPage.jsx');
+    expect(notification).toContain('/v1/public/store/lha/cod-order');
+    expect(notification).toContain("centerVision: 'synced'");
+    expect(notification).toContain("error: 'order_sync_failed'");
+    expect(notification).toContain("stage = 'center_vision'");
+    expect(checkout).toContain('The order could not be fully confirmed and synchronized with store operations yet.');
+  });
+
+
+  it('uses Center Vision as the order synchronization readiness authority', () => {
+    const health = read('api/order-sync-health.js');
+    expect(health).toContain("orderAuthority: 'center-vision'");
+    expect(health).toContain('/v1/health/ready');
+  });
+
+  it('uses Center Vision for canonical order creation and guest lookup', () => {
+    const notification = read('api/order-notification.js');
+    const lookup = read('api/center-vision-order-lookup.js');
+    expect(notification).toContain('/v1/public/store/lha/cod-order');
+    expect(notification).toContain("provider: 'center-vision'");
+    expect(lookup).toContain('/v1/public/store/lha/order-lookup');
+  });
+
 });

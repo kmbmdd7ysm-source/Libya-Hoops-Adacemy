@@ -15,106 +15,58 @@ function parseObject(value) {
   }
 }
 
-function supabaseConfig() {
-  const url = clean(
-    process.env.SUPABASE_URL ||
-    process.env.VITE_SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.PUBLIC_SUPABASE_URL
-  ).replace(/\/$/, '');
-  const serviceKey = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  return url && serviceKey ? { url, serviceKey } : null;
-}
-
-async function supabaseRequest(path, options = {}) {
-  const config = supabaseConfig();
-  if (!config) throw new Error('supabase_server_config_missing');
-  const response = await fetch(`${config.url}${path}`, {
-    ...options,
-    headers: {
-      apikey: config.serviceKey,
-      authorization: `Bearer ${config.serviceKey}`,
-      accept: 'application/json',
-      'content-type': 'application/json',
-      ...(options.headers || {}),
-    },
-    signal: AbortSignal.timeout(15000),
+function normalizeLines(syncPayload) {
+  if (!Array.isArray(syncPayload?.items) || !syncPayload.items.length) {
+    throw new Error('order_lines_missing');
+  }
+  return syncPayload.items.map((item) => {
+    const sku = clean(item?.sku).toUpperCase();
+    const quantity = Number(item?.quantity);
+    if (!sku || !Number.isInteger(quantity) || quantity < 1) {
+      throw new Error('invalid_order_line');
+    }
+    return { sku, quantity };
   });
-  const text = await response.text().catch(() => '');
-  let payload = null;
-  try { payload = text ? JSON.parse(text) : null; } catch { payload = null; }
-  if (!response.ok) throw new Error(`supabase_${response.status}:${text.slice(0, 300)}`);
-  return payload;
 }
 
-async function existingOrderByTicket(ticket) {
-  const query = new URLSearchParams({
-    select: 'order_number,idempotency_key',
-    idempotency_key: `eq.${ticket}`,
-    limit: '1',
-  });
-  const rows = await supabaseRequest(`/rest/v1/orders?${query.toString()}`);
-  return Array.isArray(rows) ? rows[0] || null : null;
-}
-
-async function ensureCloudOrder(syncPayload) {
+async function syncCenterVision(syncPayload, input) {
   const idempotencyKey = clean(syncPayload?.idempotencyKey);
   const email = clean(syncPayload?.email).toLowerCase();
-  const currency = clean(syncPayload?.currency).toUpperCase();
-  const paymentMethod = clean(syncPayload?.paymentMethod || 'cash_on_delivery').toLowerCase();
-  const shipping = parseObject(syncPayload?.shipping) || syncPayload?.shipping || {};
-  const items = Array.isArray(syncPayload?.items) ? syncPayload.items : [];
+  const currencyCode = clean(syncPayload?.currency || input.canonicalCurrency || 'USD').toUpperCase();
+  const fullName = clean(input.customerName || input.name || 'LHA customer');
+  const phone = clean(input.customerPhone);
+  const shippingAddress = parseObject(syncPayload?.shipping) || {};
+  const lines = normalizeLines(syncPayload);
 
   if (!/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new Error('invalid_idempotency_key');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('invalid_customer_email');
-  if (!['USD', 'LYD'].includes(currency)) throw new Error('invalid_currency');
-  if (!['cash_on_delivery', 'cash'].includes(paymentMethod)) throw new Error('invalid_payment_method');
-  if (!items.length || items.length > 50) throw new Error('invalid_order_items');
+  if (!/^[A-Z]{3}$/.test(currencyCode)) throw new Error('invalid_currency');
 
-  const normalizedItems = items.map((item) => ({
-    productId: clean(item?.productId),
-    variantId: clean(item?.variantId),
-    quantity: Number(item?.quantity),
-    registrationId: clean(item?.registrationId) || null,
-  }));
-  if (normalizedItems.some((item) => !item.productId || !item.variantId || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99)) {
-    throw new Error('invalid_order_items');
-  }
-
-  const existing = await existingOrderByTicket(idempotencyKey);
-  if (existing?.order_number) return { orderNumber: existing.order_number, duplicate: true };
-
-  const result = await supabaseRequest('/rest/v1/rpc/create_order_transactional', {
-    method: 'POST',
-    body: JSON.stringify({
-      p_user_id: null,
-      p_customer_email: email,
-      p_currency: currency,
-      p_payment_method: paymentMethod,
-      p_idempotency_key: idempotencyKey,
-      p_shipping: shipping,
-      p_items: normalizedItems,
-    }),
-  });
-
-  const order = result?.order;
-  if (!order?.order_number) throw new Error('cloud_order_creation_invalid');
-  return { orderNumber: order.order_number, duplicate: Boolean(result?.duplicate) };
-}
-
-async function syncCenterVision(orderNumber, ticket) {
   let lastError;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const response = await fetch(`${CENTER_VISION_API}/v1/public/store/lha/sync-order`, {
+      const response = await fetch(`${CENTER_VISION_API}/v1/public/store/lha/cod-order`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify({ orderNumber, ticket }),
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone: phone || undefined,
+          locale: clean(shippingAddress.locale || input.language || 'en').toLowerCase(),
+          currencyCode,
+          idempotencyKey,
+          sourceOrderNumber: clean(input.orderNumber) || undefined,
+          shippingTotal: clean(input.canonicalShippingTotal || '0'),
+          shippingAddress,
+          lines,
+        }),
         signal: AbortSignal.timeout(15000),
       });
       const text = await response.text().catch(() => '');
-      if (!response.ok) throw new Error(`center_vision_${response.status}:${text.slice(0, 240)}`);
-      return text ? JSON.parse(text) : {};
+      if (!response.ok) throw new Error(`center_vision_${response.status}:${text.slice(0, 300)}`);
+      const payload = text ? JSON.parse(text) : {};
+      if (!payload?.publicId) throw new Error('center_vision_order_id_missing');
+      return payload;
     } catch (error) {
       lastError = error;
       if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 350 * 2 ** attempt));
@@ -167,29 +119,34 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'missing_order_sync_payload' });
   }
 
+  let stage = 'center_vision';
   try {
-    const cloud = await ensureCloudOrder(syncPayload);
-    const ticket = clean(syncPayload.idempotencyKey);
-    const centerVision = await syncCenterVision(cloud.orderNumber, ticket);
+    const centerVision = await syncCenterVision(syncPayload, input);
+    const canonicalOrderNumber = centerVision.publicId;
 
+    stage = 'notification';
     let notification = 'sent';
-    try { await notifyFormspree(input, cloud.orderNumber); }
+    try { await notifyFormspree(input, canonicalOrderNumber); }
     catch { notification = 'pending'; }
 
     return res.status(200).json({
       ok: true,
-      provider: 'center-vision+supabase',
-      orderNumber: cloud.orderNumber,
-      duplicate: cloud.duplicate,
+      provider: 'center-vision',
+      orderNumber: canonicalOrderNumber,
+      duplicate: Boolean(centerVision.duplicate),
       centerVision: 'synced',
-      centerVisionOrderPublicId: centerVision?.publicId || null,
+      centerVisionOrderPublicId: canonicalOrderNumber,
       notification,
     });
   } catch (error) {
+    const detail = safe(error?.message || error, 500);
+    console.error('LHA_ORDER_SYNC_FAILED', { stage, detail });
     return res.status(502).json({
       ok: false,
       error: 'order_sync_failed',
-      detail: safe(error?.message || error, 500),
+      stage,
+      detail,
+      retryable: true,
     });
   }
 }
