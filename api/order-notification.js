@@ -167,11 +167,15 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'missing_order_sync_payload' });
   }
 
+  let stage = 'supabase';
   try {
     const cloud = await ensureCloudOrder(syncPayload);
     const ticket = clean(syncPayload.idempotencyKey);
+
+    stage = 'center_vision';
     const centerVision = await syncCenterVision(cloud.orderNumber, ticket);
 
+    stage = 'notification';
     let notification = 'sent';
     try { await notifyFormspree(input, cloud.orderNumber); }
     catch { notification = 'pending'; }
@@ -186,10 +190,14 @@ export default async function handler(req, res) {
       notification,
     });
   } catch (error) {
+    const detail = safe(error?.message || error, 500);
+    console.error('LHA_ORDER_SYNC_FAILED', { stage, detail });
     return res.status(502).json({
       ok: false,
       error: 'order_sync_failed',
-      detail: safe(error?.message || error, 500),
+      stage,
+      detail,
+      retryable: true,
     });
   }
 }
