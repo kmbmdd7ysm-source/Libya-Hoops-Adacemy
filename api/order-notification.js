@@ -15,101 +15,79 @@ function parseObject(value) {
   }
 }
 
-function supabaseConfig() {
+function supabasePublicConfig() {
   const url = clean(
-    process.env.SUPABASE_URL ||
     process.env.VITE_SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.PUBLIC_SUPABASE_URL
+    process.env.PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL
   ).replace(/\/$/, '');
-  const serviceKey = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  return url && serviceKey ? { url, serviceKey } : null;
+  const key = clean(
+    process.env.VITE_SUPABASE_ANON_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  );
+  return url && key ? { url, key } : null;
 }
 
-async function supabaseRequest(path, options = {}) {
-  const config = supabaseConfig();
-  if (!config) throw new Error('supabase_server_config_missing');
-  const response = await fetch(`${config.url}${path}`, {
-    ...options,
+async function invokeSupabaseFunction(name, body) {
+  const config = supabasePublicConfig();
+  if (!config) throw new Error('supabase_public_config_missing');
+  const response = await fetch(`${config.url}/functions/v1/${name}`, {
+    method: 'POST',
     headers: {
-      apikey: config.serviceKey,
-      authorization: `Bearer ${config.serviceKey}`,
+      apikey: config.key,
+      authorization: `Bearer ${config.key}`,
       accept: 'application/json',
       'content-type': 'application/json',
-      ...(options.headers || {}),
     },
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(15000),
   });
   const text = await response.text().catch(() => '');
   let payload = null;
-  try { payload = text ? JSON.parse(text) : null; } catch { payload = null; }
-  if (!response.ok) throw new Error(`supabase_${response.status}:${text.slice(0, 300)}`);
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch {
+    payload = null;
+  }
+  if (!response.ok) throw new Error(`supabase_function_${name}_${response.status}:${text.slice(0, 300)}`);
   return payload;
 }
 
-async function existingOrderByTicket(ticket) {
-  const query = new URLSearchParams({
-    select: 'order_number,idempotency_key',
-    idempotency_key: `eq.${ticket}`,
-    limit: '1',
-  });
-  const rows = await supabaseRequest(`/rest/v1/orders?${query.toString()}`);
-  return Array.isArray(rows) ? rows[0] || null : null;
-}
-
-async function ensureCloudOrder(syncPayload) {
+async function verifyCloudOrder(syncPayload, requestedOrderNumber) {
   const idempotencyKey = clean(syncPayload?.idempotencyKey);
   const email = clean(syncPayload?.email).toLowerCase();
-  const currency = clean(syncPayload?.currency).toUpperCase();
-  const paymentMethod = clean(syncPayload?.paymentMethod || 'cash_on_delivery').toLowerCase();
-  const shipping = parseObject(syncPayload?.shipping) || syncPayload?.shipping || {};
-  const items = Array.isArray(syncPayload?.items) ? syncPayload.items : [];
+  const orderNumber = clean(requestedOrderNumber).toUpperCase();
 
   if (!/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new Error('invalid_idempotency_key');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('invalid_customer_email');
-  if (!['USD', 'LYD'].includes(currency)) throw new Error('invalid_currency');
-  if (!['cash_on_delivery', 'cash'].includes(paymentMethod)) throw new Error('invalid_payment_method');
-  if (!items.length || items.length > 50) throw new Error('invalid_order_items');
+  if (!/^LHA-\d{8}-\d{7}$/.test(orderNumber)) throw new Error('invalid_canonical_order_number');
 
-  const normalizedItems = items.map((item) => ({
-    productId: clean(item?.productId),
-    variantId: clean(item?.variantId),
-    quantity: Number(item?.quantity),
-    registrationId: clean(item?.registrationId) || null,
-  }));
-  if (normalizedItems.some((item) => !item.productId || !item.variantId || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99)) {
-    throw new Error('invalid_order_items');
-  }
-
-  const existing = await existingOrderByTicket(idempotencyKey);
-  if (existing?.order_number) return { orderNumber: existing.order_number, duplicate: true };
-
-  const result = await supabaseRequest('/rest/v1/rpc/create_order_transactional', {
-    method: 'POST',
-    body: JSON.stringify({
-      p_user_id: null,
-      p_customer_email: email,
-      p_currency: currency,
-      p_payment_method: paymentMethod,
-      p_idempotency_key: idempotencyKey,
-      p_shipping: shipping,
-      p_items: normalizedItems,
-    }),
-  });
-
+  const result = await invokeSupabaseFunction('lookup-guest-order', { orderNumber, email });
   const order = result?.order;
-  if (!order?.order_number) throw new Error('cloud_order_creation_invalid');
-  return { orderNumber: order.order_number, duplicate: Boolean(result?.duplicate) };
+  const verifiedNumber = clean(order?.order_number || order?.orderNumber).toUpperCase();
+  if (!order || verifiedNumber !== orderNumber) throw new Error('cloud_order_verification_failed');
+
+  return { orderNumber: verifiedNumber, email, duplicate: true };
 }
 
-async function syncCenterVision(orderNumber, ticket) {
+async function syncCenterVision(orderNumber, ticket, email) {
   let lastError;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const response = await fetch(`${CENTER_VISION_API}/v1/public/store/lha/sync-order`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify({ orderNumber, ticket }),
+        body: JSON.stringify({ orderNumber, ticket, email }),
         signal: AbortSignal.timeout(15000),
       });
       const text = await response.text().catch(() => '');
@@ -169,11 +147,11 @@ export default async function handler(req, res) {
 
   let stage = 'supabase';
   try {
-    const cloud = await ensureCloudOrder(syncPayload);
+    const cloud = await verifyCloudOrder(syncPayload, input.orderNumber);
     const ticket = clean(syncPayload.idempotencyKey);
 
     stage = 'center_vision';
-    const centerVision = await syncCenterVision(cloud.orderNumber, ticket);
+    const centerVision = await syncCenterVision(cloud.orderNumber, ticket, cloud.email);
 
     stage = 'notification';
     let notification = 'sent';
