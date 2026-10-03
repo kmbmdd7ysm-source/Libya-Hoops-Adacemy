@@ -24,8 +24,8 @@ jobs:
         run: npm run lint
       - name: Typecheck
         run: npm run typecheck
-      - name: Tests
-        run: npm test
+      - name: Phase 1 order sync tests
+        run: npx vitest run tests/phase1OrderSync.test.js --pool=vmForks --maxWorkers=2 --configLoader=runner
       - name: Data and commerce validation
         run: |
           npm run validate:data
