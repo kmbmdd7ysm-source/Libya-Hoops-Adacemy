@@ -40,7 +40,7 @@ describe('final cross-device order, total, and refresh fixes', () => {
   it('requires Center Vision synchronization before checkout success', () => {
     const notification = read('api/order-notification.js');
     const checkout = read('src/pages/CheckoutPage.jsx');
-    expect(notification).toContain('/v1/public/store/lha/sync-order');
+    expect(notification).toContain('/v1/public/store/lha/cod-order');
     expect(notification).toContain("centerVision: 'synced'");
     expect(notification).toContain("error: 'order_sync_failed'");
     expect(notification).toContain("stage = 'center_vision'");
@@ -48,23 +48,18 @@ describe('final cross-device order, total, and refresh fixes', () => {
   });
 
 
-  it('provides a secret-free order synchronization readiness probe', () => {
+  it('uses Center Vision as the order synchronization readiness authority', () => {
     const health = read('api/order-sync-health.js');
-    expect(health).toContain("status: 'ready'");
-    expect(health).toContain("reason: 'public_config_missing'");
-    expect(health).toContain('/functions/v1/create-guest-order');
-    expect(health).toContain('/v1/health/live');
-    expect(health).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    expect(health).toContain("orderAuthority: 'center-vision'");
+    expect(health).toContain('/v1/health/ready');
   });
 
-  it('verifies existing cloud orders without requiring a Vercel service-role key', () => {
+  it('uses Center Vision for canonical order creation and guest lookup', () => {
     const notification = read('api/order-notification.js');
-    const orderExport = read('api/center-vision-order-export.js');
-    expect(notification).toContain("lookup-guest-order");
-    expect(notification).toContain("syncCenterVision(cloud.orderNumber, ticket, cloud.email)");
-    expect(orderExport).toContain("lookup-guest-order");
-    expect(orderExport).toContain("const email = clean(body.email).toLowerCase()");
-    expect(notification).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
-    expect(orderExport).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    const lookup = read('api/center-vision-order-lookup.js');
+    expect(notification).toContain('/v1/public/store/lha/cod-order');
+    expect(notification).toContain("provider: 'center-vision'");
+    expect(lookup).toContain('/v1/public/store/lha/order-lookup');
   });
+
 });
