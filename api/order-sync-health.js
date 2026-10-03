@@ -1,31 +1,54 @@
 const clean = (value) => String(value ?? '').trim();
 
-function supabaseConfig() {
+function supabasePublicConfig() {
   const url = clean(
-    process.env.SUPABASE_URL ||
     process.env.VITE_SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.PUBLIC_SUPABASE_URL
+    process.env.PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL
   ).replace(/\/$/, '');
-  const serviceKey = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  return url && serviceKey ? { url, serviceKey } : null;
+  const key = clean(
+    process.env.VITE_SUPABASE_ANON_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ||
+    process.env.PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_DEFAULT_KEY
+  );
+  return url && key ? { url, key } : null;
 }
 
 async function checkSupabase() {
-  const config = supabaseConfig();
-  if (!config) return { status: 'failed', reason: 'server_config_missing' };
+  const config = supabasePublicConfig();
+  if (!config) return { status: 'failed', reason: 'public_config_missing' };
   try {
-    const response = await fetch(`${config.url}/rest/v1/orders?select=id&limit=1`, {
+    const response = await fetch(`${config.url}/functions/v1/create-guest-order`, {
+      method: 'POST',
       headers: {
-        apikey: config.serviceKey,
-        authorization: `Bearer ${config.serviceKey}`,
+        apikey: config.key,
+        authorization: `Bearer ${config.key}`,
         accept: 'application/json',
+        'content-type': 'application/json',
       },
+      body: JSON.stringify({}),
       signal: AbortSignal.timeout(8000),
     });
-    return response.ok
+    const text = await response.text().catch(() => '');
+    let payload = null;
+    try {
+      payload = text ? JSON.parse(text) : null;
+    } catch {
+      payload = null;
+    }
+    const ready = response.status === 400 && payload?.error === 'invalid_request';
+    return ready
       ? { status: 'ready' }
-      : { status: 'failed', reason: `http_${response.status}` };
+      : { status: 'failed', reason: `edge_${response.status}` };
   } catch {
     return { status: 'failed', reason: 'unreachable' };
   }
