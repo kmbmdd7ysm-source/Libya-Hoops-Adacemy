@@ -70,4 +70,23 @@ describe('phase 1 order synchronization invariants', () => {
     expect(statuses).toContain("on_hold: { category: 'warning'");
   });
 
+  it('retains central shipment state and shows it in verified order tracking', () => {
+    const orders = read('src/services/orders.js');
+    const statuses = read('src/services/orderStatus.js');
+    const detail = read('src/pages/OrderDetailPage.jsx');
+    expect(orders).toContain('shipment: row.shipment || null');
+    expect(statuses).toContain("out_for_delivery: { category: 'pending'");
+    expect(detail).toContain("presentOrderStatus('shipment', order.shipment.status, lang)");
+    expect(detail).toContain('order.shipment?.trackingNumber');
+  });
+
+  it('uses real Center Vision stock only when inventory authority is enabled', () => {
+    const proxy = read('api/center-vision-inventory.js');
+    const page = read('src/pages/ProductPage.jsx');
+    expect(proxy).toContain('/v1/public/store/inventory?siteKey=LHA');
+    expect(page).toContain("data.authority !== 'center-vision'");
+    expect(page).toContain('authoritativeStock[variant.sku] ?? 0');
+    expect(page).toContain('maxStock: effectiveStock(matchedVariant)');
+  });
+
 });

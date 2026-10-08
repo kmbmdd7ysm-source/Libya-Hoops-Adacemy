@@ -52,6 +52,9 @@ export default function OrderDetailPage() {
   const fulfillment = order
     ? presentOrderStatus('fulfillment', order.fulfillmentStatus, lang)
     : null;
+  const shipment = order?.shipment
+    ? presentOrderStatus('shipment', order.shipment.status, lang)
+    : null;
   return (
     <>
       <Seo
@@ -155,6 +158,18 @@ export default function OrderDetailPage() {
                   <dt>{pick({ en: 'Fulfillment status', ar: 'حالة التنفيذ' })}</dt>
                   <dd>{fulfillment.label}</dd>
                 </div>
+                {shipment && (
+                  <div>
+                    <dt>{pick({ en: 'Shipping status', ar: 'حالة الشحن' })}</dt>
+                    <dd>{shipment.label}</dd>
+                  </div>
+                )}
+                {order.shipment?.trackingNumber && (
+                  <div>
+                    <dt>{pick({ en: 'Tracking number', ar: 'رقم تتبع الشحنة' })}</dt>
+                    <dd>{order.shipment.trackingNumber}</dd>
+                  </div>
+                )}
                 <div>
                   <dt>{pick({ en: 'Payment method', ar: 'طريقة الدفع' })}</dt>
                   <dd>

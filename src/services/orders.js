@@ -144,6 +144,7 @@ export function normalizeOrder(order = {}) {
     customer: order.customer || {},
     shipping: order.shipping || order.shipping_summary || null,
     shippingRate: order.shippingRate || order.shipping_rate || null,
+    shipment: order.shipment || null,
     items,
     source: order.source || 'local',
     syncState: order.syncState || 'local-only',
@@ -557,6 +558,7 @@ async function lookupCenterVisionOrder(orderNumber, email) {
     orderStatus: row.status,
     fulfillmentStatus: row.fulfillmentStatus,
     shipping: row.shippingAddress,
+    shipment: row.shipment || null,
     items: Array.isArray(row.lines)
       ? row.lines.map((line) => ({
           id: line.sku,

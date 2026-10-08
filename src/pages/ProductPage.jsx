@@ -46,6 +46,52 @@ export default function ProductPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [error, setError] = useState('');
   const [adding, setAdding] = useState(false);
+  const [authoritativeStock, setAuthoritativeStock] = useState(null);
+
+  useEffect(() => {
+    if (
+      !product ||
+      product.available === false ||
+      product.comingSoon ||
+      (product.fulfillmentType && product.fulfillmentType !== 'physical')
+    ) return undefined;
+
+    let active = true;
+    let refreshInterval = null;
+    const refresh = async () => {
+      if (document.visibilityState === 'hidden') return;
+      try {
+        const response = await fetch('/api/center-vision-inventory', { cache: 'no-store' });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!active) return;
+        if (data.authority !== 'center-vision') {
+          setAuthoritativeStock(null);
+          return;
+        }
+        const inventory = {};
+        for (const variant of data.variants || []) {
+          if (typeof variant.sku === 'string' && Number.isFinite(variant.available)) {
+            inventory[variant.sku] = Math.max(0, Math.trunc(variant.available));
+          }
+        }
+        setAuthoritativeStock(inventory);
+        // Poll only when the central warehouse is the active source of truth.
+        if (refreshInterval === null) refreshInterval = setInterval(refresh, 120_000);
+      } catch {
+        // Keep the last trusted snapshot if the warehouse endpoint briefly fails.
+      }
+    };
+    void refresh();
+    return () => {
+      active = false;
+      if (refreshInterval !== null) clearInterval(refreshInterval);
+    };
+  }, [slug]);
+
+  const effectiveStock = (variant) =>
+    authoritativeStock === null ? variant.stock : (authoritativeStock[variant.sku] ?? 0);
+
 
   useEffect(() => {
     if (product) {
@@ -87,16 +133,16 @@ export default function ProductPage() {
   const stockForSize = (s) => {
     if (!product) return 0;
     const vs = product.variants.filter((v) => v.size === s && (!needsColor || v.color === color));
-    return vs.reduce((sum, v) => sum + v.stock, 0);
+    return vs.reduce((sum, v) => sum + effectiveStock(v), 0);
   };
 
   if (!product) return <NotFoundPage />;
 
   const comingSoon = product.available === false || product.comingSoon === true;
   const soldOut = product.availability === 'sold-out';
-  const low = isLowStock(product);
+  const low = matchedVariant ? effectiveStock(matchedVariant) <= (product.lowStockThreshold || 3) : isLowStock(product);
   const onSale = product.compareAt && product.compareAt > product.price;
-  const maxStock = matchedVariant ? matchedVariant.stock : product.stock;
+  const maxStock = matchedVariant ? effectiveStock(matchedVariant) : product.stock;
 
   const cat = getCategory(product.category);
   const sub = getSubcategory(product.category, product.subcategory);
@@ -119,7 +165,7 @@ export default function ProductPage() {
       setError(t.product.chooseSize);
       return;
     }
-    if (!matchedVariant || matchedVariant.stock <= 0) {
+    if (!matchedVariant || effectiveStock(matchedVariant) <= 0) {
       setError(t.common.outOfStock);
       return;
     }
@@ -137,7 +183,7 @@ export default function ProductPage() {
       size: matchedVariant.size,
       color: matchedVariant.color,
       sku: matchedVariant.sku,
-      maxStock: matchedVariant.stock,
+      maxStock: effectiveStock(matchedVariant),
       href: `/products/${product.slug}`,
       quantity: qty,
     });
@@ -325,7 +371,7 @@ export default function ProductPage() {
                   </div>
                 )}
 
-                {matchedVariant && low && matchedVariant.stock > 0 && (
+                {matchedVariant && low && effectiveStock(matchedVariant) > 0 && (
                   <p className="stock-note">{t.product.lowStock}</p>
                 )}
 
@@ -334,7 +380,7 @@ export default function ProductPage() {
                   onQuantityChange={setQty}
                   max={maxStock || 1}
                   onAdd={addToCart}
-                  addDisabled={!matchedVariant || matchedVariant.stock <= 0}
+                  addDisabled={!matchedVariant || effectiveStock(matchedVariant) <= 0}
                   adding={adding}
                   favorite={wishlist.has(product.id)}
                   onFavorite={() => wishlist.toggle(product.id)}
