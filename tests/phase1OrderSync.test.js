@@ -80,4 +80,13 @@ describe('phase 1 order synchronization invariants', () => {
     expect(detail).toContain('order.shipment?.trackingNumber');
   });
 
+  it('uses real Center Vision stock only when inventory authority is enabled', () => {
+    const proxy = read('api/center-vision-inventory.js');
+    const page = read('src/pages/ProductPage.jsx');
+    expect(proxy).toContain('/v1/public/store/inventory?siteKey=LHA');
+    expect(page).toContain("data.authority !== 'center-vision'");
+    expect(page).toContain('authoritativeStock[variant.sku] ?? 0');
+    expect(page).toContain('maxStock: effectiveStock(matchedVariant)');
+  });
+
 });
