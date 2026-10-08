@@ -49,7 +49,15 @@ export default function ProductPage() {
   const [authoritativeStock, setAuthoritativeStock] = useState(null);
 
   useEffect(() => {
+    if (
+      !product ||
+      product.available === false ||
+      product.comingSoon ||
+      (product.fulfillmentType && product.fulfillmentType !== 'physical')
+    ) return undefined;
+
     let active = true;
+    let refreshInterval = null;
     const refresh = async () => {
       if (document.visibilityState === 'hidden') return;
       try {
@@ -68,17 +76,18 @@ export default function ProductPage() {
           }
         }
         setAuthoritativeStock(inventory);
+        // Poll only when the central warehouse is the active source of truth.
+        if (refreshInterval === null) refreshInterval = setInterval(refresh, 120_000);
       } catch {
-        // Retain the last trusted snapshot if the inventory endpoint briefly fails.
+        // Keep the last trusted snapshot if the warehouse endpoint briefly fails.
       }
     };
-    refresh();
-    const interval = setInterval(refresh, 60_000);
+    void refresh();
     return () => {
       active = false;
-      clearInterval(interval);
+      if (refreshInterval !== null) clearInterval(refreshInterval);
     };
-  }, []);
+  }, [slug]);
 
   const effectiveStock = (variant) =>
     authoritativeStock === null ? variant.stock : (authoritativeStock[variant.sku] ?? 0);
