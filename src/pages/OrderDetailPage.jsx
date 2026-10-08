@@ -18,7 +18,7 @@ export default function OrderDetailPage() {
       '',
   );
   const [state, setState] = useState({ state: 'loading', order: null, error: null });
-  const load = async (verifiedEmail = email) => {
+  const load = async (verifiedEmail = email || auth.user?.email || '') => {
     setState((current) => ({ ...current, state: 'loading' }));
     setState(await getOrderDetails({ orderNumber, userId: auth.user?.id, email: verifiedEmail }));
   };
@@ -28,14 +28,15 @@ export default function OrderDetailPage() {
   // Refresh only verified orders while the customer keeps the tracker open.
   // Do not replace an already visible order with a loading placeholder.
   useEffect(() => {
-    if (auth.loading || !email) return undefined;
+    const verifiedEmail = email || auth.user?.email || '';
+    if (auth.loading || !verifiedEmail) return undefined;
     let active = true;
     const refresh = async () => {
       if (document.visibilityState === 'hidden') return;
       const result = await getOrderDetails({
         orderNumber,
         userId: auth.user?.id,
-        email,
+        email: verifiedEmail,
       });
       if (active && result.order) setState(result);
     };
