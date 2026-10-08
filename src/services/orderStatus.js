@@ -9,6 +9,7 @@ const STATUS_MAP = {
   },
   order: {
     pending: { category: 'pending', en: 'Pending', ar: 'قيد الانتظار' },
+    draft: { category: 'pending', en: 'Pending', ar: 'قيد الانتظار' },
     received: { category: 'pending', en: 'Order Received', ar: 'تم استلام الطلب' },
     confirmed: { category: 'pending', en: 'Confirmed', ar: 'تم التأكيد' },
     processing: { category: 'pending', en: 'Processing', ar: 'قيد التجهيز' },
@@ -22,6 +23,8 @@ const STATUS_MAP = {
   fulfillment: {
     unfulfilled: { category: 'pending', en: 'Not Fulfilled', ar: 'لم يتم التنفيذ' },
     processing: { category: 'pending', en: 'Preparing', ar: 'قيد التحضير' },
+    partial: { category: 'warning', en: 'Partially Fulfilled', ar: 'تم تنفيذ جزء من الطلب' },
+    on_hold: { category: 'warning', en: 'On Hold', ar: 'معلق مؤقتاً' },
     in_delivery_process: { category: 'pending', en: 'In Delivery Process', ar: 'قيد التوصيل' },
     out_for_delivery: { category: 'pending', en: 'Out for Delivery', ar: 'أثناء التوصيل' },
     delivered: { category: 'success', en: 'Delivered', ar: 'تم التوصيل' },
