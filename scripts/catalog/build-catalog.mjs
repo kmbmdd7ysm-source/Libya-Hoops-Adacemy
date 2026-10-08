@@ -26,7 +26,7 @@ export function buildCatalog(input = products) {
           canonical_slug: product.slug,
           sku: variant.sku,
           product_name: product.name.en,
-          product_status: 'active',
+          product_status: active ? 'active' : product.comingSoon || product.available === false ? 'coming_soon' : 'sold_out',
           active,
           color: variant.color || null,
           size: variant.size || null,
