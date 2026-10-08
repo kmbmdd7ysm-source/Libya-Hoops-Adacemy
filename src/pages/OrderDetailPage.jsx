@@ -25,6 +25,26 @@ export default function OrderDetailPage() {
   useEffect(() => {
     if (!auth.loading) load();
   }, [auth.loading, auth.user?.id, orderNumber]);
+  // Refresh only verified orders while the customer keeps the tracker open.
+  // Do not replace an already visible order with a loading placeholder.
+  useEffect(() => {
+    if (auth.loading || !email) return undefined;
+    let active = true;
+    const refresh = async () => {
+      if (document.visibilityState === 'hidden') return;
+      const result = await getOrderDetails({
+        orderNumber,
+        userId: auth.user?.id,
+        email,
+      });
+      if (active && result.order) setState(result);
+    };
+    const interval = setInterval(refresh, 30_000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [auth.loading, auth.user?.id, orderNumber, email]);
   const order = state.order;
   const payment = order ? presentOrderStatus('payment', order.paymentStatus, lang) : null;
   const status = order ? presentOrderStatus('order', order.orderStatus, lang) : null;
