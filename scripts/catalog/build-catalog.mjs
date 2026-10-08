@@ -11,6 +11,7 @@ export function buildCatalog(input = products) {
         throw new Error(`Unsupported currency for ${product.id}`);
       if (!Number.isFinite(product.price) || product.price < 0)
         throw new Error(`Invalid price for ${product.id}`);
+      const active = product.available !== false && product.comingSoon !== true && product.availability !== 'sold-out';
       return (product.variants || []).map((variant) => {
         if (!variant?.sku) throw new Error(`Variant missing SKU for ${product.id}`);
         const variantId = `${product.id}:${variant.sku}`;
@@ -26,14 +27,16 @@ export function buildCatalog(input = products) {
           sku: variant.sku,
           product_name: product.name.en,
           product_status: 'active',
-          active: product.availability !== 'sold-out',
+          active,
           color: variant.color || null,
           size: variant.size || null,
           currency: product.currency,
           unit_price: product.price,
           compare_at_price: product.compareAt ?? null,
           availability_state:
-            variant.stock > 0
+            !active
+              ? 'unavailable'
+              : variant.stock > 0
               ? variant.stock <= product.lowStockThreshold
                 ? 'low_stock'
                 : 'in_stock'
