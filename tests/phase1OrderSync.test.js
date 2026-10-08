@@ -70,4 +70,14 @@ describe('phase 1 order synchronization invariants', () => {
     expect(statuses).toContain("on_hold: { category: 'warning'");
   });
 
+  it('retains central shipment state and shows it in verified order tracking', () => {
+    const orders = read('src/services/orders.js');
+    const statuses = read('src/services/orderStatus.js');
+    const detail = read('src/pages/OrderDetailPage.jsx');
+    expect(orders).toContain('shipment: row.shipment || null');
+    expect(statuses).toContain("out_for_delivery: { category: 'pending'");
+    expect(detail).toContain("presentOrderStatus('shipment', order.shipment.status, lang)");
+    expect(detail).toContain('order.shipment?.trackingNumber');
+  });
+
 });
