@@ -63,4 +63,11 @@ describe('phase 1 order synchronization invariants', () => {
     expect(detail).toContain('clearInterval(interval)');
   });
 
+  it('maps the operational Center Vision order and fulfillment states in both languages', () => {
+    const statuses = read('src/services/orderStatus.js');
+    expect(statuses).toContain("draft: { category: 'pending'");
+    expect(statuses).toContain("partial: { category: 'warning'");
+    expect(statuses).toContain("on_hold: { category: 'warning'");
+  });
+
 });
