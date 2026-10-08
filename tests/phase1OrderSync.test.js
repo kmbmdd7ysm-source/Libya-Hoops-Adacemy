@@ -47,4 +47,20 @@ describe('phase 1 order synchronization invariants', () => {
     expect(notification).toContain('for (let attempt = 0; attempt < 3; attempt += 1)');
     expect(notification).toContain('retryable: true');
   });
+  it('prioritizes Center Vision status when a verified customer opens an order', () => {
+    const orders = read('src/services/orders.js');
+    const details = orders.slice(orders.indexOf('export async function getOrderDetails'));
+    expect(details.indexOf('const live = await lookupGuestOrder(number, email)')).toBeLessThan(
+      details.indexOf('if (userId) {'),
+    );
+    expect(details).toContain("live.source === 'center-vision'");
+  });
+
+  it('refreshes verified order tracking without requiring a page reload', () => {
+    const detail = read('src/pages/OrderDetailPage.jsx');
+    expect(detail).toContain('const interval = setInterval(refresh, 30_000)');
+    expect(detail).toContain("document.visibilityState === 'hidden'");
+    expect(detail).toContain('clearInterval(interval)');
+  });
+
 });
