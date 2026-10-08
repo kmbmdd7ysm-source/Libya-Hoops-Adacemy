@@ -631,6 +631,12 @@ export async function lookupGuestOrder(orderNumber, email) {
 export async function getOrderDetails({ orderNumber, userId, email }) {
   const number = clean(orderNumber).toUpperCase();
   if (!number) return { state: 'not-found', order: null, error: null };
+  // Center Vision is authoritative for operational order status.
+  // A verified lookup must take precedence over local/cloud order snapshots.
+  if (email) {
+    const live = await lookupGuestOrder(number, email);
+    if (live.source === 'center-vision' || live.order || !userId) return live;
+  }
   if (userId) {
     const result = await getMyOrders(userId);
     const order =
