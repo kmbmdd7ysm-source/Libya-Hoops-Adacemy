@@ -33,16 +33,10 @@ export function buildCatalog(input = products) {
           currency: product.currency,
           unit_price: product.price,
           compare_at_price: product.compareAt ?? null,
-          availability_state:
-            !active
-              ? 'unavailable'
-              : variant.stock > 0
-              ? variant.stock <= product.lowStockThreshold
-                ? 'low_stock'
-                : 'in_stock'
-              : 'out_of_stock',
+          // Never turn demo product stock into authoritative warehouse quantities.
+          availability_state: !active ? 'unavailable' : 'out_of_stock',
           inventory_tracking: inventoryTracking,
-          inventory_quantity: inventoryTracking ? variant.stock : null,
+          inventory_quantity: inventoryTracking ? 0 : null,
           variant_data: {
             color: variant.color || null,
             size: variant.size || null,
