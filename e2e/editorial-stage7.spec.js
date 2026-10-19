@@ -41,9 +41,11 @@ test('shop mega menu stays available by keyboard and mouse, including category l
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  const cookieDialog = page.locator('.cookie-banner');
+  await expect(cookieDialog).toBeVisible();
+  await cookieDialog.locator('.cookie-buttons .btn-secondary').first().click();
+  await expect(cookieDialog).toBeHidden();
   await expect(page.locator('.site-header')).toHaveAttribute('data-hydrated', 'true');
-  const reject = page.getByRole('button', { name: /reject|رفض/i });
-  if (await reject.isVisible().catch(() => false)) await reject.click();
   const shop = page.locator('.desktop-nav a[href="/shop"]');
   await shop.focus();
   const mega = page.locator('#shop-mega-menu');
