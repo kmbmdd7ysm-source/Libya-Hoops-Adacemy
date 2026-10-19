@@ -851,23 +851,38 @@ html[lang^='ar'] .section-label {
   color: #111 !important;
   backdrop-filter: none !important;
 }
-.search-overlay .search-mobile-head { background: #fff !important; color: #111; }
+.search-overlay .search-mobile-head {
+  background: #fff !important;
+  color: #111;
+}
 .search-overlay .search-input-wrap {
   background: #f3f3f3 !important;
   color: #111 !important;
 }
-.search-overlay .search-input-wrap input { color: #111; }
-.search-overlay .search-input-wrap input::placeholder { color: #525252; opacity: 1; }
-.search-overlay .search-screen-content { background: #fff; color: #111; }
+.search-overlay .search-input-wrap input {
+  color: #111;
+}
+.search-overlay .search-input-wrap input::placeholder {
+  color: #525252;
+  opacity: 1;
+}
+.search-overlay .search-screen-content {
+  background: #fff;
+  color: #111;
+}
 .search-overlay .search-screen-content h2,
 .search-overlay .search-cancel,
-.search-overlay .search-suggestions li small { color: #444 !important; }
+.search-overlay .search-suggestions li small {
+  color: #444 !important;
+}
 .search-overlay .search-chip-grid > button {
   background: #f3f3f3 !important;
   color: #111 !important;
   border: 1px solid #d1d1d1 !important;
 }
-.search-overlay .search-chip-grid > button:hover { background: #dedede !important; }
+.search-overlay .search-chip-grid > button:hover {
+  background: #dedede !important;
+}
 /* Avoid a translucent animation during automated or assistive-tech reading. */
 .search-overlay.open,
 .search-overlay.open .search-overlay-inner {
@@ -888,13 +903,15 @@ html[lang^='ar'] .section-label {
   cursor: pointer;
   text-align: start;
 }
-.search-overlay .search-suggestions [role='option'] > span { font-weight: 730; }
+.search-overlay .search-suggestions [role='option'] > span {
+  font-weight: 730;
+}
 .search-overlay .search-suggestions [role='option'] > small {
   color: #494949;
-  font-size: .78rem;
+  font-size: 0.78rem;
   white-space: nowrap;
 }
-.search-overlay .search-suggestions [role='option']:is(:hover,.active,[aria-selected='true']) {
+.search-overlay .search-suggestions [role='option']:is(:hover, .active, [aria-selected='true']) {
   background: #f2f2f2;
 }
 .search-overlay .search-suggestions [role='option']:focus-visible {
