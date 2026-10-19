@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test('digital training checkout never presents physical cash-on-delivery as payment', async ({ page }) => {
   await page.goto('/online-training', { waitUntil: 'load' });
+  const rejectCookies = page.getByRole('button', { name: /reject|رفض/i });
+  if (await rejectCookies.isVisible().catch(() => false)) await rejectCookies.click();
   await expect(page.locator('.training-discovery')).toBeVisible();
   // Follow a real in-app link so hydration and cart providers stay mounted.
   await page.locator('a[href="/online-training/bodyweight-work"]').first().click();
