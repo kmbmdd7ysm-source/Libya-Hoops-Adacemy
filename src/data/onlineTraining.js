@@ -87,7 +87,7 @@ export const onlineTraining = [
         },
       },
       {
-        title: { en: 'Weeks 3–6 · Game Application', ar: 'الأسابيع 3–6 · التطبيق' },
+        title: { en: 'Weeks 3–4 · Game Application', ar: 'الأسابيع 3–4 · التطبيق' },
         lessons: {
           en: ['Change of pace', 'Creating separation', 'Live reads'],
           ar: ['تغيير الإيقاع', 'خلق المساحة', 'القراءة الحية'],
