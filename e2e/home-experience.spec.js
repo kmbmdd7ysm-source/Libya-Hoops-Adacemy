@@ -60,8 +60,8 @@ test('hero has a pause/resume control while video is enabled', async ({ page }) 
   await expect(page.locator('.home-v2-hero video')).toHaveJSProperty('paused', true);
 });
 
-test.use({ reducedMotion: 'reduce' });
 test('reduced motion visitors get the static hero poster', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await expect(page.locator('.home-v2-hero .hero-poster')).toBeVisible();
   await expect(page.locator('.home-v2-hero video')).toHaveCount(0);
