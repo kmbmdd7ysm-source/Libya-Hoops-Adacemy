@@ -23,6 +23,7 @@ import SmartImage from '../components/common/SmartImage';
 import EmptyState from '../components/common/EmptyState';
 import { sendFormspree } from '../services/formspree';
 import { listAddresses } from '../services/account/addressService';
+import { canSubmitCodCart, requiresNonCodCheckout } from '../utils/commerceGuard';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const configured = isPaymentsConfigured();
@@ -49,7 +50,7 @@ export default function CheckoutPage() {
   });
   const [agree, setAgree] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(
-    isCashEligibleCountry(countryCode) ? 'cash' : 'online',
+    canSubmitCodCart(items, countryCode) ? 'cash' : 'online',
   );
   const [eligibilityNotice, setEligibilityNotice] = useState('');
   const [orderConfirmed, setOrderConfirmed] = useState('');
@@ -92,6 +93,8 @@ export default function CheckoutPage() {
     : '';
   const addressRequirements = getAddressRequirements(shippingCountryCode);
   const isLibyaAddress = shippingCountryCode === 'LY';
+  const physicalCodEligible = canSubmitCodCart(items, shippingCountryCode);
+  const hasNonCodItems = requiresNonCodCheckout(items);
 
   const changeCountry = (nextCode) => {
     const normalized = normalizeCountryCode(nextCode);
@@ -103,7 +106,7 @@ export default function CheckoutPage() {
       postal: undefined,
       state: undefined,
     }));
-    if (isCashEligibleCountry(normalized)) {
+    if (canSubmitCodCart(items, normalized)) {
       setPaymentMethod('cash');
       setEligibilityNotice('');
     } else {
@@ -234,11 +237,11 @@ export default function CheckoutPage() {
       if (addressRequirements?.postalCodeRequired && !form.postal.trim())
         e.postal = t.checkout.requiredError;
     }
-    if (paymentMethod === 'cash' && !isCashEligibleCountry(shippingCountryCode)) {
-      e.payment =
-        lang === 'ar'
-          ? 'الدفع النقدي متاح فقط للتوصيل داخل ليبيا.'
-          : 'Cash payment is available only for deliveries in Libya.';
+    if (paymentMethod === 'cash' && !physicalCodEligible) {
+      e.payment = pick({
+        en: 'Cash on delivery requires physical products with valid SKUs and a Libya delivery address.',
+        ar: 'الدفع عند الاستلام يتطلب منتجات مادية بأكواد صحيحة وعنوان توصيل داخل ليبيا.',
+      });
     }
     if (!rateReady && (currency === 'LYD' || hasPhysical)) {
       e.shipping =
@@ -294,7 +297,7 @@ export default function CheckoutPage() {
         })),
       };
       if (paymentMethod === 'cash') {
-        if (!isCashEligibleCountry(shippingCountryCode)) {
+        if (!physicalCodEligible) {
           setFailed(
             lang === 'ar'
               ? 'الدفع النقدي متاح فقط للتوصيل داخل ليبيا.'
@@ -410,6 +413,8 @@ export default function CheckoutPage() {
                 },
                 items: payload.items.map((item) => ({
                   productId: item.id,
+                  type: item.type,
+                  fulfillmentType: item.fulfillmentType || (item.type === 'product' ? 'physical' : undefined),
                   variantId: item.sku ? `${item.id}:${item.sku}` : `${item.type}:${item.id}`,
                   sku: item.sku || null,
                   quantity: item.quantity,
@@ -733,7 +738,7 @@ export default function CheckoutPage() {
 
                     <fieldset className="form-block payment-methods">
                       <legend>{lang === 'ar' ? 'طريقة الدفع' : 'Payment method'}</legend>
-                      {isCashEligibleCountry(shippingCountryCode) ? (
+                      {physicalCodEligible ? (
                         <label
                           className={`payment-choice ${paymentMethod === 'cash' ? 'active' : ''}`}
                         >
@@ -755,9 +760,15 @@ export default function CheckoutPage() {
                         </label>
                       ) : (
                         <p className="notice notice--muted" role="status">
-                          {lang === 'ar'
-                            ? 'الدفع النقدي متاح فقط للتوصيل داخل ليبيا.'
-                            : 'Cash payment is available only for deliveries in Libya.'}
+                          {hasNonCodItems
+                            ? pick({
+                                en: 'Cash on delivery is for physical goods with verified SKUs only. Digital programs and event registrations require separate confirmed payment and delivery.',
+                                ar: 'الدفع عند الاستلام للمنتجات المادية ذات الأكواد المعتمدة فقط. البرامج الرقمية وتسجيل الفعاليات تحتاج دفع وتسليم مؤكدين بشكل منفصل.',
+                              })
+                            : pick({
+                                en: 'Cash on delivery is available for eligible physical orders within Libya only.',
+                                ar: 'الدفع عند الاستلام متاح للطلبات المادية المؤهلة داخل ليبيا فقط.',
+                              })}
                         </p>
                       )}
                       <label
