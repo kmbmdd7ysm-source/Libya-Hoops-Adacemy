@@ -1,5 +1,5 @@
-
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart, cartKey } from '../context/CartContext';
 import { SITE } from '../config';
@@ -22,19 +22,23 @@ export default function TrainingDetailPage() {
   const { addItem } = useCart();
   const wishlist = useWishlist();
   const program = getTraining(slug);
-  const [searchParams, setSearchParams] = useSearchParams();
-  // Keep selected plan in URL: an app/route refresh cannot silently charge
-  // the first (often cheaper) tier instead of the plan a visitor chose.
-  const requestedOptionId = searchParams.get('plan');
-  const selectedOptionId = program?.purchaseOptions?.some((option) => option.id === requestedOptionId)
-    ? requestedOptionId
-    : program?.purchaseOptions?.[0]?.id || 'default';
+  const [selectedOptionId, setSelectedOptionId] = useState(() => {
+    // A prerendered page can remount when client JS finishes loading. Keep a
+    // customer's chosen tier stable rather than falling back to month one.
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.sessionStorage.getItem(`lha-training-plan:${slug}`);
+    } catch {
+      return null;
+    }
+  });
   const selectOption = (optionId) => {
-    setSearchParams((current) => {
-      const next = new URLSearchParams(current);
-      next.set('plan', optionId);
-      return next;
-    }, { replace: true });
+    try {
+      window.sessionStorage.setItem(`lha-training-plan:${slug}`, optionId);
+    } catch {
+      // Private browsing may disallow storage; local React state still works.
+    }
+    setSelectedOptionId(optionId);
   };
 
   if (!program) return <NotFoundPage />;
