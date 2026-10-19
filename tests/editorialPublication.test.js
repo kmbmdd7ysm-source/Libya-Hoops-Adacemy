@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
-  events, publishedEvents, getEvent, upcomingEvents, pastEvents,
-  featuredEvents, isEventEnded, canRegister,
+  events,
+  publishedEvents,
+  getEvent,
+  upcomingEvents,
+  pastEvents,
+  featuredEvents,
+  isEventEnded,
+  canRegister,
 } from '../src/data/events.js';
 
 describe('events are public only after their details are verified', () => {
@@ -23,8 +29,12 @@ describe('events are public only after their details are verified', () => {
 
   it('requires verified publication, open status, capacity and valid dates for registration', () => {
     const e = {
-      verified: true, status: 'open', remaining: 5, comingSoon: false,
-      startDate: '2026-12-20', endDate: '2026-12-20',
+      verified: true,
+      status: 'open',
+      remaining: 5,
+      comingSoon: false,
+      startDate: '2026-12-20',
+      endDate: '2026-12-20',
       registrationDeadline: '2026-12-19',
     };
     expect(canRegister(e, '2026-10-19')).toBe(true);
