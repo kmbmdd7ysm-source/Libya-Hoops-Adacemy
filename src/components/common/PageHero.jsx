@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 
 const heroArtwork = [
   {
@@ -34,6 +35,18 @@ const heroArtwork = [
   },
 ];
 
+// Visible hero copy is intentionally shorter than the detailed SEO copy below
+// the fold. Preserve the original page descriptions in the metadata.
+const heroIntros = [
+  { test: /^\\/shop(?:\\/|$)/, en: 'Performance essentials. Everyday style.', ar: 'ملابس رياضية. ستايل كل يوم.' },
+  { test: /^\\/online-training(?:\\/|$)/, en: 'Train anywhere. Get better every day.', ar: 'تدرّب من أي مكان. وتطوّر كل يوم.' },
+  { test: /^\\/programs(?:\\/|$)/, en: 'Real basketball work starts here.', ar: 'التطور الحقيقي يبدأ في الملعب.' },
+  { test: /^\\/about(?:\\/|$)/, en: 'Built in Libya. Made for the game.', ar: 'من ليبيا. ومن أجل اللعبة.' },
+  { test: /^\\/events(?:\\/|$)/, en: 'The next opportunity starts with a plan.', ar: 'كل فرصة جديدة تبدأ بخطة.' },
+  { test: /^\\/coaches(?:\\/|$)/, en: 'Stronger habits. Better players.', ar: 'عادات أفضل. لاعبين أقوى.' },
+  { test: /^\\/contact(?:\\/|$)/, en: 'Your next step starts here.', ar: 'خطوتك الجاية تبدأ من هنا.' },
+];
+
 /**
  * Section-wide editorial art: existing academy project assets, not fabricated
  * event / coach portraits. Hero headlines and CTAs remain accessible HTML.
@@ -41,7 +54,10 @@ const heroArtwork = [
  */
 export default function PageHero({ label, title, description, children }) {
   const { pathname } = useLocation();
+  const { pick } = useLanguage();
   const media = heroArtwork.find(({ test }) => test.test(pathname));
+  const editorial = heroIntros.find(({ test }) => test.test(pathname));
+  const shortDescription = editorial ? pick(editorial) : description;
 
   return (
     <section className={`page-hero${media ? ' page-hero--media' : ''}`}>
@@ -63,7 +79,7 @@ export default function PageHero({ label, title, description, children }) {
       <div className="container page-hero-inner">
         {label && <p className="section-label">{label}</p>}
         <h1 className="display-title">{title}</h1>
-        {description && <p className="page-description">{description}</p>}
+        {shortDescription && <p className="page-description">{shortDescription}</p>}
         {children}
       </div>
     </section>
