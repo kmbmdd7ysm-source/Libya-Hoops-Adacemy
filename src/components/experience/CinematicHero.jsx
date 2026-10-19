@@ -9,6 +9,7 @@ export default function CinematicHero() {
   const reduced = useReducedMotion();
   const [failed, setFailed] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -16,29 +17,36 @@ export default function CinematicHero() {
   }, [reduced]);
 
   useEffect(() => {
-    if (!videoEnabled || failed) return undefined;
-
+    if (!videoEnabled || failed || paused) return undefined;
     const element = video.current;
     if (!element) return undefined;
 
     const startPlayback = () => {
       element.play().catch(() => {
-        // iOS can briefly reject autoplay while the page is settling.
-        // Retry once on the first user interaction without showing controls.
-        const retry = () => element.play().catch(() => {});
-        window.addEventListener('touchstart', retry, { once: true, passive: true });
-        window.addEventListener('pointerdown', retry, { once: true, passive: true });
+        // Some mobile browsers block autoplay. The poster stays visible,
+        // and a visitor can still deliberately start the video.
       });
     };
 
     if (element.readyState >= 2) startPlayback();
     else element.addEventListener('canplay', startPlayback, { once: true });
-
     return () => element.removeEventListener('canplay', startPlayback);
-  }, [videoEnabled, failed]);
+  }, [videoEnabled, failed, paused]);
+
+  const togglePlayback = () => {
+    const element = video.current;
+    if (!element) return;
+    if (paused) {
+      setPaused(false);
+      element.play().catch(() => setPaused(true));
+    } else {
+      element.pause();
+      setPaused(true);
+    }
+  };
 
   return (
-    <section className="hero cinematic-hero">
+    <section className="hero cinematic-hero home-v2-hero" aria-label={pick({ en: 'Libya Hoops Academy', ar: 'ليبيا هوبس أكاديمي' })}>
       <div className="hero-media" aria-hidden="true">
         <picture className="hero-poster-picture">
           <source media="(max-width: 767px)" srcSet="/media/hero/lha-hero-poster-mobile.webp" />
@@ -69,41 +77,50 @@ export default function CinematicHero() {
           </video>
         )}
       </div>
+
       <div className="container hero-inner">
-        <p className="hero-kicker">
-          {pick({ en: 'Libya Hoops Academy', ar: 'أكاديمية ليبيا لكرة السلة' })}
-        </p>
+        <p className="hero-kicker">{pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}</p>
         <h1 className="hero-title display-title">
           {pick({
-            en: (
-              <>
-                <span>OWN THE</span>
-                <br />
-                <span className="outline">GAME.</span>
-              </>
-            ),
-            ar: (
-              <>
-                <span>امتلك</span>
-                <br />
-                <span className="outline">اللعبة.</span>
-              </>
-            ),
+            en: <><span>OWN THE</span><br /><span className="outline">GAME.</span></>,
+            ar: <><span>امتلك</span><br /><span className="outline">اللعبة.</span></>,
           })}
         </h1>
-        <p className="hero-text">{t.home.heroText}</p>
-        <div className="hero-actions">
-          <Link to="/programs" className="btn-primary block">
-            {t.common.explorePrograms}
+        <p className="hero-text">
+          {pick({
+            en: 'Build your game with purpose. Train on court, develop anywhere, and carry the culture beyond the lines.',
+            ar: 'طوّر مستواك بهدف. تدرّب في الملعب، وطوّر أداءك من أي مكان، وخلي شغفك باللعبة جزء من يومك.',
+          })}
+        </p>
+        <div className="hero-actions home-v2-hero-actions">
+          <Link to="/programs" className="btn-primary block">{t.common.explorePrograms}</Link>
+          <Link to="/online-training" className="btn-secondary block">
+            {pick({ en: 'Online Training', ar: 'التدريب أونلاين' })}
           </Link>
-          <Link to="/shop" className="btn-secondary block">
-            {t.common.shopNow}
+          <Link to="/shop" className="home-v2-hero-shop">
+            {pick({ en: 'Explore the Store', ar: 'تسوّق منتجات الأكاديمية' })}
+            <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </div>
-      <a className="hero-scroll" href="#home-story">
+
+      {videoEnabled && !failed && (
+        <button
+          type="button"
+          className="home-v2-video-toggle"
+          onClick={togglePlayback}
+          aria-label={paused
+            ? pick({ en: 'Play background video', ar: 'تشغيل فيديو الخلفية' })
+            : pick({ en: 'Pause background video', ar: 'إيقاف فيديو الخلفية مؤقتاً' })}
+        >
+          {paused
+            ? pick({ en: 'PLAY FILM', ar: 'تشغيل' })
+            : pick({ en: 'PAUSE FILM', ar: 'إيقاف' })}
+        </button>
+      )}
+      <a className="hero-scroll" href="#home-paths">
         <span className="sr-only">
-          {pick({ en: 'Scroll to academy content', ar: 'انتقل إلى محتوى الأكاديمية' })}
+          {pick({ en: 'Explore training and store paths', ar: 'استكشف خيارات التدريب والمتجر' })}
         </span>
         <span className="hero-scroll-dot" aria-hidden="true" />
       </a>
