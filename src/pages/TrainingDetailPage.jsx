@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart, cartKey } from '../context/CartContext';
 import { SITE } from '../config';
@@ -22,7 +22,20 @@ export default function TrainingDetailPage() {
   const { addItem } = useCart();
   const wishlist = useWishlist();
   const program = getTraining(slug);
-  const [selectedOptionId, setSelectedOptionId] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Keep selected plan in URL: an app/route refresh cannot silently charge
+  // the first (often cheaper) tier instead of the plan a visitor chose.
+  const requestedOptionId = searchParams.get('plan');
+  const selectedOptionId = program?.purchaseOptions?.some((option) => option.id === requestedOptionId)
+    ? requestedOptionId
+    : program?.purchaseOptions?.[0]?.id || 'default';
+  const selectOption = (optionId) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('plan', optionId);
+      return next;
+    }, { replace: true });
+  };
 
   if (!program) return <NotFoundPage />;
 
@@ -171,7 +184,7 @@ export default function TrainingDetailPage() {
               {program.purchaseOptions?.length > 0 && (
                 <div className="training-purchase-options" role="radiogroup" aria-label={pick({ en: 'Choose access plan', ar: 'اختر مدة الاشتراك' })}>
                   {program.purchaseOptions.map((option) => (
-                    <button key={option.id} type="button" role="radio" aria-checked={selectedOption?.id === option.id} className={`training-purchase-option${selectedOption?.id === option.id ? ' active' : ''}`} onClick={() => setSelectedOptionId(option.id)}>
+                    <button key={option.id} type="button" role="radio" aria-checked={selectedOption?.id === option.id} className={`training-purchase-option${selectedOption?.id === option.id ? ' active' : ''}`} onClick={() => selectOption(option.id)}>
                       <span><strong>{pick(option.label)}</strong>{option.duration && <small>{pick(option.duration)}</small>}</span>
                       <span><Price amount={option.price} compareAt={option.compareAt} size="sm" />{option.savings && <small className="option-saving">{pick(option.savings)}</small>}</span>
                     </button>
