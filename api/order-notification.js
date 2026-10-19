@@ -1,7 +1,16 @@
-const ENDPOINT = process.env.FORMSPREE_ORDER_ENDPOINT || process.env.VITE_FORM_ENDPOINT || 'https://formspree.io/f/mqerbqvd';
-const CENTER_VISION_API = (process.env.CENTER_VISION_API_BASE_URL || 'https://br-sweet-mountain-b46pgqvs-centerapi.compute.c-6.us-east-2.aws.neon.tech/api').replace(/\/$/, '');
+const ENDPOINT =
+  process.env.FORMSPREE_ORDER_ENDPOINT ||
+  process.env.VITE_FORM_ENDPOINT ||
+  'https://formspree.io/f/mqerbqvd';
+const CENTER_VISION_API = (
+  process.env.CENTER_VISION_API_BASE_URL ||
+  'https://br-sweet-mountain-b46pgqvs-centerapi.compute.c-6.us-east-2.aws.neon.tech/api'
+).replace(/\/$/, '');
 
-const safe = (value, max = 12000) => String(value ?? '').replace(/\0/g, '').slice(0, max);
+const safe = (value, max = 12000) =>
+  String(value ?? '')
+    .replace(/\0/g, '')
+    .slice(0, max);
 const clean = (value) => String(value ?? '').trim();
 
 function parseObject(value) {
@@ -22,7 +31,12 @@ function normalizeLines(syncPayload) {
   return syncPayload.items.map((item) => {
     const sku = clean(item?.sku).toUpperCase();
     const quantity = Number(item?.quantity);
-    if (!/^[A-Z0-9][A-Z0-9._:-]{0,79}$/.test(sku) || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+    if (
+      !/^[A-Z0-9][A-Z0-9._:-]{0,79}$/.test(sku) ||
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 99
+    ) {
       throw new Error('invalid_order_line');
     }
     return { sku, quantity };
@@ -32,25 +46,34 @@ function normalizeLines(syncPayload) {
 async function syncCenterVision(syncPayload, input) {
   const idempotencyKey = clean(syncPayload?.idempotencyKey);
   const email = clean(syncPayload?.email).toLowerCase();
-  const currencyCode = clean(syncPayload?.currency || input.canonicalCurrency || 'USD').toUpperCase();
+  const currencyCode = clean(
+    syncPayload?.currency || input.canonicalCurrency || 'USD',
+  ).toUpperCase();
   const fullName = clean(input.customerName || input.name || 'LHA customer');
   const phone = clean(input.customerPhone);
   const shippingAddress = parseObject(syncPayload?.shipping) || {};
   const lines = normalizeLines(syncPayload);
   // COD sync is currently a physical-goods SKU endpoint. Never mislabel a
   // digital training subscription or event as a shippable paid order.
-  if (syncPayload.items.length > 25 ||
-    syncPayload.items.some((item) =>
-      item?.type && item.type !== 'product' ||
-      item?.fulfillmentType && item.fulfillmentType !== 'physical'
-    )) {
+  if (
+    syncPayload.items.length > 25 ||
+    syncPayload.items.some(
+      (item) =>
+        (item?.type && item.type !== 'product') ||
+        (item?.fulfillmentType && item.fulfillmentType !== 'physical'),
+    )
+  ) {
     throw new Error('unsupported_cod_fulfillment');
   }
-  if (clean(input.paymentMethod).toLowerCase() !== 'cash on delivery' ||
-      clean(syncPayload.paymentMethod || 'cash_on_delivery').toLowerCase() !== 'cash_on_delivery') {
+  if (
+    clean(input.paymentMethod).toLowerCase() !== 'cash on delivery' ||
+    clean(syncPayload.paymentMethod || 'cash_on_delivery').toLowerCase() !== 'cash_on_delivery'
+  ) {
     throw new Error('invalid_cod_payment_method');
   }
-  const deliveryCountry = clean(shippingAddress.country || shippingAddress.countryCode).toUpperCase();
+  const deliveryCountry = clean(
+    shippingAddress.country || shippingAddress.countryCode,
+  ).toUpperCase();
   if (deliveryCountry !== 'LY') throw new Error('unsupported_cod_country');
 
   if (!/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new Error('invalid_idempotency_key');
@@ -91,9 +114,15 @@ async function syncCenterVision(syncPayload, input) {
 }
 
 async function notifyFormspree(input, canonicalOrderNumber) {
-  const message = safe(input.message).replace(/^Order number:.*$/m, `Order number: ${canonicalOrderNumber}`);
+  const message = safe(input.message).replace(
+    /^Order number:.*$/m,
+    `Order number: ${canonicalOrderNumber}`,
+  );
   const params = new URLSearchParams({
-    _subject: safe(input._subject || `New LHA order ${canonicalOrderNumber}`, 180).replace(safe(input.orderNumber, 80), canonicalOrderNumber),
+    _subject: safe(input._subject || `New LHA order ${canonicalOrderNumber}`, 180).replace(
+      safe(input.orderNumber, 80),
+      canonicalOrderNumber,
+    ),
     _template: 'table',
     form_type: 'order',
     order_number: canonicalOrderNumber,
@@ -109,7 +138,10 @@ async function notifyFormspree(input, canonicalOrderNumber) {
   });
   const response = await fetch(ENDPOINT, {
     method: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    },
     body: params.toString(),
     signal: AbortSignal.timeout(15000),
   });
@@ -141,8 +173,11 @@ export default async function handler(req, res) {
 
     stage = 'notification';
     let notification = 'sent';
-    try { await notifyFormspree(input, canonicalOrderNumber); }
-    catch { notification = 'pending'; }
+    try {
+      await notifyFormspree(input, canonicalOrderNumber);
+    } catch {
+      notification = 'pending';
+    }
 
     return res.status(200).json({
       ok: true,

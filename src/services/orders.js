@@ -236,33 +236,33 @@ async function invokeOrderFunction(name, body) {
 
 function orderIdentity(order) {
   return clean(
-    order?.idempotencyKey ||
-      order?.idempotency_key ||
-      order?.orderNumber ||
-      order?.order_number,
+    order?.idempotencyKey || order?.idempotency_key || order?.orderNumber || order?.order_number,
   );
 }
 
 function mergeOrderLists(...groups) {
   const merged = new Map();
-  groups.flat().filter(Boolean).forEach((raw) => {
-    const order = normalizeOrder(raw);
-    const key = orderIdentity(order) || order.id;
-    const current = merged.get(key);
-    const orderTime = Number(new Date(order.updatedAt || order.createdAt));
-    const currentTime = current
-      ? Number(new Date(current.updatedAt || current.createdAt))
-      : Number.NEGATIVE_INFINITY;
-    const orderIsSynced = order.syncState === 'synced' || order.source === 'cloud';
-    const currentIsSynced = current?.syncState === 'synced' || current?.source === 'cloud';
-    if (
-      !current ||
-      orderTime > currentTime ||
-      (orderTime === currentTime && orderIsSynced && !currentIsSynced)
-    ) {
-      merged.set(key, order);
-    }
-  });
+  groups
+    .flat()
+    .filter(Boolean)
+    .forEach((raw) => {
+      const order = normalizeOrder(raw);
+      const key = orderIdentity(order) || order.id;
+      const current = merged.get(key);
+      const orderTime = Number(new Date(order.updatedAt || order.createdAt));
+      const currentTime = current
+        ? Number(new Date(current.updatedAt || current.createdAt))
+        : Number.NEGATIVE_INFINITY;
+      const orderIsSynced = order.syncState === 'synced' || order.source === 'cloud';
+      const currentIsSynced = current?.syncState === 'synced' || current?.source === 'cloud';
+      if (
+        !current ||
+        orderTime > currentTime ||
+        (orderTime === currentTime && orderIsSynced && !currentIsSynced)
+      ) {
+        merged.set(key, order);
+      }
+    });
   return [...merged.values()]
     .sort((a, b) => Number(new Date(b.createdAt)) - Number(new Date(a.createdAt)))
     .slice(0, MAX_ORDERS);

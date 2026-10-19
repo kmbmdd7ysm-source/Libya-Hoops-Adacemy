@@ -123,7 +123,6 @@ export default function CheckoutPage() {
     }
   };
 
-
   const applySavedAddress = (address) => {
     if (!address) return;
     setSelectedAddressId(address.id || '');
@@ -162,7 +161,9 @@ export default function CheckoutPage() {
       .catch(() => {
         if (active) setSavedAddresses([]);
       });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [auth.user?.id]);
 
   const shipping = useMemo(
@@ -415,7 +416,8 @@ export default function CheckoutPage() {
                 items: payload.items.map((item) => ({
                   productId: item.id,
                   type: item.type,
-                  fulfillmentType: item.fulfillmentType || (item.type === 'product' ? 'physical' : undefined),
+                  fulfillmentType:
+                    item.fulfillmentType || (item.type === 'product' ? 'physical' : undefined),
                   variantId: item.sku ? `${item.id}:${item.sku}` : `${item.type}:${item.id}`,
                   sku: item.sku || null,
                   quantity: item.quantity,
@@ -615,12 +617,15 @@ export default function CheckoutPage() {
                             <select
                               value={selectedAddressId}
                               onChange={(event) =>
-                                applySavedAddress(savedAddresses.find((row) => row.id === event.target.value))
+                                applySavedAddress(
+                                  savedAddresses.find((row) => row.id === event.target.value),
+                                )
                               }
                             >
                               {savedAddresses.map((address) => (
                                 <option key={address.id} value={address.id}>
-                                  {address.label || 'Home'} — {address.address_line_1 || address.line1}, {address.city}
+                                  {address.label || 'Home'} —{' '}
+                                  {address.address_line_1 || address.line1}, {address.city}
                                 </option>
                               ))}
                             </select>
@@ -629,7 +634,14 @@ export default function CheckoutPage() {
                             </Link>
                           </label>
                         )}
-                        {isLibyaAddress && <p className="field-help">{pick({ en: 'Estimated delivery: 24–48 hours', ar: 'مدة التوصيل المتوقعة: 24–48 ساعة' })}</p>}
+                        {isLibyaAddress && (
+                          <p className="field-help">
+                            {pick({
+                              en: 'Estimated delivery: 24–48 hours',
+                              ar: 'مدة التوصيل المتوقعة: 24–48 ساعة',
+                            })}
+                          </p>
+                        )}
                         {hasPhysical && !digitalOnly && items.some((i) => i.type !== 'product') && (
                           <p className="notice notice--muted">{t.checkout.mixedNote}</p>
                         )}
