@@ -24,7 +24,7 @@ for (const width of [320, 390, 768, 1440]) {
           dir: document.documentElement.dir,
           header: Boolean(document.querySelector('.site-header')),
           h1: [...document.querySelectorAll('main h1')].filter(el => getComputedStyle(el).display !== 'none').length,
-          activeStyles: [...document.styleSheets].some(sheet => String(sheet.href || '').includes('final-editorial-system')),
+          activeStyles: getComputedStyle(document.documentElement).getPropertyValue('--lha-max').trim() === '1420px',
         }));
         if (state.sw > state.vw + 2 || !state.header ||
             state.dir !== (locale === 'ar' ? 'rtl' : 'ltr') ||
