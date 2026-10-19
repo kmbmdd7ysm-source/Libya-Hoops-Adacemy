@@ -49,7 +49,10 @@ test('interactive open states are accessible', async ({ page }) => {
   await page.goto('/shop');
   await page.locator('.mobile-filter-pills button').first().click();
   await assertAxe(page, 'filters main sheet');
-  await page.getByRole('dialog').getByRole('button', { name: /Size|المقاس/i }).click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: /Size|المقاس/i })
+    .click();
   await assertAxe(page, 'size filter group');
   await page.getByRole('button', { name: /close|إغلاق/i }).click();
   await page.getByRole('button', { name: /Sort By|ترتيب/i }).click();
