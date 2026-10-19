@@ -32,7 +32,12 @@ export default function Header() {
     menuPanel = useRef(null),
     megaTimer = useRef(null);
 
+  // A client-side hydration pass is not a route change. Closing every
+  // overlay on initial mount can erase a keyboard user's first focus action.
+  const priorPathname = useRef(location.pathname);
   useEffect(() => {
+    if (priorPathname.current === location.pathname) return;
+    priorPathname.current = location.pathname;
     setMobileOpen(false);
     setMegaOpen(false);
   }, [location.pathname]);
@@ -101,9 +106,15 @@ export default function Header() {
                     clearTimeout(megaTimer.current);
                     setMegaOpen(true);
                   }}
-                  onMouseLeave={() =>
-                    (megaTimer.current = setTimeout(() => setMegaOpen(false), 120))
-                  }
+                  onMouseLeave={() => {
+                    clearTimeout(megaTimer.current);
+                    megaTimer.current = setTimeout(() => {
+                      const focus = document.activeElement;
+                      if (!focus?.closest('.nav-mega-wrap, #shop-mega-menu')) {
+                        setMegaOpen(false);
+                      }
+                    }, 180);
+                  }}
                 >
                   <NavLink
                     to={item.to}
@@ -215,7 +226,12 @@ export default function Header() {
           className={`mega-menu${megaOpen ? ' open' : ''}`}
           hidden={!megaOpen}
           onMouseEnter={() => clearTimeout(megaTimer.current)}
-          onMouseLeave={() => setMegaOpen(false)}
+          onMouseLeave={() => {
+            const focus = document.activeElement;
+            if (!focus?.closest('.nav-mega-wrap, #shop-mega-menu')) {
+              setMegaOpen(false);
+            }
+          }}
           onKeyDown={(event) => {
             if (event.key === 'Escape') {
               setMegaOpen(false);
