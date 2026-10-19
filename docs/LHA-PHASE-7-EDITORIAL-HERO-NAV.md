@@ -1,7 +1,7 @@
 # Libya Hoops Academy 2.0 — Phase 7: Premium Hero, Navigation and Academy Editorial
 
 **Date:** October 19, 2026
-**Current state:** Source implementation complete on staged GitHub branch. Final full mobile regression and Vercel production deployment must be verified before claiming release.
+**Current state:** SCOPED PHASE 7 RELEASED and Vercel production READY, but full global visual/functional QA and Stage 6 operational integrations are unfinished.
 
 ## Work actually implemented
 
@@ -32,3 +32,10 @@
 - Durable project master: `docs/LHA-NEXT-LEVEL-HANDOFF.md`
 - Full outstanding UI checklist: `docs/LHA-EXPERIENCE-FINAL-AUDIT.md`
 - Stage 6 commerce safety report: `docs/LHA-PHASE-6-COMMERCE-DESIGN.md`
+
+## Final verified production release
+- Main release code: `44356d5e73073b37cbd6ba97d356810513f716ea`; inspector: https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/9igFuBPMqq48Bz9hTWKqYcr2R92A — **production READY**.
+- Live homepage and interior pages `/events`, `/coaches`, `/about`, `/online-training` were fetched read-only and showed the new content, local WebP hero assets and no published stale event listing.
+- Additional 320–430px EN/AR narrow responsive rerun **7/7 passed** after correcting both overflow classes. An attempted full 32-test matrix rerun after this fix could not finish due to a Vercel sandbox stop (exit 143); therefore NO blanket 32/32 claim for that last source.
+- PWA auto-reload root cause: `PwaPrompt.jsx` listened to `controller-changed` and invoked `location.reload()` without consent unless a form was focused. It now only refreshes when the user explicitly clicks Update; checkout and mega keyboard regressions are stable in focused tests.
+- Current user-facing original planned stages left: **2 (8 and 9)**. The secure payment/digital delivery and true Center Vision operational backlog from phase 6 remains independently open.

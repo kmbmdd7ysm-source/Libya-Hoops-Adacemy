@@ -32,3 +32,10 @@
 
 ## Continuation and priority
 Keep operational work from stage 6 separate from visible art direction and content. Next active tracks: close verified payment and authenticated delivery; complete coaches/events editorial accuracy; account polish; then systematic full-site visual, bilingual, accessibility, SEO and performance sign-off. Do not claim '100% complete' before evidence proves each gate.
+
+## Phase 7 editorial pass (implemented and still not full-site signoff)
+- Added route-specific interior art direction for the public shop, academy, online training, events, coaches and contact pages, using files already stored in the GitHub project. Actual use rights and editorial photography quality require final human signoff.
+- Reduced top desktop navigation to six primary paths and fixed keyboard-only dropdown access. Fixed PWA first-controller takeover causing unsolicited full page reload, including during keyboard use.
+- Demo event pages/date promos suppressed instead of inventing dates; published coach roster is empty, shown as transparent program/approach content rather than bogus staff.
+- Fixed small-screen training filter chips and event banner overflow (7 formerly failing responsive cases rerun PASS). A full post-fix 32-case matrix remains unverified due to sandbox stop; revisit in Phase 9.
+- **Two original roadmap phases remain (8 account/bilingual, 9 complete cross-device release QA); Phase 6 operational payment and fulfillment must also be closed.**
