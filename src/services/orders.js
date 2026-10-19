@@ -218,6 +218,8 @@ export function updateLocalOrderNumber(idempotencyKey, orderNumber) {
       orderNumber: number,
       source: 'center-vision',
       syncState: 'synced',
+      orderStatus: 'confirmed',
+      fulfillmentStatus: 'unfulfilled',
       updatedAt: new Date().toISOString(),
     });
   });
