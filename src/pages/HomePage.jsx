@@ -115,8 +115,8 @@ export default function HomePage() {
             </div>
             <p>
               {pick({
-                en: 'Three ways to grow. One game.'
-                ar: 'ثلاث طرق للتطور. لعبة واحدة.'
+                en: 'Three ways to grow. One game.',
+                ar: 'ثلاث طرق للتطور. لعبة واحدة.',
               })}
             </p>
           </div>
