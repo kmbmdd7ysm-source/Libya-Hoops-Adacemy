@@ -1,0 +1,216 @@
+/* LHA 2.0 / phase 8 — quiet, monochrome customer experience.
+   All photos reference existing, original academy media in the repository. */
+
+.account-access-section { background: #f7f7f7; }
+.account-access-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  max-width: 1190px;
+  min-height: 660px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  padding: 0;
+  overflow: hidden;
+}
+.account-access-art {
+  position: relative;
+  isolation: isolate;
+  min-height: 660px;
+  background: #0b0b0b;
+  color: #fff;
+  overflow: hidden;
+}
+.account-access-art img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.account-access-art::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,.3) 55%,rgba(0,0,0,.12));
+}
+.account-access-art-content {
+  position: absolute;
+  z-index: 2;
+  inset-inline: clamp(26px,3vw,56px);
+  bottom: clamp(34px,4vw,65px);
+  display: grid;
+  gap: 13px;
+}
+.account-access-art-content span {
+  font-size: .76rem;
+  letter-spacing: .12em;
+  font-weight: 780;
+  color: #eee;
+}
+.account-access-art-content strong {
+  font-size: clamp(2.5rem,4.2vw,4.6rem);
+  font-weight: 900;
+  letter-spacing: -.045em;
+  line-height: 1;
+  max-width: 11ch;
+}
+.account-access-art-content p {
+  max-width: 39ch;
+  line-height: 1.65;
+  font-size: .98rem;
+  color: #f1f1f1;
+  margin: 0;
+}
+.account-access-form {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(30px,4vw,66px);
+}
+.account-access-form h1 {
+  font-size: clamp(2.25rem,3.3vw,3.6rem);
+  letter-spacing: -.035em;
+  line-height: 1.12;
+  margin-block: 12px 30px;
+}
+.account-access-form .section-label { color: #616161; }
+.account-access-form :is(input,button) { min-height: 44px; }
+.account-access-form :is(input,button,a):focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+.account-access-guest-note {
+  border-top: 1px solid #e5e5e5;
+  margin-top: 26px;
+  padding-top: 24px;
+  line-height: 1.65;
+  color: #555;
+  font-size: .9rem;
+}
+.account-access-guest-note a { text-underline-offset: 3px; font-weight: 800; color: #111; }
+.account-layout { grid-template-columns: minmax(175px,220px) minmax(0,1fr); gap: clamp(22px,3vw,55px); }
+.account-nav { align-self: start; position: sticky; top: 105px; padding-inline-end: 10px; }
+.account-nav button {
+  font-size: .94rem;
+  font-weight: 620;
+  padding: 13px 17px;
+  border-inline-start-width: 2px;
+  color: #424242;
+  transition: background .16s ease,color .16s ease;
+}
+.account-nav button:hover { background: #f3f3f3; color: #111; }
+.account-nav button.active { color: #090909; background: #f1f1f1; }
+.account-nav button:focus-visible { outline: 2px solid #111; outline-offset: -2px; }
+.account-content { padding-bottom: 45px; }
+.account-section-heading { padding-bottom: 24px; margin-bottom: 28px; border-bottom: 1px solid #dedede; }
+.account-section-heading .section-label { margin: 0 0 10px; color: #666; }
+.account-section-heading h2 { margin: 0; font-size: clamp(1.7rem,2.5vw,2.5rem); line-height: 1.2; letter-spacing: -.035em; }
+.account-grid article { border-color: #ddd; background: #fff; min-width: 0; }
+.account-grid article h2 { line-height: 1.5; }
+.account-text-link { padding: 0; background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; color: #111; font: inherit; cursor: pointer; font-weight: 700; }
+.account-text-link:focus-visible { outline: 2px solid #111; outline-offset: 4px; }
+
+.help-featured-links {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 12px;
+  margin-bottom: clamp(30px,4vw,52px);
+}
+.help-featured-link {
+  min-height: 150px;
+  color: #111;
+  background: #fff;
+  border: 1px solid #dedede;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color .18s ease,background .18s ease;
+}
+.help-featured-link > svg:first-child { width: 23px; height: 23px; }
+.help-featured-link > svg:last-child { margin-top: auto; align-self: flex-end; }
+.help-featured-link span { display: grid; gap: 7px; min-width: 0; }
+.help-featured-link strong { line-height: 1.3; font-size: 1rem; }
+.help-featured-link small { line-height: 1.55; color: #555; font-size: .82rem; }
+.help-featured-link:hover { color: #111; border-color: #555; background: #f8f8f8; }
+.help-featured-link:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+.help-search .search-input-wrap { max-width: 100%; }
+.help-search input { width: 100%; }
+.help-topic h3 { overflow-wrap: anywhere; }
+.faq-jump-nav {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(35px,5vw,60px);
+}
+.faq-jump-nav a {
+  min-height: 45px;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #d8d8d8;
+  color: #111;
+  font-size: .85rem;
+  font-weight: 700;
+  transition: border-color .18s ease,background .18s ease;
+}
+.faq-jump-nav a:hover { border-color: #111; background: #f5f5f5; }
+.faq-jump-nav a:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+.faq-category { scroll-margin-top: 110px; min-width: 0; }
+html[lang^='ar'] :is(.account-access-art-content strong,.account-access-form h1,.account-section-heading h2) {
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+html[lang^='ar'] .account-access-art-content span { letter-spacing: 0; }
+@media(max-width:850px) {
+  .account-access-layout { grid-template-columns: minmax(0,1fr); }
+  .account-access-art { min-height: 285px; }
+  .account-access-art-content { bottom: 22px; }
+  .account-access-art-content strong { font-size: clamp(2.1rem,7vw,3.3rem); }
+  .account-access-form { padding: clamp(26px,5vw,52px); }
+  .help-featured-links { grid-template-columns: minmax(0,1fr); gap: 10px; }
+  .help-featured-link { min-height: 90px; display: grid; grid-template-columns: 24px 1fr 19px; align-items: center; padding: 17px; }
+  .help-featured-link > svg:last-child { margin: 0; align-self: center; }
+}
+@media(max-width:640px) {
+  .account-access-section { padding-block: 0 !important; background: white; }
+  .account-access-layout { border: 0; }
+  .account-access-art { min-height: 220px; }
+  .account-access-art-content { gap: 8px; }
+  .account-access-art-content p { font-size: .84rem; }
+  .account-access-form { padding: 32px clamp(17px,5vw,34px) 55px; }
+  .account-access-form h1 { font-size: 2rem; }
+  .account-layout { display: block; }
+  .account-nav {
+    position: relative;
+    top: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    border: 0;
+    padding: 0;
+    margin-bottom: 32px;
+  }
+  .account-nav button {
+    flex: 0 1 auto;
+    min-height: 44px;
+    border: 1px solid #dadada;
+    border-radius: 3px;
+    padding: 10px 13px;
+    font-size: .86rem;
+  }
+  .account-nav button.active { border-color: #111; }
+  .account-section-heading { margin-bottom: 23px; }
+  .account-grid { grid-template-columns: minmax(0,1fr); }
+  .faq-jump-nav { gap: 6px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .help-featured-link,.faq-jump-nav a,.account-nav button { transition: none; }
+}
