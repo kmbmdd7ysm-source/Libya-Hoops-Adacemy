@@ -35,7 +35,7 @@ for (const width of [390, 1440]) {
         const scan = await page.evaluate(() => ({
           width: document.documentElement.clientWidth,
           scroll: document.documentElement.scrollWidth,
-          footer: Boolean(document.querySelector('.site-footer')),
+          footer: Boolean(document.querySelector('.deferred-footer, .site-footer')),
           logo: Boolean(document.querySelector('.site-header .brand-logo')),
           dir: document.documentElement.dir,
         }));
