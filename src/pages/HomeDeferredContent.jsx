@@ -18,7 +18,9 @@ export default function HomeDeferredContent() {
 
   const availableTraining = onlineTraining.filter((program) => program.available !== false);
   const featuredTrainingIds = new Set(
-    featuredTraining().filter((program) => program.available !== false).map((program) => program.id),
+    featuredTraining()
+      .filter((program) => program.available !== false)
+      .map((program) => program.id),
   );
   const training = [
     ...availableTraining.filter((program) => featuredTrainingIds.has(program.id)),
@@ -31,7 +33,10 @@ export default function HomeDeferredContent() {
   return (
     <div className="home-deferred-content home-v2-deferred">
       {programs.length > 0 && (
-        <section className="section home-v2-catalog-section" aria-labelledby="home-programs-heading">
+        <section
+          className="section home-v2-catalog-section"
+          aria-labelledby="home-programs-heading"
+        >
           <div className="container">
             <div id="home-programs-heading">
               <SectionHeading
@@ -42,14 +47,19 @@ export default function HomeDeferredContent() {
               />
             </div>
             <div className="card-grid card-grid--3">
-              {programs.map((program) => <ProgramCard key={program.id} program={program} />)}
+              {programs.map((program) => (
+                <ProgramCard key={program.id} program={program} />
+              ))}
             </div>
           </div>
         </section>
       )}
 
       {training.length > 0 && (
-        <section className="section section--muted home-v2-catalog-section" aria-labelledby="home-online-heading">
+        <section
+          className="section section--muted home-v2-catalog-section"
+          aria-labelledby="home-online-heading"
+        >
           <div className="container">
             <div id="home-online-heading">
               <SectionHeading
@@ -60,7 +70,9 @@ export default function HomeDeferredContent() {
               />
             </div>
             <div className="card-grid card-grid--3">
-              {training.map((program) => <TrainingCard key={program.id} program={program} />)}
+              {training.map((program) => (
+                <TrainingCard key={program.id} program={program} />
+              ))}
             </div>
           </div>
         </section>
@@ -78,7 +90,9 @@ export default function HomeDeferredContent() {
               />
             </div>
             <div className="product-grid">
-              {gear.map((product) => <ProductCard key={product.id} product={product} />)}
+              {gear.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
           </div>
         </section>
@@ -88,10 +102,14 @@ export default function HomeDeferredContent() {
         <div className="container academy-grid">
           <div className="academy-copy">
             <p className="section-label">{t.home.academyTitle}</p>
-            <h2 id="home-about-title" className="section-title">{t.home.philosophyTitle}</h2>
+            <h2 id="home-about-title" className="section-title">
+              {t.home.philosophyTitle}
+            </h2>
             <p className="lead">{t.home.academyText}</p>
             <p>{t.home.philosophyText}</p>
-            <Link to="/about" className="btn-secondary block">{t.common.learnMore}</Link>
+            <Link to="/about" className="btn-secondary block">
+              {t.common.learnMore}
+            </Link>
           </div>
           <div className="academy-values">
             {t.home.values.slice(0, 3).map((value, index) => (
@@ -105,14 +123,23 @@ export default function HomeDeferredContent() {
         </div>
       </section>
 
-      <section className="section cta-band home-v2-cta" aria-label={pick({ en: 'Join the academy', ar: 'انضم إلى الأكاديمية' })}>
+      <section
+        className="section cta-band home-v2-cta"
+        aria-label={pick({ en: 'Join the academy', ar: 'انضم إلى الأكاديمية' })}
+      >
         <div className="container cta-inner">
-          <p className="section-label">{pick({ en: 'THE NEXT STEP IS YOURS', ar: 'الخطوة الجاية عليك' })}</p>
+          <p className="section-label">
+            {pick({ en: 'THE NEXT STEP IS YOURS', ar: 'الخطوة الجاية عليك' })}
+          </p>
           <h2 className="display-title">{t.home.ctaTitle}</h2>
           <p>{t.home.ctaText}</p>
           <div className="hero-actions">
-            <Link to="/contact" className="btn-primary block">{t.common.joinAcademy}</Link>
-            <Link to="/programs" className="btn-ghost block">{t.common.explorePrograms}</Link>
+            <Link to="/contact" className="btn-primary block">
+              {t.common.joinAcademy}
+            </Link>
+            <Link to="/programs" className="btn-ghost block">
+              {t.common.explorePrograms}
+            </Link>
           </div>
         </div>
       </section>
