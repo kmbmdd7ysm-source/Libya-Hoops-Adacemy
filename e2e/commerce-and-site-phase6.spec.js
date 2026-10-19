@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test('digital training checkout never presents physical cash-on-delivery as payment', async ({ page }) => {
-  await page.goto('/online-training/bodyweight-work', { waitUntil: 'load' });
-  // Allow the prerendered detail page to hydrate before initiating cart navigation.
-  await page.waitForTimeout(650);
+  await page.goto('/online-training', { waitUntil: 'load' });
+  await expect(page.locator('.training-discovery')).toBeVisible();
+  // Follow a real in-app link so hydration and cart providers stay mounted.
+  await page.locator('a[href="/online-training/bodyweight-work"]').first().click();
+  await expect(page).toHaveURL(/\/online-training\/bodyweight-work$/);
   await expect(page.locator('.purchase-primary')).toBeVisible();
   await page.locator('.purchase-primary').click();
   await expect(page.locator('.cart-drawer.open')).toBeVisible();
