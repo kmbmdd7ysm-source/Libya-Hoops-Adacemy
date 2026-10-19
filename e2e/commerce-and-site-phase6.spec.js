@@ -4,8 +4,10 @@ test('digital training checkout never presents physical cash-on-delivery as paym
   page,
 }) => {
   await page.goto('/online-training', { waitUntil: 'load' });
-  const rejectCookies = page.getByRole('button', { name: /reject|رفض/i });
-  if (await rejectCookies.isVisible().catch(() => false)) await rejectCookies.click();
+  const cookieDialog = page.locator('.cookie-banner');
+  await expect(cookieDialog).toBeVisible();
+  await cookieDialog.locator('.cookie-buttons .btn-secondary').first().click();
+  await expect(cookieDialog).toBeHidden();
   await expect(page.locator('.training-discovery')).toBeVisible();
   // Follow a real in-app link so hydration and cart providers stay mounted.
   await page.locator('a[href="/online-training/bodyweight-work"]').first().click();
