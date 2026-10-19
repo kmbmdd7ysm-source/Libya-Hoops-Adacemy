@@ -294,7 +294,7 @@ export default function AccountPage() {
   if (!auth.user || mode === 'reset-password')
     return (
       <>
-        <Seo title="Account" path="/account" />
+        <Seo title={pick({ en: "Account", ar: "الحساب" })} path="/account" />
         <section className="section account-access-section">
           <div className="container account-access-layout">
             <aside
@@ -325,7 +325,7 @@ export default function AccountPage() {
               onSubmit={submit}
               noValidate
             >
-              <p className="section-label">LHA ACCOUNT</p>
+              <p className="section-label">{pick({ en: 'LHA ACCOUNT', ar: 'حساب الأكاديمية' })}</p>
               <h1>
                 {pick({
                   en:
@@ -628,7 +628,7 @@ export default function AccountPage() {
   };
   return (
     <>
-      <Seo title="Account" path="/account" />
+      <Seo title={pick({ en: "Account", ar: "الحساب" })} path="/account" />
       <section className="section account-page">
         <div className="container">
           <div className="account-heading">
@@ -713,7 +713,7 @@ export default function AccountPage() {
               />
             </label>
             <div>
-              <p className="section-label">LHA ACCOUNT</p>
+              <p className="section-label">{pick({ en: 'LHA ACCOUNT', ar: 'حساب الأكاديمية' })}</p>
               <h1>{pick({ en: 'Your account', ar: 'حسابك' })}</h1>
               <p>{auth.user.email}</p>
             </div>
