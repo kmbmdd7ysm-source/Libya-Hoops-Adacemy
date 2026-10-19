@@ -14,8 +14,8 @@ const pathways = [
     image: '/images/programs/elite-development.webp',
     title: { en: 'On-Court Training', ar: 'التدريب في الملعب' },
     description: {
-      en: 'Train smarter. Play stronger.'
-      ar: 'تدرّب بذكاء. العب بقوة.'
+      en: 'Train smarter. Play stronger.',
+      ar: 'تدرّب بذكاء. العب بقوة.',
     },
     action: { en: 'Explore Programs', ar: 'اكتشف البرامج' },
   },
