@@ -1,0 +1,44 @@
+# LHA 2.0 — Phase 4: Homepage Experience
+
+**Date:** October 18, 2026  
+**Status:** Developed on isolated branch, tested; production deployment verification required after merge.
+
+## Design and content rules
+- Academy-first storytelling; black, white and grayscale UI only.
+- Use the academy's **existing** project media, not invented imagery or fabricated player/coach achievements.
+- Equal English and Arabic content, readable RTL, touch-first responsive design.
+- Existing product availability, prices, inventory and checkout integrations left unchanged.
+
+## Delivered
+1. **Hero upgrade** in `src/components/experience/CinematicHero.jsx`: existing official poster and video remain; three clear pathways to `/programs`, `/online-training` and `/shop`. Users can pause/resume the background video via an accessible control. Reduced-motion / data-saver settings retain the static-poster fallback.
+2. **Three editorial entry paths** in `src/pages/HomePage.jsx`: On-Court Training, Train Anywhere and Carry the Culture. Each has grounded bilingual copy, a verified local image, accessible link text and a direct route. Empty marketing metrics (such as generic 360-degree stats) are removed.
+3. **Simplified homepage sections** in `src/pages/HomeDeferredContent.jsx`: in-person programs → actually available digital plans → gear → academy philosophy → contact/academy join CTA. Existing source data is used without invented prices, dates or coach profiles.
+4. **Removed misleading homepage placeholders**: coach section is empty in the authoritative data and no longer appears on the homepage. Past/closed 2026 event listings that were still marked `comingSoon` are no longer promoted as upcoming on the homepage. Dedicated events/coaches routes remain unchanged for later work.
+5. **Homepage-only CSS** `src/styles/home-experience.css` is imported after the global/responsive foundation. Premium monochrome contrast, measured whitespace, poster overlays, custom 3-column/1-column media pathways, language-aware typography, touch geometry, reduced-motion handling and focus indicators.
+6. Maintained intersection-based deferred loading for below-fold content and the existing high-priority static hero poster.
+
+## Source assets verified
+- `/media/hero/lha-hero-poster.webp`
+- `/media/hero/lha-hero-poster-mobile.webp`
+- `/media/hero/lha-hero.mp4`
+- `/images/programs/elite-development.webp`
+- `/images/training/full-body-strength.jpg`
+- `/images/categories/clothing-hero-player.webp`
+
+## Sandbox quality gates
+- `npm ci`: PASS.
+- Data validation, commerce validation, media validation and SEO validation: PASS.
+- ESLint and TypeScript: PASS.
+- Vite build: PASS, **71 static HTML pages**.
+- `npm audit --omit=dev`: PASS (0 known production vulnerabilities).
+- `e2e/home-experience.spec.js`: **11/11 PASS** including image loading, routing, English/Arabic layout, 320/390/768/1440 viewports, video pause/resume and reduced motion.
+- Focused regression `responsive-matrix.spec.js`, `core-flows.spec.js`, `online-training-catalog.spec.js`: **20/20 PASS**. This includes cross-page viewport containment and representative commerce/training routes.
+- New files formatted via Prettier in QA sandbox and matching source was committed back to the branch.
+
+## Not covered by Phase 4
+- No assertion that original video shows a particular BAL training scene; it is the existing media file, not new sourced imagery.
+- No complete payment, profile-address synchronization or full 1,600+ accessibility/visual suite claim. Remaining stage-1 QA debt is preserved.
+- Training document content and sale rights = Stage 5. Full checkout/account cloud integration = Stages 6–8. Events/coaches details = Stage 7.
+
+## Next step
+Merge tested branch `lha-phase4-home-20261018` to `main`; independently verify Vercel production READY, then mark this stage delivered in the master handoff and proceed to Stage 5.
