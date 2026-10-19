@@ -65,12 +65,17 @@ export async function listAddresses(userId, options = {}) {
     if (options.signal && typeof query.abortSignal === 'function') query = query.abortSignal(options.signal);
     const { data, error } = await query;
     if (error) throw error;
+    // A successful cloud response is authoritative even when the list is empty.
+    // Otherwise addresses removed on another device can reappear from stale cache.
     const normalized = (data || []).map(normalizeRow);
-    if (normalized.length) writeLocal(userId, normalized);
-    return normalized.length ? normalized : readLocal(userId).map(normalizeRow);
+    writeLocal(userId, normalized);
+    return normalized;
   } catch (error) {
-    const cached = readLocal(userId);
-    if (cached.length) return cached;
+    // Only use the last known copy when the device is explicitly offline.
+    // A cloud permission or network failure while online must not look like success.
+    if (globalThis.navigator?.onLine === false) {
+      return readLocal(userId).map(normalizeRow);
+    }
     throw error;
   }
 }
