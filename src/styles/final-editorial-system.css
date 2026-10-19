@@ -868,6 +868,39 @@ html[lang^='ar'] .section-label {
   border: 1px solid #d1d1d1 !important;
 }
 .search-overlay .search-chip-grid > button:hover { background: #dedede !important; }
+/* Avoid a translucent animation during automated or assistive-tech reading. */
+.search-overlay.open,
+.search-overlay.open .search-overlay-inner {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+.search-overlay .search-suggestions [role='option'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 60px;
+  padding: 12px 2px;
+  border-bottom: 1px solid #dedede;
+  color: #111;
+  background: #fff;
+  cursor: pointer;
+  text-align: start;
+}
+.search-overlay .search-suggestions [role='option'] > span { font-weight: 730; }
+.search-overlay .search-suggestions [role='option'] > small {
+  color: #494949;
+  font-size: .78rem;
+  white-space: nowrap;
+}
+.search-overlay .search-suggestions [role='option']:is(:hover,.active,[aria-selected='true']) {
+  background: #f2f2f2;
+}
+.search-overlay .search-suggestions [role='option']:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: -3px;
+}
 @media (max-width: 1200px) {
   .home-v2-hero .hero-title {
     font-size: clamp(4.1rem, 8.2vw, 8rem) !important;
