@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import Seo from '../components/common/Seo';
 import PageHero from '../components/common/PageHero';
@@ -10,15 +10,32 @@ import { durationFilters, matchesTraining, trainingGoals } from '../data/trainin
 
 export default function OnlineTrainingPage() {
   const { t, pick } = useLanguage();
-  const [goal, setGoal] = useState('all');
-  const [duration, setDuration] = useState('all');
+  const [params, setParams] = useSearchParams();
+  const requestedGoal = params.get('goal');
+  const requestedDuration = params.get('duration');
+  const goal = trainingGoals.some((item) => item.id === requestedGoal) ? requestedGoal : 'all';
+  const duration = durationFilters.some((item) => item.id === requestedDuration) ? requestedDuration : 'all';
 
   const readyPrograms = onlineTraining.filter((program) => program.available !== false);
   const upcomingPrograms = onlineTraining.filter((program) => program.available === false);
   const filteredPrograms = readyPrograms.filter((program) => matchesTraining(program, goal, duration));
+  // Keep both filters in the URL so a route remount, refresh or shared link
+  // preserves the complete selection instead of silently resetting the goal.
+  const changeFilter = (field, value) => {
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      if (value === 'all') next.delete(field);
+      else next.set(field, value);
+      return next;
+    }, { replace: true });
+  };
   const resetFilters = () => {
-    setGoal('all');
-    setDuration('all');
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('goal');
+      next.delete('duration');
+      return next;
+    }, { replace: true });
   };
 
   return (
@@ -56,7 +73,7 @@ export default function OnlineTrainingPage() {
                     key={item.id}
                     className={`training-filter-chip${goal === item.id ? ' is-active' : ''}`}
                     aria-pressed={goal === item.id}
-                    onClick={() => setGoal(item.id)}
+                    onClick={() => changeFilter('goal', item.id)}
                   >
                     {pick(item.label)}
                   </button>
@@ -72,7 +89,7 @@ export default function OnlineTrainingPage() {
                     key={item.id}
                     className={`training-filter-chip${duration === item.id ? ' is-active' : ''}`}
                     aria-pressed={duration === item.id}
-                    onClick={() => setDuration(item.id)}
+                    onClick={() => changeFilter('duration', item.id)}
                   >
                     {pick(item.label)}
                   </button>
