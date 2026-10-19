@@ -24,19 +24,18 @@ export default function TrainingCard({ program, eager = false }) {
           <Icon name="play" size={20} />
         </span>
         <div className="training-card-badges">
-          {!program.available && <Badge tone="limited">{t.training.comingSoon}</Badge>}
+          {program.available === false && <Badge tone="limited">{t.training.comingSoon}</Badge>}
         </div>
       </Link>
       <div className="training-card-body">
         <h3 className="training-card-title">
           <Link to={to}>{pick(program.title)}</Link>
         </h3>
+        {program.marketingCaption && <p className="training-card-caption">{pick(program.marketingCaption)}</p>}
         <ul className="training-card-meta">
-          <li>{pick(program.level)}</li>
-          <li>{pick(program.duration)}</li>
-          <li>
-            {program.sessions} {t.training.sessions}
-          </li>
+          {program.level && <li>{pick(program.level)}</li>}
+          {program.duration && <li>{pick(program.duration)}</li>}
+          {program.sessions && <li>{program.sessions} {t.training.sessions}</li>}
         </ul>
         <div className="training-card-foot">
           {program.available === false ? (
