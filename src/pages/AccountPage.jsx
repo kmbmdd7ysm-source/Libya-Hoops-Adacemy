@@ -290,8 +290,27 @@ export default function AccountPage() {
     return (
       <>
         <Seo title="Account" path="/account" />
-        <section className="section">
-          <form className="container account-panel auth-form" onSubmit={submit} noValidate>
+        <section className="section account-access-section">
+          <div className="container account-access-layout">
+            <aside className="account-access-art" aria-label={pick({ en: 'Academy training', ar: 'تدريب الأكاديمية' })}>
+              <img
+                src="/images/programs/youth-development.webp"
+                alt=""
+                width="1312"
+                height="816"
+                loading="eager"
+                decoding="async"
+              />
+              <div className="account-access-art-content">
+                <span>{pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}</span>
+                <strong>{pick({ en: 'YOUR GAME. YOUR SPACE.', ar: 'لعبتك. مساحتك.' })}</strong>
+                <p>{pick({
+                  en: 'Access your orders, profile and saved essentials in one place.',
+                  ar: 'طلباتك وملفك الشخصي ومفضلاتك كلها في مكان واحد.',
+                })}</p>
+              </div>
+            </aside>
+            <form className="account-panel auth-form account-access-form" onSubmit={submit} noValidate>
             <p className="section-label">LHA ACCOUNT</p>
             <h1>
               {pick({
@@ -517,7 +536,16 @@ export default function AccountPage() {
                 </button>
               )}
             </div>
+            <p className="account-access-guest-note">
+              {pick({
+                en: 'Just shopping? You can browse and use guest checkout without creating an account.',
+                ar: 'تبي تتسوق بس؟ تقدر تتصفح وتكمل الشراء كضيف من غير حساب.',
+              })}
+              {' '}
+              <Link to="/shop">{pick({ en: 'Explore shop', ar: 'تصفح المتجر' })}</Link>
+            </p>
           </form>
+          </div>
         </section>
       </>
     );
@@ -650,7 +678,7 @@ export default function AccountPage() {
               <p className="section-label">LHA ACCOUNT</p>
               <h1>{pick({ en: 'Your account', ar: 'حسابك' })}</h1>
               <p>
-                {auth.user.email} · {data.status}
+                {auth.user.email}
               </p>
             </div>
             <button
@@ -682,7 +710,11 @@ export default function AccountPage() {
                 </button>
               ))}
             </nav>
-            <div className="account-content">
+            <div className="account-content" id="account-section-content">
+              <div className="account-section-heading" aria-live="polite">
+                <p className="section-label">{pick({ en: 'ACCOUNT', ar: 'الحساب' })}</p>
+                <h2>{t[section]}</h2>
+              </div>
               {section === 'overview' && (
                 <div className="account-grid">
                   <article>
@@ -700,9 +732,9 @@ export default function AccountPage() {
                   <article>
                     <h2>{pick({ en: 'Orders', ar: 'الطلبات' })}</h2>
                     <strong>{ordersState.orders.length}</strong>
-                    <Link to="/order-tracking">
+                    <button type="button" className="account-text-link" onClick={() => selectSection('orders')}>
                       {pick({ en: 'View My Orders', ar: 'عرض طلباتي' })}
-                    </Link>
+                    </button>
                   </article>
                 </div>
               )}
