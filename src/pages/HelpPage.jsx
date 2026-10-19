@@ -278,7 +278,7 @@ export default function HelpPage() {
                   })}
             </p>
             <div className="button-row">
-              <Link className="btn-primary" to={auth.user ? '/order-tracking' : '/account'}>
+              <Link className="btn-primary" to={auth.user ? '/account?section=orders' : '/account'}>
                 {auth.user
                   ? pick({ en: 'My Orders', ar: 'طلباتي' })
                   : pick({ en: 'Sign In', ar: 'تسجيل الدخول' })}
