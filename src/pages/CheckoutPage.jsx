@@ -767,8 +767,8 @@ export default function CheckoutPage() {
                                 ar: 'الدفع عند الاستلام للمنتجات المادية ذات الأكواد المعتمدة فقط. البرامج الرقمية وتسجيل الفعاليات تحتاج دفع وتسليم مؤكدين بشكل منفصل.',
                               })
                             : pick({
-                                en: 'Cash on delivery is available for eligible physical orders within Libya only.',
-                                ar: 'الدفع عند الاستلام متاح للطلبات المادية المؤهلة داخل ليبيا فقط.',
+                                en: 'Cash payment is available only for eligible physical products delivered within Libya.',
+                                ar: 'الدفع النقدي متاح فقط للمنتجات المادية المؤهلة للتوصيل داخل ليبيا.',
                               })}
                         </p>
                       )}
