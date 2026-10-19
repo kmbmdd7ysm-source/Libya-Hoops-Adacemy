@@ -7,7 +7,7 @@ import { useCompare } from '../../context/CompareContext';
 import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../hooks/useWishlist';
 import { trackEvent } from '../../utils/analytics';
-import { mainNav, megaMenu } from '../../data/navigation';
+import { mainNav, desktopNav, megaMenu } from '../../data/navigation';
 import AnnouncementBar from './AnnouncementBar';
 import CurrencySelector from '../common/CurrencySelector';
 
@@ -92,7 +92,7 @@ export default function Header() {
             <img src={SITE.logo} alt="" width="415" height="482" className="brand-logo brand-logo--header" />
           </Link>
           <nav className="desktop-nav" aria-label={t.a11y.mainNav}>
-            {mainNav.map((item) =>
+            {desktopNav.map((item) =>
               item.mega ? (
                 <div
                   key={item.to}
@@ -110,6 +110,18 @@ export default function Header() {
                     className="nav-link"
                     aria-haspopup="true"
                     aria-expanded={megaOpen}
+                    aria-controls="shop-mega-menu"
+                    onFocus={() => setMegaOpen(true)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Escape') setMegaOpen(false);
+                      if (event.key === 'ArrowDown') {
+                        event.preventDefault();
+                        setMegaOpen(true);
+                        requestAnimationFrame(() =>
+                          document.querySelector('#shop-mega-menu a')?.focus(),
+                        );
+                      }
+                    }}
                   >
                     {navLabel(item)}
                   </NavLink>
@@ -198,7 +210,19 @@ export default function Header() {
             </button>
           </div>
         </div>
-        <div className={`mega-menu${megaOpen ? ' open' : ''}`} hidden={!megaOpen}>
+        <div
+          id="shop-mega-menu"
+          className={`mega-menu${megaOpen ? ' open' : ''}`}
+          hidden={!megaOpen}
+          onMouseEnter={() => clearTimeout(megaTimer.current)}
+          onMouseLeave={() => setMegaOpen(false)}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              setMegaOpen(false);
+              document.querySelector('.nav-mega-wrap .nav-link')?.focus();
+            }
+          }}
+        >
           <div className="container mega-inner">
             <div className="mega-col mega-featured">
               {megaMenu.featured.map((l) => (
