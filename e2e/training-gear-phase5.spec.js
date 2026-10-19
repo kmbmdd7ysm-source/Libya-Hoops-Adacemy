@@ -49,3 +49,15 @@ for (const width of [375, 1024, 1440]) {
       .toBeLessThanOrEqual(width + 2);
   });
 }
+
+test('selected training tier and exact price reach the cart', async ({ page }) => {
+  await page.goto('/online-training/bodyweight-work');
+  const options = page.locator('.training-purchase-options');
+  await expect(options.getByRole('radio')).toHaveCount(3);
+  await options.getByRole('radio').nth(1).click();
+  await expect(options.getByRole('radio').nth(1)).toHaveAttribute('aria-checked', 'true');
+  await page.locator('.purchase-primary').click();
+  await expect(page.locator('.cart-drawer.open')).toBeVisible();
+  await expect(page.locator('.cart-drawer .cart-line-name')).toContainText('3 Months');
+  await expect(page.locator('.cart-drawer .cart-line-price')).toContainText('40');
+});
