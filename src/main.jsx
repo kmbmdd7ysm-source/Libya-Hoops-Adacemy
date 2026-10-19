@@ -19,6 +19,7 @@ import './styles/home-experience.css';
 import './styles/training-and-gear.css';
 import './styles/site-refinement.css';
 import './styles/editorial-stage7.css';
+import './styles/customer-stage8.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
