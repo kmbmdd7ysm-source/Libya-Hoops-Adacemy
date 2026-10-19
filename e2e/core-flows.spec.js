@@ -65,7 +65,8 @@ test('shop, wishlist, comparison, cart and checkout country/cash flows', async (
   await expect(page.locator('main')).toContainText(addedProductName);
   await page.goto('/checkout');
   const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
-  if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
+  await expect(guestChoice).toBeVisible();
+  await guestChoice.click();
   await expect(
     page.locator('button[aria-haspopup="listbox"]').first(),
   ).toBeVisible();
@@ -122,7 +123,8 @@ test('physical product keeps its variant through cart drawer checkout', async ({
   await expect(page).toHaveURL(/\/checkout$/);
   await expect(page.locator('main')).toBeVisible();
   const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
-  if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
+  await expect(guestChoice).toBeVisible();
+  await guestChoice.click();
   if (sizeText) await expect(page.locator('main')).toContainText(sizeText.split(':').pop().trim());
   await expect(
     page.locator('button[aria-haspopup="listbox"]').first(),
