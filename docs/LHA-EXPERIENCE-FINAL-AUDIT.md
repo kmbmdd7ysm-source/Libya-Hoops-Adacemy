@@ -39,3 +39,10 @@ Keep operational work from stage 6 separate from visible art direction and conte
 - Demo event pages/date promos suppressed instead of inventing dates; published coach roster is empty, shown as transparent program/approach content rather than bogus staff.
 - Fixed small-screen training filter chips and event banner overflow (7 formerly failing responsive cases rerun PASS). A full post-fix 32-case matrix remains unverified due to sandbox stop; revisit in Phase 9.
 - **Two original roadmap phases remain (8 account/bilingual, 9 complete cross-device release QA); Phase 6 operational payment and fulfillment must also be closed.**
+
+## Phase 8 update — bilingual customer paths (2026-10-19)
+- Sign-in/signup with real academy imagery, clearer sign-in form layout and explicit guest shop action are deployed. Authenticated screens have refined section navigation; internal My Orders links now enter the account orders section.
+- Help offers three routes (verified guest lookup, account, contact) and indexes terms from both EN and AR even when one locale is selected. FAQs gain bilingual jump navigation with category anchors.
+- Verified: focused browser smoke across 390 and 1440 width EN/AR plus saved source code validators, 10/10 PASS. Production pages opened read-only after READY.
+- Still required: authorized signed-in test account lifecycle (profile/addresses/order history/settings), email confirmation flow, final line-by-line Arabic/English content QA and screen-reader/touch/Lighthouse evidence. Stage 6 commercial integrations remain open.
+- Only **Phase 9** remains in the original nine-stage design roadmap; the broader operational backlog is separate.

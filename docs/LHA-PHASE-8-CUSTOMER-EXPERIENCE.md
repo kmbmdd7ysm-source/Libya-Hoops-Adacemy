@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-19
 **Scope:** Bilingual account access, customer navigation, help center and FAQ visual consistency.
-**State:** Code tested on an isolated branch; production confirmation to follow.
+**State:** RELEASED on Vercel production READY. Scoped phase-eight work delivered; authenticated end-to-end acceptance remains open.
 
 ## Implemented
 - Account access screen: a two-column black/white editorial layout using the academy's existing youth-development photo, a clear sign-in/sign-up panel and a direct guest-shopping path. No new, invented images.
@@ -24,3 +24,8 @@
 - One original roadmap phase remains after Phase 8: **Phase 9**. The operational integration backlog is additional.
 
 All visual design must remain simple, premium, black/white/neutral gray, with real product photos retaining original colors.
+
+## Production verification
+- Deployed main SHA `8fb6662b46b726f864e4037d1bb7d91ee2fed937`, production **READY**, inspect: https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/52MGEqinZVAqZbvpeezpVCoyCYcj
+- Read-only live checks loaded `/account?mode=signup`, `/account?mode=signin`, `/help`, `/faq`, `/order-tracking`. The user-specific account operations were not exercised on live data.
+- Fresh sandbox after final formatting: Prettier, data/media/SEO, ESLint, TypeScript, build (66 prerendered pages) and 10/10 focused Playwright account/support/FAQ/responsive regressions passed.
