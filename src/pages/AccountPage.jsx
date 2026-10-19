@@ -628,7 +628,7 @@ export default function AccountPage() {
   };
   return (
     <>
-      <Seo title={pick({ en: "Account", ar: "الحساب" })} path="/account" />
+      <Seo title={pick({ en: 'Account', ar: 'الحساب' })} path="/account" />
       <section className="section account-page">
         <div className="container">
           <div className="account-heading">
