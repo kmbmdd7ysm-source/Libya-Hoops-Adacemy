@@ -38,13 +38,41 @@ const heroArtwork = [
 // Visible hero copy is intentionally shorter than the detailed SEO copy below
 // the fold. Preserve the original page descriptions in the metadata.
 const heroIntros = [
-  { test: /^\/shop(?:\/|$)/, en: 'Performance essentials. Everyday style.', ar: 'ملابس رياضية. ستايل كل يوم.' },
-  { test: /^\/online-training(?:\/|$)/, en: 'Train anywhere. Get better every day.', ar: 'تدرّب من أي مكان. وتطوّر كل يوم.' },
-  { test: /^\/programs(?:\/|$)/, en: 'Real basketball work starts here.', ar: 'التطور الحقيقي يبدأ في الملعب.' },
-  { test: /^\/about(?:\/|$)/, en: 'Built in Libya. Made for the game.', ar: 'من ليبيا. ومن أجل اللعبة.' },
-  { test: /^\/events(?:\/|$)/, en: 'The next opportunity starts with a plan.', ar: 'كل فرصة جديدة تبدأ بخطة.' },
-  { test: /^\/coaches(?:\/|$)/, en: 'Stronger habits. Better players.', ar: 'عادات أفضل. لاعبين أقوى.' },
-  { test: /^\/contact(?:\/|$)/, en: 'Your next step starts here.', ar: 'خطوتك الجاية تبدأ من هنا.' },
+  {
+    test: /^\/shop(?:\/|$)/,
+    en: 'Performance essentials. Everyday style.',
+    ar: 'ملابس رياضية. ستايل كل يوم.',
+  },
+  {
+    test: /^\/online-training(?:\/|$)/,
+    en: 'Train anywhere. Get better every day.',
+    ar: 'تدرّب من أي مكان. وتطوّر كل يوم.',
+  },
+  {
+    test: /^\/programs(?:\/|$)/,
+    en: 'Real basketball work starts here.',
+    ar: 'التطور الحقيقي يبدأ في الملعب.',
+  },
+  {
+    test: /^\/about(?:\/|$)/,
+    en: 'Built in Libya. Made for the game.',
+    ar: 'من ليبيا. ومن أجل اللعبة.',
+  },
+  {
+    test: /^\/events(?:\/|$)/,
+    en: 'The next opportunity starts with a plan.',
+    ar: 'كل فرصة جديدة تبدأ بخطة.',
+  },
+  {
+    test: /^\/coaches(?:\/|$)/,
+    en: 'Stronger habits. Better players.',
+    ar: 'عادات أفضل. لاعبين أقوى.',
+  },
+  {
+    test: /^\/contact(?:\/|$)/,
+    en: 'Your next step starts here.',
+    ar: 'خطوتك الجاية تبدأ من هنا.',
+  },
 ];
 
 /**
