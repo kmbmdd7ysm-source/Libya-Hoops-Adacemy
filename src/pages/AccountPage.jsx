@@ -63,9 +63,15 @@ export default function AccountPage() {
     [ordersState, setOrdersState] = useState({ state: 'idle', orders: [], error: null }),
     [profile, setProfile] = useState(() => ({
       firstName:
-        data?.profile?.first_name || data?.profile?.firstName || auth.user?.user_metadata?.first_name || '',
+        data?.profile?.first_name ||
+        data?.profile?.firstName ||
+        auth.user?.user_metadata?.first_name ||
+        '',
       lastName:
-        data?.profile?.last_name || data?.profile?.lastName || auth.user?.user_metadata?.last_name || '',
+        data?.profile?.last_name ||
+        data?.profile?.lastName ||
+        auth.user?.user_metadata?.last_name ||
+        '',
       displayName:
         data?.profile?.display_name ||
         data?.profile?.displayName ||
@@ -240,8 +246,7 @@ export default function AccountPage() {
           last_name: lastName,
           display_name: normalizedName,
         });
-      }
-      else if (mode === 'reset') r = await auth.reset(normalizedEmail);
+      } else if (mode === 'reset') r = await auth.reset(normalizedEmail);
       else if (mode === 'reset-password') r = await auth.updatePassword(password);
       else r = await auth.signIn(normalizedEmail, password);
       if (r?.error) throw r.error;
@@ -292,7 +297,10 @@ export default function AccountPage() {
         <Seo title="Account" path="/account" />
         <section className="section account-access-section">
           <div className="container account-access-layout">
-            <aside className="account-access-art" aria-label={pick({ en: 'Academy training', ar: 'تدريب الأكاديمية' })}>
+            <aside
+              className="account-access-art"
+              aria-label={pick({ en: 'Academy training', ar: 'تدريب الأكاديمية' })}
+            >
               <img
                 src="/images/programs/youth-development.webp"
                 alt=""
@@ -304,247 +312,273 @@ export default function AccountPage() {
               <div className="account-access-art-content">
                 <span>{pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}</span>
                 <strong>{pick({ en: 'YOUR GAME. YOUR SPACE.', ar: 'لعبتك. مساحتك.' })}</strong>
-                <p>{pick({
-                  en: 'Access your orders, profile and saved essentials in one place.',
-                  ar: 'طلباتك وملفك الشخصي ومفضلاتك كلها في مكان واحد.',
-                })}</p>
-              </div>
-            </aside>
-            <form className="account-panel auth-form account-access-form" onSubmit={submit} noValidate>
-            <p className="section-label">LHA ACCOUNT</p>
-            <h1>
-              {pick({
-                en:
-                  mode === 'signup'
-                    ? 'Create account'
-                    : mode === 'reset'
-                      ? 'Reset password'
-                      : mode === 'reset-password'
-                        ? 'Choose a new password'
-                        : 'Sign in',
-                ar:
-                  mode === 'signup'
-                    ? 'إنشاء حساب'
-                    : mode === 'reset'
-                      ? 'إعادة تعيين كلمة المرور'
-                      : mode === 'reset-password'
-                        ? 'اختر كلمة مرور جديدة'
-                        : 'تسجيل الدخول',
-              })}
-            </h1>
-            {!auth.configured && (
-              <p className="form-notice">
-                {pick({
-                  en: 'Cloud accounts require Supabase configuration. Guest shopping remains available.',
-                  ar: 'تحتاج الحسابات السحابية إلى إعداد Supabase. يظل التسوق كضيف متاحًا.',
-                })}
-              </p>
-            )}
-            {mode === 'signup' && (
-              <>
-                <label>
-                  {pick({ en: 'Full name', ar: 'الاسم الكامل' })}
-                  <input
-                    ref={nameRef}
-                    autoComplete="name"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </label>
-                <label>
-                  {pick({ en: 'Profile photo (optional)', ar: 'الصورة الشخصية (اختيارية)' })}
-                  <input
-                    ref={photoRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      const result = await validateProfileImage(f);
-                      if (!result.valid) {
-                        const message =
-                          result.reason === 'signature'
-                            ? pick({
-                                en: 'This file is not a valid image.',
-                                ar: 'هذا الملف ليس صورة صالحة.',
-                              })
-                            : pick({
-                                en: 'Choose a JPG, PNG, or WebP image.',
-                                ar: 'اختر صورة بصيغة JPG أو PNG أو WebP.',
-                              });
-                        setMsg(message);
-                        e.target.value = '';
-                        focusField(photoRef);
-                        return;
-                      }
-                      if (photoPreview) URL.revokeObjectURL(photoPreview);
-                      setPhotoPreview(URL.createObjectURL(f));
-                      setMsg('');
-                    }}
-                  />
-                </label>
-                {photoPreview && (
-                  <div className="profile-photo-preview">
-                    <img
-                      src={photoPreview}
-                      alt={pick({ en: 'Profile preview', ar: 'معاينة الصورة الشخصية' })}
-                      width="320"
-                      height="320"
-                      decoding="async"
-                    />
-                    <button type="button" onClick={clearPhotoPreview}>
-                      {pick({ en: 'Remove', ar: 'إزالة' })}
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-            {mode !== 'reset-password' && (
-              <label>
-                {pick({ en: 'Email', ar: 'البريد الإلكتروني' })}
-                <input
-                  ref={emailRef}
-                  type="email"
-                  dir="ltr"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </label>
-            )}
-            {mode !== 'reset' && (
-              <label>
-                {pick({ en: 'Password', ar: 'كلمة المرور' })}
-                <span className="password-field">
-                  <input
-                    ref={passwordRef}
-                    type={show ? 'text' : 'password'}
-                    dir="ltr"
-                    minLength="8"
-                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShow((v) => !v)}
-                    aria-label={pick(
-                      show
-                        ? { en: 'Hide password', ar: 'إخفاء كلمة المرور' }
-                        : { en: 'Show password', ar: 'إظهار كلمة المرور' },
-                    )}
-                  >
-                    {pick(show ? { en: 'Hide', ar: 'إخفاء' } : { en: 'Show', ar: 'إظهار' })}
-                  </button>
-                </span>
-              </label>
-            )}
-            {mode === 'signup' && (
-              <label>
-                {pick({ en: 'Confirm new password', ar: 'تأكيد كلمة المرور الجديدة' })}
-                <input
-                  ref={confirmRef}
-                  type={show ? 'text' : 'password'}
-                  dir="ltr"
-                  autoComplete="new-password"
-                  required
-                  minLength="8"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </label>
-            )}
-            <button className="btn-primary" type="submit" disabled={busy || !auth.configured}>
-              {busy
-                ? pick({ en: 'Please wait…', ar: 'يرجى الانتظار…' })
-                : pick(
-                    mode === 'signup'
-                      ? { en: 'Create Account', ar: 'إنشاء الحساب' }
-                      : { en: 'Continue', ar: 'متابعة' },
-                  )}
-            </button>
-            {msg && (
-              <p id="account-error-summary" role="alert" aria-live="assertive">
-                {msg}
-              </p>
-            )}
-            {verificationEmail && auth.cloudConfigured && !auth.user && (
-              <div className="account-verification-panel" role="status" aria-live="polite">
-                <strong>{pick({ en: 'Verify your email', ar: 'أكد بريدك الإلكتروني' })}</strong>
                 <p>
                   {pick({
-                    en: `We sent a verification link to ${verificationEmail}. Open it, then you can sign in on any device.`,
-                    ar: `أرسلنا رابط التأكيد إلى ${verificationEmail}. افتحه وبعدها تقدر تسجل الدخول من أي جهاز.`,
+                    en: 'Access your orders, profile and saved essentials in one place.',
+                    ar: 'طلباتك وملفك الشخصي ومفضلاتك كلها في مكان واحد.',
                   })}
                 </p>
-                <div className="account-verification-actions">
+              </div>
+            </aside>
+            <form
+              className="account-panel auth-form account-access-form"
+              onSubmit={submit}
+              noValidate
+            >
+              <p className="section-label">LHA ACCOUNT</p>
+              <h1>
+                {pick({
+                  en:
+                    mode === 'signup'
+                      ? 'Create account'
+                      : mode === 'reset'
+                        ? 'Reset password'
+                        : mode === 'reset-password'
+                          ? 'Choose a new password'
+                          : 'Sign in',
+                  ar:
+                    mode === 'signup'
+                      ? 'إنشاء حساب'
+                      : mode === 'reset'
+                        ? 'إعادة تعيين كلمة المرور'
+                        : mode === 'reset-password'
+                          ? 'اختر كلمة مرور جديدة'
+                          : 'تسجيل الدخول',
+                })}
+              </h1>
+              {!auth.configured && (
+                <p className="form-notice">
+                  {pick({
+                    en: 'Cloud accounts require Supabase configuration. Guest shopping remains available.',
+                    ar: 'تحتاج الحسابات السحابية إلى إعداد Supabase. يظل التسوق كضيف متاحًا.',
+                  })}
+                </p>
+              )}
+              {mode === 'signup' && (
+                <>
+                  <label>
+                    {pick({ en: 'Full name', ar: 'الاسم الكامل' })}
+                    <input
+                      ref={nameRef}
+                      autoComplete="name"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    {pick({ en: 'Profile photo (optional)', ar: 'الصورة الشخصية (اختيارية)' })}
+                    <input
+                      ref={photoRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        const result = await validateProfileImage(f);
+                        if (!result.valid) {
+                          const message =
+                            result.reason === 'signature'
+                              ? pick({
+                                  en: 'This file is not a valid image.',
+                                  ar: 'هذا الملف ليس صورة صالحة.',
+                                })
+                              : pick({
+                                  en: 'Choose a JPG, PNG, or WebP image.',
+                                  ar: 'اختر صورة بصيغة JPG أو PNG أو WebP.',
+                                });
+                          setMsg(message);
+                          e.target.value = '';
+                          focusField(photoRef);
+                          return;
+                        }
+                        if (photoPreview) URL.revokeObjectURL(photoPreview);
+                        setPhotoPreview(URL.createObjectURL(f));
+                        setMsg('');
+                      }}
+                    />
+                  </label>
+                  {photoPreview && (
+                    <div className="profile-photo-preview">
+                      <img
+                        src={photoPreview}
+                        alt={pick({ en: 'Profile preview', ar: 'معاينة الصورة الشخصية' })}
+                        width="320"
+                        height="320"
+                        decoding="async"
+                      />
+                      <button type="button" onClick={clearPhotoPreview}>
+                        {pick({ en: 'Remove', ar: 'إزالة' })}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+              {mode !== 'reset-password' && (
+                <label>
+                  {pick({ en: 'Email', ar: 'البريد الإلكتروني' })}
+                  <input
+                    ref={emailRef}
+                    type="email"
+                    dir="ltr"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </label>
+              )}
+              {mode !== 'reset' && (
+                <label>
+                  {pick({ en: 'Password', ar: 'كلمة المرور' })}
+                  <span className="password-field">
+                    <input
+                      ref={passwordRef}
+                      type={show ? 'text' : 'password'}
+                      dir="ltr"
+                      minLength="8"
+                      autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShow((v) => !v)}
+                      aria-label={pick(
+                        show
+                          ? { en: 'Hide password', ar: 'إخفاء كلمة المرور' }
+                          : { en: 'Show password', ar: 'إظهار كلمة المرور' },
+                      )}
+                    >
+                      {pick(show ? { en: 'Hide', ar: 'إخفاء' } : { en: 'Show', ar: 'إظهار' })}
+                    </button>
+                  </span>
+                </label>
+              )}
+              {mode === 'signup' && (
+                <label>
+                  {pick({ en: 'Confirm new password', ar: 'تأكيد كلمة المرور الجديدة' })}
+                  <input
+                    ref={confirmRef}
+                    type={show ? 'text' : 'password'}
+                    dir="ltr"
+                    autoComplete="new-password"
+                    required
+                    minLength="8"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </label>
+              )}
+              <button className="btn-primary" type="submit" disabled={busy || !auth.configured}>
+                {busy
+                  ? pick({ en: 'Please wait…', ar: 'يرجى الانتظار…' })
+                  : pick(
+                      mode === 'signup'
+                        ? { en: 'Create Account', ar: 'إنشاء الحساب' }
+                        : { en: 'Continue', ar: 'متابعة' },
+                    )}
+              </button>
+              {msg && (
+                <p id="account-error-summary" role="alert" aria-live="assertive">
+                  {msg}
+                </p>
+              )}
+              {verificationEmail && auth.cloudConfigured && !auth.user && (
+                <div className="account-verification-panel" role="status" aria-live="polite">
+                  <strong>{pick({ en: 'Verify your email', ar: 'أكد بريدك الإلكتروني' })}</strong>
+                  <p>
+                    {pick({
+                      en: `We sent a verification link to ${verificationEmail}. Open it, then you can sign in on any device.`,
+                      ar: `أرسلنا رابط التأكيد إلى ${verificationEmail}. افتحه وبعدها تقدر تسجل الدخول من أي جهاز.`,
+                    })}
+                  </p>
+                  <div className="account-verification-actions">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      disabled={busy}
+                      onClick={async () => {
+                        setBusy(true);
+                        try {
+                          const result = await auth.resendVerification(verificationEmail);
+                          if (result?.error) throw result.error;
+                          setMsg(
+                            pick({
+                              en: 'Verification email sent again. Check your inbox and spam folder.',
+                              ar: 'تم إرسال رابط التأكيد من جديد. راجع الوارد والرسائل غير المرغوب فيها.',
+                            }),
+                          );
+                        } catch (error) {
+                          setMsg(errorText(error, lang));
+                        } finally {
+                          setBusy(false);
+                        }
+                      }}
+                    >
+                      {pick({ en: 'Resend verification', ar: 'إعادة إرسال التأكيد' })}
+                    </button>
+                    <button
+                      type="button"
+                      className="account-verification-signin"
+                      onClick={() => {
+                        setMode('signin');
+                        setEmail(verificationEmail);
+                        setPassword('');
+                      }}
+                    >
+                      {pick({ en: 'Go to sign in', ar: 'الذهاب لتسجيل الدخول' })}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="account-switch">
+                {mode !== 'signin' && (
                   <button
                     type="button"
-                    className="btn-secondary"
-                    disabled={busy}
-                    onClick={async () => {
-                      setBusy(true);
-                      try {
-                        const result = await auth.resendVerification(verificationEmail);
-                        if (result?.error) throw result.error;
-                        setMsg(
-                          pick({
-                            en: 'Verification email sent again. Check your inbox and spam folder.',
-                            ar: 'تم إرسال رابط التأكيد من جديد. راجع الوارد والرسائل غير المرغوب فيها.',
-                          }),
-                        );
-                      } catch (error) {
-                        setMsg(errorText(error, lang));
-                      } finally {
-                        setBusy(false);
-                      }
-                    }}
-                  >
-                    {pick({ en: 'Resend verification', ar: 'إعادة إرسال التأكيد' })}
-                  </button>
-                  <button
-                    type="button"
-                    className="account-verification-signin"
                     onClick={() => {
                       setMode('signin');
-                      setEmail(verificationEmail);
-                      setPassword('');
+                      setVerificationEmail('');
+                      setMsg('');
                     }}
                   >
-                    {pick({ en: 'Go to sign in', ar: 'الذهاب لتسجيل الدخول' })}
+                    {pick({ en: 'Sign in', ar: 'تسجيل الدخول' })}
                   </button>
-                </div>
+                )}
+                {mode !== 'signup' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signup');
+                      setVerificationEmail('');
+                      setMsg('');
+                    }}
+                  >
+                    {pick({ en: 'Create account', ar: 'إنشاء حساب' })}
+                  </button>
+                )}
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('reset');
+                      setVerificationEmail('');
+                      setMsg('');
+                    }}
+                  >
+                    {pick({ en: 'Forgot password?', ar: 'نسيت كلمة المرور؟' })}
+                  </button>
+                )}
               </div>
-            )}
-            <div className="account-switch">
-              {mode !== 'signin' && (
-                <button type="button" onClick={() => { setMode('signin'); setVerificationEmail(''); setMsg(''); }}>
-                  {pick({ en: 'Sign in', ar: 'تسجيل الدخول' })}
-                </button>
-              )}
-              {mode !== 'signup' && (
-                <button type="button" onClick={() => { setMode('signup'); setVerificationEmail(''); setMsg(''); }}>
-                  {pick({ en: 'Create account', ar: 'إنشاء حساب' })}
-                </button>
-              )}
-              {mode === 'signin' && (
-                <button type="button" onClick={() => { setMode('reset'); setVerificationEmail(''); setMsg(''); }}>
-                  {pick({ en: 'Forgot password?', ar: 'نسيت كلمة المرور؟' })}
-                </button>
-              )}
-            </div>
-            <p className="account-access-guest-note">
-              {pick({
-                en: 'Just shopping? You can browse and use guest checkout without creating an account.',
-                ar: 'تبي تتسوق بس؟ تقدر تتصفح وتكمل الشراء كضيف من غير حساب.',
-              })}
-              {' '}
-              <Link to="/shop">{pick({ en: 'Explore shop', ar: 'تصفح المتجر' })}</Link>
-            </p>
-          </form>
+              <p className="account-access-guest-note">
+                {pick({
+                  en: 'Just shopping? You can browse and use guest checkout without creating an account.',
+                  ar: 'تبي تتسوق بس؟ تقدر تتصفح وتكمل الشراء كضيف من غير حساب.',
+                })}{' '}
+                <Link to="/shop">{pick({ en: 'Explore shop', ar: 'تصفح المتجر' })}</Link>
+              </p>
+            </form>
           </div>
         </section>
       </>
@@ -561,7 +595,8 @@ export default function AccountPage() {
       });
       const firstName = clean(profile.firstName);
       const lastName = clean(profile.lastName);
-      const displayName = clean(profile.displayName) || [firstName, lastName].filter(Boolean).join(' ');
+      const displayName =
+        clean(profile.displayName) || [firstName, lastName].filter(Boolean).join(' ');
       const metadataResult = await auth.updateMetadata({
         first_name: firstName,
         last_name: lastName,
@@ -641,7 +676,10 @@ export default function AccountPage() {
                       data.saveProfile(nextProfile),
                       auth.updateMetadata({ avatar_url: avatarUrl }),
                     ]);
-                    if (profileResult.status === 'rejected' && metadataResult.status === 'rejected') {
+                    if (
+                      profileResult.status === 'rejected' &&
+                      metadataResult.status === 'rejected'
+                    ) {
                       throw profileResult.reason || metadataResult.reason;
                     }
                     if (metadataResult.status === 'fulfilled' && metadataResult.value?.error) {
@@ -677,9 +715,7 @@ export default function AccountPage() {
             <div>
               <p className="section-label">LHA ACCOUNT</p>
               <h1>{pick({ en: 'Your account', ar: 'حسابك' })}</h1>
-              <p>
-                {auth.user.email}
-              </p>
+              <p>{auth.user.email}</p>
             </div>
             <button
               className="btn-secondary"
@@ -732,7 +768,11 @@ export default function AccountPage() {
                   <article>
                     <h2>{pick({ en: 'Orders', ar: 'الطلبات' })}</h2>
                     <strong>{ordersState.orders.length}</strong>
-                    <button type="button" className="account-text-link" onClick={() => selectSection('orders')}>
+                    <button
+                      type="button"
+                      className="account-text-link"
+                      onClick={() => selectSection('orders')}
+                    >
                       {pick({ en: 'View My Orders', ar: 'عرض طلباتي' })}
                     </button>
                   </article>
