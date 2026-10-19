@@ -46,7 +46,7 @@
 - Do not make destructive production DB or checkout changes during a visual design pass.
 
 ## Phase status (update only after verification)
-- Phase 1: **IN PROGRESS** — source import fix committed as `3560210`; Vercel deployment and QA validation pending as of initial entry.
+- Phase 1: **IN PROGRESS (BUILD RECOVERED; QA NOT FINISHED)** — import fix `3560210` successfully deployed (`dpl_CHuhFJXDZGxkFWuWXHRJMqBcSvaJ`, READY); documentation commit `f484c3f` also deployed (`dpl_DeD8cACFrYFMvmzsJ3WfJKu3vnVe`, READY). Vite built and generated 71 static pages. Read-only public smoke checked `/online-training`, `/online-training/source-pro-split`, `/online-training/vert-code-elite`, `/order-tracking` successfully. Draft PRO SPLIT remains Coming Soon/not buyable. Full QA (lint, typecheck, tests, responsive visual inspection, auth, end-to-end checkout) is still not verified. Vercel uses Node 22.x per package engines and emits a mismatch warning versus project settings 24.x.
 - Phases 2–9: **NOT STARTED**.
 - Keep a concise actual change log with commit, deployment state, tests that were *actually run*, and remaining work. Never represent a proposed step as completed.
 
