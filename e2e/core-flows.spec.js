@@ -67,7 +67,7 @@ test('shop, wishlist, comparison, cart and checkout country/cash flows', async (
   const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
   if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
   await expect(
-    page.locator('input[name="country"], button[aria-haspopup="listbox"]').first(),
+    page.locator('button[aria-haspopup="listbox"]').first(),
   ).toBeVisible();
 
   const countryTrigger = page.locator('button[aria-haspopup="listbox"]').first();
@@ -125,7 +125,7 @@ test('physical product keeps its variant through cart drawer checkout', async ({
   if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
   if (sizeText) await expect(page.locator('main')).toContainText(sizeText.split(':').pop().trim());
   await expect(
-    page.locator('input[name="country"], button[aria-haspopup="listbox"]').first(),
+    page.locator('button[aria-haspopup="listbox"]').first(),
   ).toBeVisible();
 });
 
