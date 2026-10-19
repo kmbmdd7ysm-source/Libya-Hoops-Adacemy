@@ -26,6 +26,8 @@ export default function Header() {
   const [mobileShopOpen, setMobileShopOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchButton = useRef(null);
   const menuButton = useRef(null),
@@ -91,7 +93,7 @@ export default function Header() {
   return (
     <>
       <AnnouncementBar />
-      <header className={`site-header${scrolled ? ' scrolled' : ''}`}>
+      <header className={`site-header${scrolled ? ' scrolled' : ''}`} data-hydrated={hydrated}>
         <div className="container header-inner">
           <Link to="/" className="brand" aria-label={SITE.name}>
             <img
