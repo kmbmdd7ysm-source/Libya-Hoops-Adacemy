@@ -41,6 +41,7 @@ test('shop mega menu stays available by keyboard and mouse, including category l
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
+  await expect(page.locator('.site-header')).toHaveAttribute('data-hydrated', 'true');
   const reject = page.getByRole('button', { name: /reject|رفض/i });
   if (await reject.isVisible().catch(() => false)) await reject.click();
   const shop = page.locator('.desktop-nav a[href="/shop"]');
