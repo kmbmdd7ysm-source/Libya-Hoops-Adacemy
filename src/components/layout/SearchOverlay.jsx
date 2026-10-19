@@ -241,14 +241,18 @@ export default function SearchOverlay({ open, onClose, triggerRef }) {
                         id={`${listId}-${index}`}
                         role="option"
                         aria-selected={activeIndex === index}
+                        tabIndex={-1}
+                        className={activeIndex === index ? 'active' : ''}
+                        onMouseEnter={() => setActiveIndex(index)}
+                        onClick={() => activate(item)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            activate(item);
+                          }
+                        }}
                       >
-                        <button
-                          type="button"
-                          className={activeIndex === index ? 'active' : ''}
-                          onMouseEnter={() => setActiveIndex(index)}
-                          onClick={() => activate(item)}
-                        >
-                          <span>
+                        <span>
                             <Highlight text={pick(item.label)} query={query} />
                           </span>
                           <small>
@@ -275,7 +279,6 @@ export default function SearchOverlay({ open, onClose, triggerRef }) {
                                 }[item.type] || 'نتيجة',
                             })}
                           </small>
-                        </button>
                       </li>
                     ))}
                   </ul>
