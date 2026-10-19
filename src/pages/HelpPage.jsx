@@ -155,10 +155,13 @@ export default function HelpPage() {
       HELP_TOPICS.filter((topic) => {
         if (!normalizedQuery) return true;
         const haystack = [
-          topic.title[lang],
-          topic.summary[lang],
-          ...(topic.keywords[lang] || []),
-          ...topic.links.map((link) => link.label[lang]),
+          topic.title.en,
+          topic.title.ar,
+          topic.summary.en,
+          topic.summary.ar,
+          ...(topic.keywords.en || []),
+          ...(topic.keywords.ar || []),
+          ...topic.links.flatMap((link) => [link.label.en, link.label.ar]),
         ].join(' ');
         return normalizeSearchText(haystack).includes(normalizedQuery);
       }),
@@ -185,6 +188,32 @@ export default function HelpPage() {
       />
       <section className="section help-page">
         <div className="container narrow">
+          <div className="help-featured-links" aria-label={pick({ en: 'Quick help', ar: 'مساعدة سريعة' })}>
+            <Link to="/order-tracking" className="help-featured-link">
+              <Icon name="orders" size={22} />
+              <span>
+                <strong>{pick({ en: 'Track an order', ar: 'تتبع طلب' })}</strong>
+                <small>{pick({ en: 'Look up your current order status', ar: 'اعرف الحالة الحالية لطلبك' })}</small>
+              </span>
+              <Icon name="chevron" size={18} />
+            </Link>
+            <Link to="/account?section=orders" className="help-featured-link">
+              <Icon name="user" size={22} />
+              <span>
+                <strong>{pick({ en: 'My account', ar: 'حسابي' })}</strong>
+                <small>{pick({ en: 'Orders, details and saved addresses', ar: 'الطلبات والبيانات والعناوين المحفوظة' })}</small>
+              </span>
+              <Icon name="chevron" size={18} />
+            </Link>
+            <Link to="/contact" className="help-featured-link">
+              <Icon name="help" size={22} />
+              <span>
+                <strong>{pick({ en: 'Contact support', ar: 'تواصل مع الدعم' })}</strong>
+                <small>{pick({ en: 'Questions about training or shopping', ar: 'استفسارات التدريب والشراء' })}</small>
+              </span>
+              <Icon name="chevron" size={18} />
+            </Link>
+          </div>
           <div className="help-search">
             <label htmlFor="help-search-input">
               {pick({ en: 'What can we help you with?', ar: 'كيف يمكننا مساعدتك؟' })}
@@ -196,6 +225,8 @@ export default function HelpPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
+                placeholder={pick({ en: 'Search orders, delivery, returns or account help', ar: 'ابحث عن الطلبات أو التوصيل أو الإرجاع أو الحساب' })}
+                aria-controls="help-topics"
               />
               {query && (
                 <button
@@ -242,7 +273,7 @@ export default function HelpPage() {
           <p className="help-result-count" role="status" aria-live="polite">
             {pick({ en: `${filtered.length} topics`, ar: `${filtered.length} مواضيع` })}
           </p>
-          <div className="help-accordions">
+          <div className="help-accordions" id="help-topics">
             {filtered.map((topic) => {
               const panelId = `help-${topic.id}`;
               const expanded = open === topic.id;
