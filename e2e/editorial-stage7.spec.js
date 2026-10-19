@@ -38,13 +38,13 @@ test('shop mega menu stays available by keyboard and mouse, including category l
  const shop=page.locator('.desktop-nav a[href="/shop"]');
  await shop.focus();
  const mega=page.locator('#shop-mega-menu');
+ await shop.press('ArrowDown');
  await expect(mega).toBeVisible();
  await expect(shop).toHaveAttribute('aria-expanded','true');
- await shop.press('ArrowDown');
  await expect(mega.locator('a').first()).toBeFocused();
  await mega.locator('a[href="/shop/clothing/t-shirts"]').focus();
  await expect(mega).toBeVisible();
- await mega.press('Escape');
+ await page.keyboard.press('Escape');
  await expect(mega).toBeHidden();
 });
 
