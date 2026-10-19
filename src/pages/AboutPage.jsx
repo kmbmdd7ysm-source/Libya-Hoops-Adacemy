@@ -3,7 +3,6 @@ import { useLanguage } from '../context/LanguageContext';
 import Seo from '../components/common/Seo';
 import PageHero from '../components/common/PageHero';
 import Breadcrumbs from '../components/common/Breadcrumbs';
-import EmptyState from '../components/common/EmptyState';
 
 export default function AboutPage() {
   const { t } = useLanguage();
@@ -63,10 +62,27 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="section section--muted">
-        <div className="container">
-          <h2 className="section-title">{t.about.milestonesTitle}</h2>
-          <EmptyState message={t.about.milestonesEmpty} />
+      <section className="section academy-about-story" aria-labelledby="academy-about-cta-title">
+        <div className="container academy-about-story-grid">
+          <div className="academy-about-story-image">
+            <img src="/images/programs/youth-development.webp" alt="" width="1312" height="816"
+              loading="lazy" decoding="async" />
+          </div>
+          <div className="academy-about-story-copy">
+            <p className="section-label">{t.about.label}</p>
+            <h2 className="section-title" id="academy-about-cta-title">
+              {t.home.philosophyTitle}
+            </h2>
+            <p>{t.home.philosophyText}</p>
+            <div className="academy-editorial-actions">
+              <Link to="/programs" className="btn-primary">
+                {t.common.explorePrograms}
+              </Link>
+              <Link to="/contact" className="btn-secondary">
+                {t.common.contactUs}
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
