@@ -1,7 +1,7 @@
 # Libya Hoops Academy 2.0 — Phase 6: Commerce Safety + Shared Site Precision
 
 **Date:** 2026-10-19
-**Status:** Implemented and QA-verified on isolated branch. Production readiness and activation must be verified separately.
+**Status:** Production READY for commerce safety and visual precision scope; phase 6 remains OPEN for actual gateway, entitlement/delivery, inventory/returns and carrier integrations.
 
 ## Delivered — operational correctness
 
@@ -43,3 +43,9 @@
 - Training and large apparel visuals: `docs/LHA-PHASE-5-TRAINING-GEAR.md`
 - Public site: https://www.libyahoopsacademy.com
 - Future work: maintain this document with final published code hash and deployment only **after** confirming production READY.
+
+## Production release and final QA (confirmed)
+- Released code SHA `8de257d2fb6e745cc044e179078969b8ac3a0615`; production Vercel inspector: https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/BWaeV9L1vM4H7FxG2gctgxUSiWtp — state **READY**, target **production**.
+- Clean sandbox verified all nine edited files match Prettier, validated `npm run validate:data`, `validate:commerce`, `validate:media` (0 warnings/errors), `validate:seo`, ESLint, TypeScript, build (71 prerendered routes), production dependency audit (0 known vulnerabilities), Vitest 12/12, Playwright 7/7 (including English/Arabic, 390px/1440px, digital payment eligibility, checkout and order tracking).
+- Read-only live smoke confirmed https://www.libyahoopsacademy.com/, /checkout, /online-training and /order-tracking load. Public tracking copy still accurately states external live carrier tracking is not connected.
+- No money accepted, no fake successful payment or real order created to prove end-to-end fulfillment. The described payment and delivery blockers are NOT resolved by this deployment.
