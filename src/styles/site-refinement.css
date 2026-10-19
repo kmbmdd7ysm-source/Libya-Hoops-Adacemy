@@ -9,13 +9,25 @@
   --site-radius: 4px;
   --site-line: #dedede;
 }
-body { font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
-main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
-.container { max-inline-size: min(100%, var(--site-container)); }
+body {
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+main,
+.container,
+.section-heading,
+.section-heading > * {
+  min-inline-size: 0;
+}
+.container {
+  max-inline-size: min(100%, var(--site-container));
+}
 .section:not(.page-hero):not(.hero) {
   padding-block: var(--site-space-section) !important;
 }
-.section-heading { margin-bottom: clamp(28px, 4vw, 48px) !important; }
+.section-heading {
+  margin-bottom: clamp(28px, 4vw, 48px) !important;
+}
 .section-heading .section-title {
   max-width: 26ch !important;
   line-height: 1.09 !important;
@@ -23,12 +35,14 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
   text-wrap: balance;
 }
 .section-label {
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-weight: 750;
-  letter-spacing: .11em !important;
+  letter-spacing: 0.11em !important;
   margin-bottom: 16px;
 }
-.section-subtitle, .section-heading .section-sub, .page-description {
+.section-subtitle,
+.section-heading .section-sub,
+.page-description {
   max-inline-size: 64ch;
   line-height: 1.68;
   color: #525252;
@@ -41,31 +55,38 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
 .page-hero-inner {
   padding-block: clamp(68px, 7.5vw, 120px) !important;
 }
-.page-hero h1, .page-hero .display-title {
+.page-hero h1,
+.page-hero .display-title {
   max-inline-size: 22ch;
   line-height: 1.05;
-  letter-spacing: -.038em;
+  letter-spacing: -0.038em;
   overflow-wrap: break-word;
 }
-.page-hero .page-description { color: #e4e4e4; }
-.page-hero .court-lines { opacity: .25; }
+.page-hero .page-description {
+  color: #e4e4e4;
+}
+.page-hero .court-lines {
+  opacity: 0.25;
+}
 
 :is(.product-card, .program-card, .training-card, .event-card, .coach-card) {
   border-color: var(--site-line) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,.025) !important;
-  transition: border-color .18s ease, box-shadow .18s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.025) !important;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease !important;
   transform: none !important;
   will-change: auto !important;
 }
 :is(.product-card, .program-card, .training-card, .event-card, .coach-card):hover {
   transform: none !important;
   border-color: #aaa !important;
-  box-shadow: 0 5px 16px rgba(0,0,0,.055) !important;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.055) !important;
 }
 :is(.product-card, .program-card, .training-card, .event-card, .coach-card):focus-within {
   border-color: #555 !important;
 }
-:is(.product-card, .program-card, .training-card) :is(h2,h3,h4) {
+:is(.product-card, .program-card, .training-card) :is(h2, h3, h4) {
   line-height: 1.32;
   overflow-wrap: anywhere;
 }
@@ -74,7 +95,10 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
   border-radius: var(--site-radius) !important;
   font-weight: 700;
   letter-spacing: 0;
-  transition: background .18s ease, border-color .18s ease, color .18s ease !important;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease !important;
   transform: none !important;
 }
 :is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add, .lang-text-btn):hover {
@@ -88,15 +112,21 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
 :is(.field, .form-block, .checkout-grid, .account-layout, .order-card) {
   min-inline-size: 0;
 }
-:is(.field, .form-block) label, .field > span {
+:is(.field, .form-block) label,
+.field > span {
   line-height: 1.5;
 }
 :is(.field input, .field textarea, .field select):focus-visible {
   outline: 2px solid #111;
   outline-offset: 2px;
 }
-.site-header .nav-link { font-weight: 650; letter-spacing: 0; }
-.site-header .brand-logo { transform: none !important; }
+.site-header .nav-link {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+.site-header .brand-logo {
+  transform: none !important;
+}
 .site-header .icon-btn {
   min-width: var(--site-interactive-height);
   min-height: var(--site-interactive-height);
@@ -105,14 +135,20 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
   justify-content: center;
   transform: none !important;
 }
-.site-header .icon-btn svg { display: block; flex: 0 0 auto; }
-.site-header .header-actions { gap: clamp(2px, .5vw, 8px); }
+.site-header .icon-btn svg {
+  display: block;
+  flex: 0 0 auto;
+}
+.site-header .header-actions {
+  gap: clamp(2px, 0.5vw, 8px);
+}
 .site-footer {
   background: #0a0a0a;
   color: #e4e4e4;
   border-top: 1px solid #242424;
 }
-.site-footer .footer-col a, .site-footer .footer-link-button {
+.site-footer .footer-col a,
+.site-footer .footer-link-button {
   line-height: 1.65;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -121,14 +157,26 @@ main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
-.site-footer .footer-newsletter-col { min-inline-size: 0; }
-.site-footer .newsletter-input-row { min-inline-size: 0; }
-.site-footer .newsletter-input-row input { min-width: 0; }
-.training-card-plans li, .cart-line, .order-card dl div {
+.site-footer .footer-newsletter-col {
   min-inline-size: 0;
 }
-.training-card-plans li > :first-child { overflow-wrap: anywhere; }
-:where(.notice, .status-badge, .tag, .badge) { letter-spacing: 0; }
+.site-footer .newsletter-input-row {
+  min-inline-size: 0;
+}
+.site-footer .newsletter-input-row input {
+  min-width: 0;
+}
+.training-card-plans li,
+.cart-line,
+.order-card dl div {
+  min-inline-size: 0;
+}
+.training-card-plans li > :first-child {
+  overflow-wrap: anywhere;
+}
+:where(.notice, .status-badge, .tag, .badge) {
+  letter-spacing: 0;
+}
 html[lang^='ar'] :is(.section-title, .page-hero h1, .page-hero .display-title, .section-label) {
   letter-spacing: 0 !important;
   line-height: 1.38 !important;
@@ -136,25 +184,50 @@ html[lang^='ar'] :is(.section-title, .page-hero h1, .page-hero .display-title, .
 html[lang^='ar'] :is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add) {
   letter-spacing: 0 !important;
 }
-@media(max-width:767px) {
-  :root { --site-space-section: clamp(54px, 12vw, 80px); }
-  .section-heading .section-title { max-width: 100% !important; font-size: clamp(1.85rem, 8vw, 3rem); }
-  .page-hero-inner { padding-block: 76px 66px !important; }
-  .page-hero h1, .page-hero .display-title { font-size: clamp(2.6rem, 10vw, 4.5rem); }
-  .site-header .header-inner { padding-inline: clamp(12px, 3vw, 22px); }
-  .site-header .icon-btn { min-width: 42px; min-height: 44px; }
-  .site-header .header-actions { gap: 0; }
-  .site-footer { padding-top: 55px; }
-  .site-footer .footer-top { row-gap: 38px; }
-  .site-footer .footer-col { min-width: 0; }
+@media (max-width: 767px) {
+  :root {
+    --site-space-section: clamp(54px, 12vw, 80px);
+  }
+  .section-heading .section-title {
+    max-width: 100% !important;
+    font-size: clamp(1.85rem, 8vw, 3rem);
+  }
+  .page-hero-inner {
+    padding-block: 76px 66px !important;
+  }
+  .page-hero h1,
+  .page-hero .display-title {
+    font-size: clamp(2.6rem, 10vw, 4.5rem);
+  }
+  .site-header .header-inner {
+    padding-inline: clamp(12px, 3vw, 22px);
+  }
+  .site-header .icon-btn {
+    min-width: 42px;
+    min-height: 44px;
+  }
+  .site-header .header-actions {
+    gap: 0;
+  }
+  .site-footer {
+    padding-top: 55px;
+  }
+  .site-footer .footer-top {
+    row-gap: 38px;
+  }
+  .site-footer .footer-col {
+    min-width: 0;
+  }
   :is(.product-card, .training-card, .program-card) {
     max-inline-size: 100%;
   }
 }
-@media(prefers-reduced-motion:reduce) {
-  *, *::before, *::after {
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
     scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

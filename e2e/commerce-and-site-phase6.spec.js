@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-test('digital training checkout never presents physical cash-on-delivery as payment', async ({ page }) => {
+test('digital training checkout never presents physical cash-on-delivery as payment', async ({
+  page,
+}) => {
   await page.goto('/online-training', { waitUntil: 'load' });
   const rejectCookies = page.getByRole('button', { name: /reject|رفض/i });
   if (await rejectCookies.isVisible().catch(() => false)) await rejectCookies.click();
@@ -17,17 +19,37 @@ test('digital training checkout never presents physical cash-on-delivery as paym
   if (await guest.isVisible().catch(() => false)) await guest.click();
   const methods = page.locator('.payment-methods');
   await expect(methods).toBeVisible();
-  await expect(methods.getByRole('radio', { name: /Cash on Delivery|الدفع نقداً/i })).toHaveCount(0);
-  await expect(methods).toContainText(/Cash on delivery is for physical goods|الدفع عند الاستلام للمنتجات المادية/i);
-  await expect(methods.getByRole('radio', { name: /online payment|الدفع الإلكتروني/i })).toBeVisible();
+  await expect(methods.getByRole('radio', { name: /Cash on Delivery|الدفع نقداً/i })).toHaveCount(
+    0,
+  );
+  await expect(methods).toContainText(
+    /Cash on delivery is for physical goods|الدفع عند الاستلام للمنتجات المادية/i,
+  );
+  await expect(
+    methods.getByRole('radio', { name: /online payment|الدفع الإلكتروني/i }),
+  ).toBeVisible();
 });
 
 for (const width of [390, 1440]) {
   for (const language of ['en', 'ar']) {
-    test(`shared premium site surfaces stay inside viewport: ${width} ${language}`, async ({ page }) => {
+    test(`shared premium site surfaces stay inside viewport: ${width} ${language}`, async ({
+      page,
+    }) => {
       await page.setViewportSize({ width, height: 880 });
       await page.addInitScript((lang) => localStorage.setItem('lha-language', lang), language);
-      const routes = ['/', '/shop', '/shop/clothing', '/online-training', '/programs', '/cart', '/checkout', '/order-tracking', '/about', '/contact', '/help'];
+      const routes = [
+        '/',
+        '/shop',
+        '/shop/clothing',
+        '/online-training',
+        '/programs',
+        '/cart',
+        '/checkout',
+        '/order-tracking',
+        '/about',
+        '/contact',
+        '/help',
+      ];
       const errors = [];
       for (const path of routes) {
         await page.goto(path, { waitUntil: 'domcontentloaded' });
@@ -39,8 +61,13 @@ for (const width of [390, 1440]) {
           logo: Boolean(document.querySelector('.site-header .brand-logo')),
           dir: document.documentElement.dir,
         }));
-        if (scan.scroll > scan.width + 2 || !scan.logo || !scan.footer ||
-          scan.dir !== (language === 'ar' ? 'rtl' : 'ltr')) errors.push({ path, ...scan });
+        if (
+          scan.scroll > scan.width + 2 ||
+          !scan.logo ||
+          !scan.footer ||
+          scan.dir !== (language === 'ar' ? 'rtl' : 'ltr')
+        )
+          errors.push({ path, ...scan });
       }
       expect(errors).toEqual([]);
     });

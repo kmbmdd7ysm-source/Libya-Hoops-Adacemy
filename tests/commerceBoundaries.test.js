@@ -2,15 +2,33 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canSubmitCodCart, requiresNonCodCheckout } from '../src/utils/commerceGuard';
 import handler from '../api/order-notification.js';
 
-const clothing = { id: 'tee', type: 'product', sku: 'LHA-TEE-001', quantity: 2, fulfillmentType: 'physical' };
-const training = { id: 'base', type: 'training', sku: '', quantity: 1, fulfillmentType: 'digital_training' };
+const clothing = {
+  id: 'tee',
+  type: 'product',
+  sku: 'LHA-TEE-001',
+  quantity: 2,
+  fulfillmentType: 'physical',
+};
+const training = {
+  id: 'base',
+  type: 'training',
+  sku: '',
+  quantity: 1,
+  fulfillmentType: 'digital_training',
+};
 
 function response() {
   return {
     statusCode: 200,
-    status(code) { this.statusCode = code; return this; },
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
     setHeader() {},
-    json(body) { this.body = body; return this; },
+    json(body) {
+      this.body = body;
+      return this;
+    },
   };
 }
 const request = (changes = {}) => ({
@@ -81,8 +99,12 @@ describe('COD boundaries', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
   it('accepts physical COD only after Center Vision returns a public order ID', async () => {
-    const fetch = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce({ ok: true, text: async () => JSON.stringify({ publicId: 'LH-ORD-TEST', duplicate: false }) })
+    const fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        text: async () => JSON.stringify({ publicId: 'LH-ORD-TEST', duplicate: false }),
+      })
       .mockResolvedValueOnce({ ok: true, text: async () => '{}' });
     const res = response();
     await handler(request(), res);

@@ -25,9 +25,7 @@ describe('final cross-device order, total, and refresh fixes', () => {
 
   it('keeps API routes excluded while routing SPA refreshes to the application root', () => {
     const vercel = JSON.parse(read('vercel.json'));
-    expect(vercel.rewrites).toEqual([
-      { source: '/((?!api/).*)', destination: '/' },
-    ]);
+    expect(vercel.rewrites).toEqual([{ source: '/((?!api/).*)', destination: '/' }]);
   });
 
   it('does not cache private order pages in the service worker', () => {
@@ -37,7 +35,6 @@ describe('final cross-device order, total, and refresh fixes', () => {
     expect(worker).toContain('PRIVATE.test(u.href)');
   });
 
-
   it('requires Center Vision synchronization before checkout success', () => {
     const notification = read('api/order-notification.js');
     const checkout = read('src/pages/CheckoutPage.jsx');
@@ -45,9 +42,10 @@ describe('final cross-device order, total, and refresh fixes', () => {
     expect(notification).toContain("centerVision: 'synced'");
     expect(notification).toContain("error: 'order_sync_failed'");
     expect(notification).toContain("stage = 'center_vision'");
-    expect(checkout).toContain('The order could not be fully confirmed and synchronized with store operations yet.');
+    expect(checkout).toContain(
+      'The order could not be fully confirmed and synchronized with store operations yet.',
+    );
   });
-
 
   it('uses Center Vision as the order synchronization readiness authority', () => {
     const health = read('api/order-sync-health.js');
@@ -62,5 +60,4 @@ describe('final cross-device order, total, and refresh fixes', () => {
     expect(notification).toContain("provider: 'center-vision'");
     expect(lookup).toContain('/v1/public/store/lha/order-lookup');
   });
-
 });
