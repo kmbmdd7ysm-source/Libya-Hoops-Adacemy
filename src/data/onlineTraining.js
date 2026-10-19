@@ -1,4 +1,4 @@
-import { suppliedTrainingCatalog } from './suppliedTrainingCatalog';
+import { suppliedTrainingCatalog } from './suppliedTrainingCatalog.js';
 
 // Source-file catalog is intentionally not purchasable until pricing, delivery files
 // and commercial redistribution permissions are confirmed.
