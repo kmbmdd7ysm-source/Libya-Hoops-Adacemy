@@ -18,6 +18,7 @@ for (const width of [320, 390, 768, 1440]) {
       for (const url of pages) {
         await page.goto(url, { waitUntil: 'domcontentloaded' });
         await expect(page.locator('main')).toBeVisible();
+        await expect(page.locator('main h1').first()).toBeVisible({ timeout: 12000 });
         const state = await page.evaluate(() => ({
           vw: document.documentElement.clientWidth,
           sw: document.documentElement.scrollWidth,
@@ -57,6 +58,7 @@ test('new split cinema hero has loaded actual image and clear clothing/training 
   await expect(cards).toHaveCount(3);
   await expect(page.locator('.home-v2-gear-tile')).toHaveCount(2);
   for (const tile of await page.locator('.home-v2-gear-tile img').all()) {
+    await tile.scrollIntoViewIfNeeded();
     await expect.poll(() => tile.evaluate(e => e.naturalWidth)).toBeGreaterThan(0);
   }
 });
