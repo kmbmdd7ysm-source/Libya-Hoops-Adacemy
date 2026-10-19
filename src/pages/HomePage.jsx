@@ -90,10 +90,17 @@ export default function HomePage() {
       />
       <CinematicHero />
 
-      <section className="brand-proof home-v2-proof" aria-label={pick({ en: 'Academy purpose', ar: 'هدف الأكاديمية' })}>
+      <section
+        className="brand-proof home-v2-proof"
+        aria-label={pick({ en: 'Academy purpose', ar: 'هدف الأكاديمية' })}
+      >
         <div className="container brand-proof-grid">
-          <p>{pick({ en: 'BUILT IN LIBYA. MADE FOR THE GAME.', ar: 'من ليبيا. ومن أجل اللعبة.' })}</p>
-          <span>{pick({ en: 'DEVELOP · PERFORM · BELONG', ar: 'تطوّر · قدّم الأفضل · انتمِ' })}</span>
+          <p>
+            {pick({ en: 'BUILT IN LIBYA. MADE FOR THE GAME.', ar: 'من ليبيا. ومن أجل اللعبة.' })}
+          </p>
+          <span>
+            {pick({ en: 'DEVELOP · PERFORM · BELONG', ar: 'تطوّر · قدّم الأفضل · انتمِ' })}
+          </span>
         </div>
       </section>
 
@@ -116,7 +123,14 @@ export default function HomePage() {
           <div className="home-v2-path-grid">
             {pathways.map((path) => (
               <Link to={path.href} className="home-v2-path" key={path.id} data-path={path.id}>
-                <img src={path.image} alt="" loading="lazy" decoding="async" width="800" height="1000" />
+                <img
+                  src={path.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width="800"
+                  height="1000"
+                />
                 <span className="home-v2-path-shade" aria-hidden="true" />
                 <span className="home-v2-path-content">
                   <span className="home-v2-path-index">
