@@ -130,12 +130,15 @@ test('physical product keeps its variant through cart drawer checkout', async ({
   );
   await page.goto('/products/hoopers-long-sleeve-performance');
   await dismissCookie(page);
-  const availableSize = page.locator('.size-pill:not(:disabled)').first();
-  if (await availableSize.count()) await availableSize.click();
+  // Select color first: changing its URL variant can intentionally reset the
+  // size selection. Always pick an available size for the resulting color.
   const availableColor = page
     .locator('.color-swatch:not(:disabled), .color-pill:not(:disabled)')
     .first();
   if (await availableColor.count()) await availableColor.click();
+  const availableSize = page.locator('.size-pill:not(:disabled)').first();
+  if (await availableSize.count()) await availableSize.click();
+  await expect(page.locator('.purchase-primary')).toBeEnabled();
   await page.locator('.purchase-primary').click();
   const drawer = page.locator('.cart-drawer');
   await expect(drawer).toBeVisible();
