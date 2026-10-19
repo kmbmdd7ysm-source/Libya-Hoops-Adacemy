@@ -47,6 +47,10 @@ test('home shows verified offers, no empty coaching or expired event placeholder
   await expect(page.locator('.home-v2-deferred .program-card').first()).toBeVisible();
   await expect(page.locator('.home-v2-deferred .training-card').first()).toBeVisible();
   await expect(page.locator('.home-v2-deferred .product-card').first()).toBeVisible();
+  // A new collection can be featured in source data while not yet available to buy.
+  // Homepage merchandising must never surface that as the main shopping offer.
+  await expect(page.locator('.home-v2-deferred .product-card .quick-add')).toHaveCount(4);
+  await expect(page.locator('.home-v2-deferred .product-card .status-pill')).toHaveCount(0);
   await expect(page.locator('.home-v2-deferred .coach-card')).toHaveCount(0);
   await expect(page.locator('.home-v2-deferred .event-card')).toHaveCount(0);
   await expect(page.getByText(/Coach profiles will appear here soon/i)).toHaveCount(0);
