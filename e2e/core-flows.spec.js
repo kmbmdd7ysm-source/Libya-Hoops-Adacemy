@@ -48,7 +48,10 @@ test('shop, wishlist, comparison, cart and checkout country/cash flows', async (
   await page.goto('/shop');
   await dismissCookie(page);
   // The first catalog item may be a Coming Soon item without Quick Add.
-  const card = page.locator('.product-card').filter({ has: page.locator('.quick-add') }).first();
+  const card = page
+    .locator('.product-card')
+    .filter({ has: page.locator('.quick-add') })
+    .first();
   await expect(card).toBeVisible();
   const addedProductName = (await card.locator('.product-card-name').textContent())?.trim();
   await card.locator('.wishlist-btn').click();
@@ -68,9 +71,7 @@ test('shop, wishlist, comparison, cart and checkout country/cash flows', async (
   const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
   await expect(guestChoice).toBeVisible();
   await guestChoice.click();
-  await expect(
-    page.locator('button[aria-haspopup="listbox"]').first(),
-  ).toBeVisible();
+  await expect(page.locator('button[aria-haspopup="listbox"]').first()).toBeVisible();
 
   const countryTrigger = page.locator('button[aria-haspopup="listbox"]').first();
   await countryTrigger.click();
@@ -151,9 +152,7 @@ test('physical product keeps its variant through cart drawer checkout', async ({
   await expect(guestChoice).toBeVisible();
   await guestChoice.click();
   if (sizeText) await expect(page.locator('main')).toContainText(sizeText.split(':').pop().trim());
-  await expect(
-    page.locator('button[aria-haspopup="listbox"]').first(),
-  ).toBeVisible();
+  await expect(page.locator('button[aria-haspopup="listbox"]').first()).toBeVisible();
 });
 
 test('search, comparison, recently viewed and reduced motion', async ({ page }) => {
