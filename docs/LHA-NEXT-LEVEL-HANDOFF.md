@@ -46,7 +46,7 @@
 - Do not make destructive production DB or checkout changes during a visual design pass.
 
 ## Phase status (update only after verification)
-- Phase 1: **IN PROGRESS (BUILD RECOVERED; QA NOT FINISHED)** — import fix `3560210` successfully deployed (`dpl_CHuhFJXDZGxkFWuWXHRJMqBcSvaJ`, READY); documentation commit `f484c3f` also deployed (`dpl_DeD8cACFrYFMvmzsJ3WfJKu3vnVe`, READY). Vite built and generated 71 static pages. Read-only public smoke checked `/online-training`, `/online-training/source-pro-split`, `/online-training/vert-code-elite`, `/order-tracking` successfully. Draft PRO SPLIT remains Coming Soon/not buyable. Full QA (lint, typecheck, tests, responsive visual inspection, auth, end-to-end checkout) is still not verified. Vercel uses Node 22.x per package engines and emits a mismatch warning versus project settings 24.x.
+- Phase 1: **IN PROGRESS / BLOCKED ON QA** — Node ESM import fix `3560210` restored successful production deploys; latest verified prior deployment `ed0ca770` was READY. Full QA executed in Vercel sandbox: validation/data/lint/typecheck/build/brand/media/commerce/SEO/cloud-readiness PASS; unit tests 257 pass / 34 fail, 63 Prettier format failures, 2 moderate npm production advisories. Focused desktop E2E: 1 pass, 2 fail; full 1,656-case suite not completed and early accessibility failures observed. DO NOT mark stage complete. **Read the detailed verified report `docs/LHA-PHASE-1-QA-RESULTS.md` before any code changes or status claims.**
 - Phases 2–9: **NOT STARTED**.
 - Keep a concise actual change log with commit, deployment state, tests that were *actually run*, and remaining work. Never represent a proposed step as completed.
 
