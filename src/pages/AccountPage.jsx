@@ -294,7 +294,7 @@ export default function AccountPage() {
   if (!auth.user || mode === 'reset-password')
     return (
       <>
-        <Seo title={pick({ en: "Account", ar: "الحساب" })} path="/account" />
+        <Seo title={pick({ en: 'Account', ar: 'الحساب' })} path="/account" />
         <section className="section account-access-section">
           <div className="container account-access-layout">
             <aside
