@@ -487,8 +487,10 @@ html[lang^='ar'] .section-label { letter-spacing: 0 !important; }
   .home-v2-hero .hero-text { font-size: .95rem !important; max-width: 32ch !important; }
   .home-v2-hero-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    min-width: 0;
+    max-width: 100%;
     width: 100%;
     margin-top: 23px;
   }
@@ -497,8 +499,18 @@ html[lang^='ar'] .section-label { letter-spacing: 0 !important; }
     min-height: 49px;
     padding-inline: 9px;
     font-size: .75rem;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
-  .home-v2-hero-shop { grid-column: 1 / -1; justify-content: start; margin: 0; }
+  .home-v2-hero-shop {
+    grid-column: 1 / -1;
+    min-width: 0;
+    max-width: 100%;
+    justify-content: start;
+    margin: 0;
+    white-space: normal;
+  }
   .home-v2-video-toggle { bottom: 17px; inset-inline-end: 17px; font-size: .63rem; }
   .hero-editorial-rail { top: 15px; inset-inline-end: 18px; gap: 10px; font-size: .57rem; }
   .hero-editorial-rail span:last-child { display: none; }
