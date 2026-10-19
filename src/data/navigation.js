@@ -6,14 +6,19 @@
 // Main header links (label = key inside translations.nav)
 export const mainNav = [
   { to: '/', key: 'home' },
-  { to: '/about', key: 'about' },
   { to: '/shop', key: 'shop', mega: true },
   { to: '/programs', key: 'programs' },
-  { to: '/events', key: 'events' },
   { to: '/online-training', key: 'onlineTraining' },
+  { to: '/events', key: 'events' },
+  { to: '/about', key: 'about' },
   { to: '/coaches', key: 'coaches' },
   { to: '/contact', key: 'contact' },
 ];
+
+// The logo is the homepage link; Coaches remains available in the full
+// mobile menu, Academy content and footer. Six top-level links stay readable
+// on laptops without hiding the training / shopping pathways.
+export const desktopNav = mainNav.filter((item) => !['home', 'coaches'].includes(item.key));
 
 // Shop mega-menu columns. `label` uses categories/subcategories names directly.
 export const megaMenu = {
