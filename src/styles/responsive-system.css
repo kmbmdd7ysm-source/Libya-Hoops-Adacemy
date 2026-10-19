@@ -1,0 +1,39 @@
+/* LHA 2.0 Phase 3 — responsive geometry and touch, monochrome foundations. */
+:root { --touch-target: 44px; }
+html { scroll-padding-top: calc(var(--header-h, 68px) + 12px); }
+:where(.container, main, .checkout-grid, .checkout-main, .checkout-summary, .product-detail, .card-grid, .shop-layout, .shop-main) { min-inline-size: 0; }
+:where(h1,h2,h3,p,label,.product-card-name,.mobile-link) { overflow-wrap: break-word; }
+:where(.mobile-menu-body,.cart-drawer-items,.filters-drawer-panel,.search-overlay-inner) {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+:where(.mobile-menu,.cart-drawer,.filters-drawer-panel,.search-overlay-inner) { max-inline-size: 100vw; }
+:where(.mobile-menu,.cart-drawer) { max-block-size: 100dvh; }
+:where(.mobile-menu-foot,.cart-drawer-foot) {
+  padding-bottom: max(16px,env(safe-area-inset-bottom,0px));
+}
+:where(.mobile-menu-head,.filters-drawer-head,.cart-drawer-head) { flex-shrink: 0; }
+:where(.country-combobox,.country-combobox__trigger,.country-combobox__popover,.country-combobox__search) { max-inline-size: 100%; }
+:where(.country-combobox__trigger,.search-overlay button,.filters-drawer button,.mobile-menu button) { min-block-size: var(--touch-target); }
+@media (max-width:767px) {
+ .site-header .header-inner { min-inline-size:0; gap: clamp(6px,2vw,12px); }
+ .site-header .header-actions { min-inline-size:0; gap: clamp(2px,1.5vw,9px); }
+ .site-header .header-actions > .icon-btn { min-inline-size:var(--touch-target); min-block-size:var(--touch-target); flex:0 0 auto; }
+ .mobile-menu { inline-size:min(94vw,420px); max-inline-size:100vw; block-size:100dvh; }
+ .mobile-menu-body { min-block-size:0; overflow-y:auto; }
+ .mobile-menu-foot { flex:0 0 auto; }
+ .cart-drawer { inline-size:min(100vw,440px); block-size:100dvh; }
+ .filters-drawer-panel { inline-size:100%; max-block-size:92dvh; }
+ .search-overlay-inner { max-block-size:100dvh; }
+ :where(input,textarea,select) { max-inline-size:100%; }
+}
+@media (max-width:375px) {
+ .mobile-menu-head,.mobile-menu-body,.mobile-menu-foot { padding-inline:14px; }
+ .site-header .header-actions { gap:2px; }
+}
+@media (min-width:768px) and (max-width:1024px) {
+ :where(.checkout-grid,.shop-layout,.account-layout)>* { min-inline-size:0; }
+}
+@media (prefers-reduced-motion:reduce) {
+ .mobile-menu,.mobile-overlay,.cart-drawer,.filters-drawer-panel { transition-duration:.01ms; }
+}
