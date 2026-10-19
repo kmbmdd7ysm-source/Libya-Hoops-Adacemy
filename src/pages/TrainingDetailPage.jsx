@@ -108,7 +108,7 @@ export default function TrainingDetailPage() {
               price: program.purchaseOptions?.[0]?.price ?? program.price,
               priceCurrency: SITE.currency,
               availability: comingSoon
-                ? 'https://schema.org/PreOrder'
+                ? 'https://schema.org/OutOfStock'
                 : 'https://schema.org/InStock',
             },
           }
@@ -154,7 +154,9 @@ export default function TrainingDetailPage() {
           <div className="detail-intro">
             <p className="section-label">{t.training.label}</p>
             <h1 className="detail-title">{pick(program.title)}</h1>
-            <p className="lead">{pick(program.description)}</p>
+            <p className="lead">{pick(program.marketingCaption || program.description)}</p>
+            {program.marketingCaption && program.marketingCaption !== program.description && <p>{pick(program.description)}</p>}
+            {program.sourceDocument && <p className="section-label">{pick({ en: "Based on supplied file", ar: "مبني على الملف المرفق" })}: {program.sourceDocument}</p>}
             {facts.length > 0 && (
               <dl className="fact-list">
                 {facts.map((f, i) => (
