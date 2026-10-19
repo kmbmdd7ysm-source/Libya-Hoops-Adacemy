@@ -33,7 +33,8 @@ describe('final cross-device order, total, and refresh fixes', () => {
   it('does not cache private order pages in the service worker', () => {
     const worker = read('public/sw.js');
     expect(worker).toContain('\\/order-tracking\\b');
-    expect(worker).toContain('lha-v6-20260730-order-sync-route');
+    expect(worker).toContain('const PRIVATE=');
+    expect(worker).toContain('PRIVATE.test(u.href)');
   });
 
 
