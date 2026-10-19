@@ -70,3 +70,28 @@ A separate **read-only browser run of the actual public production website** suc
 
 ## Change-safety policy
 No destructive database mutations, no fabricated inventory/registration dates/training session counts, no automatic public sale of draft licensed content, no uncontrolled major version upgrades, no real purchases during smoke testing.
+
+## Phase 1 follow-up — implementation and verification (2026-10-18, continued)
+
+### Live fixes shipped
+- **Online training catalog exposure restored**: `src/pages/OnlineTrainingPage.jsx`, commit `4300cc5fbe344bd84eb9d20076bf8befddbcc1b3`. Public listing now separates **10 existing available programs** from **6 Coming Soon systems** (one existing program plus 5 supplied draft-source previews). Existing prices/options unchanged and drafts cannot be added to cart. Verified production content on `/online-training`; the five source document previews remain non-purchasable.
+- **Cross-device address cache consistency**: `src/services/account/addressService.js`, commit `52425b583679515e2b0cfe8342b08a1a84fd5a30`. A successful empty cloud address list now overwrites stale local cache; permission/network errors while online are no longer hidden by returning old locally cached records. No production DB data altered.
+- Tests `e2e/online-training-catalog.spec.js` (`f8b0a9c`) and `tests/addressCacheConsistency.test.js` (`95875f3`) added; cache unit tests 2/2 PASS. Catalog test PASS on desktop, mobile, and Arabic-RTL **test project**; note that project locale alone does not prove real UI language selection.
+- Corrected pre-existing browser test mistakes in `e2e/core-flows.spec.js`: remove `localStorage.clear()` on every reload; select a product actually showing Quick Add (instead of the first Coming Soon product); proceed through required guest checkout selection; target visible country picker instead of hidden input; do not click an already-open picker closed. Changes across commits `4e9ffee`, `9ac9b6c`, `d763eb2`, `c3927aa`, `434363a`. Existing live shopping functionality was not altered by test updates.
+
+### Verification after fixes
+- Latest focused Playwright **desktop** run: **4 passed / 0 failed**: homepage currency persistence + RTL/deep links; shop/favorites/compare/cart and guest checkout country/cash controls; guest order email-verification gate; online training available/draft separation. Ran on local preview from current repository code.
+- Training-catalog Playwright run: **2 passed** on `mobile-chromium` and `arabic-rtl` test projects; earlier desktop program test also passed.
+- `npm run validate:data`, `npm run lint`, `npm run typecheck`, `npm run build` PASS on training-catalog change; Vercel production deploys continued READY.
+- Full Vitest after address-cache fix: **260 passed / 33 failed (293 tests across 52 files)**, previously 257 passed / 34 failed (291 tests across 51 files). The remaining failures are NOT resolved and must not be removed or ignored just to turn the badge green.
+- Separate `tests/addressService.integration.test.js` still reports 8 failing expectations tied to cloud-first / atomic RPC design versus the current offline/local-first implementation. A successful read fix is not proof that create/update/delete/default flows persist cross-device correctly.
+- Prior audits still outstanding: 2 moderate React Router dependency advisories, 63 Prettier-flagged files, complete accessibility/mobile suite, authenticated cloud save/delete/default flow, payment completion, Center Vision end-to-end order status. No real payment or real customer order was placed.
+
+### Next strict steps
+1. Fix verified address write/default-address atomicity in a reviewed backend/API change, preserving RLS and no destructive changes. Check real cloud persistence and fallback policy; do not assume that passing isolated cache tests proves the whole service.
+2. Audit checkout/price formatting and USD/LYD rounding vs accounting; do not silently redefine sales amounts. Investigate other 33 Vitest failures one by one and update obsolete assertions only with evidence.
+3. Address 2 moderate React Router advisories after a compatibility test of any major upgrade; never force install into production without full regression.
+4. Work through measured a11y/mobile failures and stale formatting separately; never claim the 1,656-case comprehensive Playwright suite passed.
+5. Finish Phase 1 only after production and regression gates are documented green.
+
+**Design invariant for stages 2–9: primary palette BLACK + WHITE, neutrals only, no strange or bright decorative colors, bilingual Arabic/English, mobile first.**
