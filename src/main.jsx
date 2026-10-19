@@ -14,6 +14,7 @@ import './styles/global.css';
 import './styles/premium.css';
 import './styles/account-sync.css';
 import './styles/design-system.css';
+import './styles/responsive-system.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
