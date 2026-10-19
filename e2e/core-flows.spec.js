@@ -37,7 +37,7 @@ test('homepage, currency persistence, RTL, deep links and 404', async ({ page })
   if (await languageButton.isVisible().catch(() => false)) await languageButton.click();
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 
-  await page.goto('/products/core-logo-tee');
+  await page.goto('/products/lha-logo-performance-tee');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await page.goto('/definitely-not-a-real-route');
   await expect(page.locator('main')).toBeVisible();
@@ -111,7 +111,7 @@ test('favorite state is immediate, persistent and reversible', async ({ page }) 
 });
 
 test('physical product keeps its variant through cart drawer checkout', async ({ page }) => {
-  await page.goto('/products/hoopers-long-sleeve');
+  await page.goto('/products/hoopers-long-sleeve-performance');
   await dismissCookie(page);
   const availableSize = page.locator('.size-pill:not(:disabled)').first();
   if (await availableSize.count()) await availableSize.click();
@@ -140,9 +140,9 @@ test('search, comparison, recently viewed and reduced motion', async ({ page }) 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/search?q=tee');
   await dismissCookie(page);
-  await expect(page.locator('main')).toContainText(/tee|تيشيرت/i);
-  await page.goto('/products/core-logo-tee');
-  await page.goto('/products/practice-training-tee');
+  await expect(page.locator('#main-content')).toContainText(/tee|تيشيرت/i);
+  await page.goto('/products/lha-logo-performance-tee');
+  await page.goto('/products/hoopers-performance-tee');
   await page.goto('/compare');
   await expect(page.locator('main')).toBeVisible();
 });
@@ -311,7 +311,7 @@ test.describe('mandatory production mobile flows', () => {
 
   test('product purchase controls and Arabic rendering', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/products/hoopers-long-sleeve');
+    await page.goto('/products/hoopers-long-sleeve-performance');
     await dismissCookie(page);
     const sizes = page.locator('.size-pill');
     await expect(sizes.first()).toBeVisible();
