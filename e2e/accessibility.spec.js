@@ -64,8 +64,10 @@ test('interactive open states are accessible', async ({ page }) => {
 test('Arabic home, search and footer are accessible', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await prepare(page, '/');
-  const language = page.getByRole('button', { name: /العربية/i }).first();
-  if (await language.isVisible().catch(() => false)) await language.click();
+  // The language switcher is intentionally inside the collapsed mobile menu.
+  await page.locator('.mobile-more-action').click();
+  await page.locator('.mobile-menu-foot').getByRole('button', { name: 'العربية' }).click();
+  await page.getByRole('button', { name: /close menu|إغلاق القائمة/i }).click();
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
   await assertAxe(page, 'Arabic home');
   await page.getByRole('button', { name: /فتح البحث/i }).click();
