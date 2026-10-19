@@ -1,7 +1,7 @@
 # Libya Hoops Academy 2.0 — Phase 5 Training Catalogue and Apparel Presentation
 
 **Date:** October 19, 2026  
-**Status:** Implementation verified in sandbox; production release requires verification after merge.
+**Status:** COMPLETE for training-catalogue and apparel presentation scope; Vercel production deployment independently verified READY. Secure paid digital fulfilment remains a separate unresolved integration.
 
 ## Non-negotiable rules
 - Black/white and neutral grayscale application UI; authentic product photos and official logos retain their actual image colours.
@@ -46,3 +46,9 @@
 ## Upcoming
 - Phase 6: commerce, checkout, inventory, digital fulfillment and Center Vision order lifecycle.
 - Phase 7–9: verified coaches/events/brand media, authenticated accounts, full SEO/a11y/visual/hardware QA.
+
+## Confirmed production delivery (2026-10-19)
+- Verified GitHub main source commit `459d75d6ae41106ea358a974cd00f3edd09fd196` was deployed to **Production READY** at [Vercel deployment inspector](https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/DS8Do4nQ98TPZRgiAfixW7hqnL8t).
+- Public [homepage](https://www.libyahoopsacademy.com/) contains 'BEYOND THE COURT' / 'WEAR THE WORK.' with live category links /shop/clothing and /shop/accessories, and the four actually priced garment cards remain present.
+- Public [training catalogue](https://www.libyahoopsacademy.com/online-training) shows 'FIND YOUR SYSTEM', goal and duration controls and distinct 'Training Files Under Review' previews. [PRO SPLIT](https://www.libyahoopsacademy.com/online-training/source-pro-split) displays its explicit non-purchase notice.
+- Product-level selected-tier cart price was independently tested after a fresh rebuilt preview; **$40 for LHA Base 3 months**.
