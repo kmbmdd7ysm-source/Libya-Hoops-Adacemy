@@ -12,7 +12,8 @@ export default function CinematicHero() {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const connection =
+      navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     setVideoEnabled(!reduced && !connection?.saveData);
   }, [reduced]);
 
@@ -46,7 +47,10 @@ export default function CinematicHero() {
   };
 
   return (
-    <section className="hero cinematic-hero home-v2-hero" aria-label={pick({ en: 'Libya Hoops Academy', ar: 'ليبيا هوبس أكاديمي' })}>
+    <section
+      className="hero cinematic-hero home-v2-hero"
+      aria-label={pick({ en: 'Libya Hoops Academy', ar: 'ليبيا هوبس أكاديمي' })}
+    >
       <div className="hero-media" aria-hidden="true">
         <picture className="hero-poster-picture">
           <source media="(max-width: 767px)" srcSet="/media/hero/lha-hero-poster-mobile.webp" />
@@ -79,11 +83,25 @@ export default function CinematicHero() {
       </div>
 
       <div className="container hero-inner">
-        <p className="hero-kicker">{pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}</p>
+        <p className="hero-kicker">
+          {pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}
+        </p>
         <h1 className="hero-title display-title">
           {pick({
-            en: <><span>OWN THE</span><br /><span className="outline">GAME.</span></>,
-            ar: <><span>امتلك</span><br /><span className="outline">اللعبة.</span></>,
+            en: (
+              <>
+                <span>OWN THE</span>
+                <br />
+                <span className="outline">GAME.</span>
+              </>
+            ),
+            ar: (
+              <>
+                <span>امتلك</span>
+                <br />
+                <span className="outline">اللعبة.</span>
+              </>
+            ),
           })}
         </h1>
         <p className="hero-text">
@@ -93,7 +111,9 @@ export default function CinematicHero() {
           })}
         </p>
         <div className="hero-actions home-v2-hero-actions">
-          <Link to="/programs" className="btn-primary block">{t.common.explorePrograms}</Link>
+          <Link to="/programs" className="btn-primary block">
+            {t.common.explorePrograms}
+          </Link>
           <Link to="/online-training" className="btn-secondary block">
             {pick({ en: 'Online Training', ar: 'التدريب أونلاين' })}
           </Link>
@@ -109,9 +129,11 @@ export default function CinematicHero() {
           type="button"
           className="home-v2-video-toggle"
           onClick={togglePlayback}
-          aria-label={paused
-            ? pick({ en: 'Play background video', ar: 'تشغيل فيديو الخلفية' })
-            : pick({ en: 'Pause background video', ar: 'إيقاف فيديو الخلفية مؤقتاً' })}
+          aria-label={
+            paused
+              ? pick({ en: 'Play background video', ar: 'تشغيل فيديو الخلفية' })
+              : pick({ en: 'Pause background video', ar: 'إيقاف فيديو الخلفية مؤقتاً' })
+          }
         >
           {paused
             ? pick({ en: 'PLAY FILM', ar: 'تشغيل' })
