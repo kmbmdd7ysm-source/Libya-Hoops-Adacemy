@@ -396,10 +396,24 @@ html[lang^='ar'] .site-header .mega-col h3 {
   }
   .academy-event-status-media {
     min-height: 320px;
-    aspect-ratio: 1.5;
+    min-width: 0;
+    max-width: 100%;
+    aspect-ratio: auto;
   }
   .academy-about-story-image {
     aspect-ratio: 1.8;
+  }
+}
+@media (max-width: 480px) {
+  /* All choices remain visible: no off-viewport chips in Arabic or English. */
+  .training-filter-options {
+    flex-wrap: wrap;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+  .training-filter-chip {
+    flex: 0 1 auto;
+    white-space: normal;
   }
 }
 @media (max-width: 600px) {
