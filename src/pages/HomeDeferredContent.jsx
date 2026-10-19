@@ -4,7 +4,7 @@ import SectionHeading from '../components/common/SectionHeading';
 import ProductCard from '../components/shop/ProductCard';
 import ProgramCard from '../components/programs/ProgramCard';
 import TrainingCard from '../components/training/TrainingCard';
-import { featuredProducts, newArrivals } from '../data/products';
+import { products, featuredProducts, newArrivals } from '../data/products';
 import { featuredPrograms, enabledPrograms } from '../data/programs';
 import { featuredTraining, onlineTraining } from '../data/onlineTraining';
 
@@ -27,8 +27,19 @@ export default function HomeDeferredContent() {
     ...availableTraining.filter((program) => !featuredTrainingIds.has(program.id)),
   ].slice(0, 3);
 
-  const preferredGear = featuredProducts();
-  const gear = (preferredGear.length ? preferredGear : newArrivals()).slice(0, 4);
+  // Homepage shelf must show products visitors can actually order.
+  // The featured flag may also be used for upcoming collections.
+  const availableGear = products.filter(
+    (product) =>
+      product.available !== false &&
+      !product.comingSoon &&
+      product.availability === 'in-stock' &&
+      product.price > 0,
+  );
+  const featuredGear = featuredProducts().filter((product) => availableGear.includes(product));
+  const arrivalGear = newArrivals().filter((product) => availableGear.includes(product));
+  const gear = (featuredGear.length ? featuredGear : arrivalGear.length ? arrivalGear : availableGear)
+    .slice(0, 4);
 
   return (
     <div className="home-deferred-content home-v2-deferred">
@@ -83,7 +94,7 @@ export default function HomeDeferredContent() {
           <div className="container">
             <div id="home-store-heading">
               <SectionHeading
-                label={t.home.productsTitle}
+                label={pick({ en: 'ACADEMY GEAR', ar: 'منتجات الأكاديمية' })}
                 title={t.home.productsSub}
                 link="/shop"
                 linkLabel={t.common.viewAll}
