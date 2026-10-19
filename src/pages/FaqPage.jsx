@@ -30,10 +30,19 @@ export default function FaqPage() {
       </div>
 
       <section className="section">
+        <div className="container">
+          <nav className="faq-jump-nav" aria-label={pick({ en: 'FAQ categories', ar: 'تصنيفات الأسئلة الشائعة' })}>
+            {faqCategories.map((cat) => (
+              <a key={cat.key} href={`#faq-${cat.key}`}>
+                {pick(cat.title)}
+              </a>
+            ))}
+          </nav>
+        </div>
         <div className="container faq-layout">
           {faqCategories.length > 0 ? (
             faqCategories.map((cat) => (
-              <div key={cat.key} className="faq-category">
+              <div key={cat.key} id={`faq-${cat.key}`} className="faq-category" tabIndex={-1}>
                 <h2 className="section-title">{pick(cat.title)}</h2>
                 <Accordion
                   items={cat.items.map((item) => ({
