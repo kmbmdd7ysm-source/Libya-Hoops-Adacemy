@@ -1,9 +1,10 @@
 import Icon from '../icons/Icon';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { onPwaEvent, promptInstall, applyPwaUpdate, isStandalone } from '../../utils/registerPwa';
 export default function PwaPrompt() {
   const { pick } = useLanguage();
+  const userApprovedRefresh = useRef(false);
   const [install, setInstall] = useState(false),
     [update, setUpdate] = useState(false),
     [online, setOnline] = useState(navigator.onLine);
@@ -12,8 +13,13 @@ export default function PwaPrompt() {
       onPwaEvent((e) => {
         if (e.type === 'install-available') setInstall(true);
         if (e.type === 'update-ready') setUpdate(true);
-        if (e.type === 'controller-changed' && !document.querySelector('form :focus'))
+        // A first-time service worker takeover must never interrupt keyboard
+        // navigation, an active bag, or a form. Reload only when the visitor
+        // explicitly accepted an available update.
+        if (e.type === 'controller-changed' && userApprovedRefresh.current) {
+          userApprovedRefresh.current = false;
           location.reload();
+        }
       }),
     [],
   );
@@ -65,6 +71,7 @@ export default function PwaPrompt() {
           <button
             onClick={() => {
               if (document.querySelector('form :focus')) return;
+              userApprovedRefresh.current = true;
               applyPwaUpdate();
             }}
           >
