@@ -38,8 +38,9 @@ export default function HomeDeferredContent() {
   );
   const featuredGear = featuredProducts().filter((product) => availableGear.includes(product));
   const arrivalGear = newArrivals().filter((product) => availableGear.includes(product));
-  const gear = (featuredGear.length ? featuredGear : arrivalGear.length ? arrivalGear : availableGear)
-    .slice(0, 4);
+  const gear = (
+    featuredGear.length ? featuredGear : arrivalGear.length ? arrivalGear : availableGear
+  ).slice(0, 4);
 
   return (
     <div className="home-deferred-content home-v2-deferred">
