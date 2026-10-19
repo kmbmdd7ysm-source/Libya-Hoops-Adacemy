@@ -49,7 +49,7 @@ test('interactive open states are accessible', async ({ page }) => {
   await page.goto('/shop');
   await page.locator('.mobile-filter-pills button').first().click();
   await assertAxe(page, 'filters main sheet');
-  await page.getByRole('button', { name: /Size|المقاس/i }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /Size|المقاس/i }).click();
   await assertAxe(page, 'size filter group');
   await page.getByRole('button', { name: /close|إغلاق/i }).click();
   await page.getByRole('button', { name: /Sort By|ترتيب/i }).click();
@@ -57,7 +57,8 @@ test('interactive open states are accessible', async ({ page }) => {
 
   await page.goto('/products/core-logo-tee');
   await assertAxe(page, 'product options');
-  await page.locator('footer').scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator('footer')).toBeVisible({ timeout: 12000 });
   await assertAxe(page, 'footer');
 });
 
@@ -74,6 +75,7 @@ test('Arabic home, search and footer are accessible', async ({ page }) => {
   await page.getByRole('combobox').fill('تدريب');
   await assertAxe(page, 'Arabic search');
   await page.keyboard.press('Escape');
-  await page.locator('footer').scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator('footer')).toBeVisible({ timeout: 12000 });
   await assertAxe(page, 'Arabic footer');
 });
