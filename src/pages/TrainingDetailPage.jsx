@@ -22,12 +22,12 @@ export default function TrainingDetailPage() {
   const { addItem } = useCart();
   const wishlist = useWishlist();
   const program = getTraining(slug);
-  const [selectedOptionId, setSelectedOptionId] = useState(program?.purchaseOptions?.[0]?.id || 'default');
+  const [selectedOptionId, setSelectedOptionId] = useState(null);
 
   if (!program) return <NotFoundPage />;
 
   const comingSoon = program.available === false;
-  const selectedOption = program.purchaseOptions?.find((option) => option.id === selectedOptionId) || null;
+  const selectedOption = program.purchaseOptions?.find((option) => option.id === selectedOptionId) || program.purchaseOptions?.[0] || null;
   const activePrice = selectedOption?.price ?? program.price ?? 0;
   const activeCompareAt = selectedOption?.compareAt ?? program.compareAt;
   const crumbs = [
@@ -171,7 +171,7 @@ export default function TrainingDetailPage() {
               {program.purchaseOptions?.length > 0 && (
                 <div className="training-purchase-options" role="radiogroup" aria-label={pick({ en: 'Choose access plan', ar: 'اختر مدة الاشتراك' })}>
                   {program.purchaseOptions.map((option) => (
-                    <button key={option.id} type="button" role="radio" aria-checked={selectedOptionId === option.id} className={`training-purchase-option${selectedOptionId === option.id ? ' active' : ''}`} onClick={() => setSelectedOptionId(option.id)}>
+                    <button key={option.id} type="button" role="radio" aria-checked={selectedOption?.id === option.id} className={`training-purchase-option${selectedOption?.id === option.id ? ' active' : ''}`} onClick={() => setSelectedOptionId(option.id)}>
                       <span><strong>{pick(option.label)}</strong>{option.duration && <small>{pick(option.duration)}</small>}</span>
                       <span><Price amount={option.price} compareAt={option.compareAt} size="sm" />{option.savings && <small className="option-saving">{pick(option.savings)}</small>}</span>
                     </button>
@@ -179,6 +179,21 @@ export default function TrainingDetailPage() {
                 </div>
               )}
               {!comingSoon && <Price amount={activePrice} compareAt={activeCompareAt} size="lg" />}
+              {comingSoon ? (
+                <p className="training-delivery-note" role="note">
+                  {pick({
+                    en: 'Preview only. This system cannot be purchased or downloaded while its original contents, pricing and release permissions are reviewed.',
+                    ar: 'للمعاينة فقط. لا يمكن شراء أو تنزيل هذا النظام قبل مراجعة المحتوى الأصلي والسعر وصلاحيات النشر.',
+                  })}
+                </p>
+              ) : (
+                <p className="training-delivery-note" role="note">
+                  {pick({
+                    en: 'Your selection is saved in the order. Digital access is handled separately from checkout; this page does not provide an instant download. Confirm delivery details with the academy before purchase.',
+                    ar: 'يُحفظ اختيارك في الطلب. الوصول للملفات الرقمية يتم بشكل منفصل عن الدفع، وما فيش تنزيل فوري من هذه الصفحة. تأكد من تفاصيل التسليم مع الأكاديمية قبل الشراء.',
+                  })}
+                </p>
+              )}
               {comingSoon ? (
                 <span className="status-pill">{t.training.comingSoon}</span>
               ) : (
