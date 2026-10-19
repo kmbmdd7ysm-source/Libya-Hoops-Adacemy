@@ -253,32 +253,32 @@ export default function SearchOverlay({ open, onClose, triggerRef }) {
                         }}
                       >
                         <span>
-                            <Highlight text={pick(item.label)} query={query} />
-                          </span>
-                          <small>
-                            {pick({
-                              en:
-                                {
-                                  product: 'Product',
-                                  category: 'Category',
-                                  program: 'Program',
-                                  event: 'Event',
-                                  training: 'Online Training',
-                                  coach: 'Coach',
-                                  page: 'Page',
-                                }[item.type] || 'Result',
-                              ar:
-                                {
-                                  product: 'منتج',
-                                  category: 'فئة',
-                                  program: 'برنامج',
-                                  event: 'فعالية',
-                                  training: 'تدريب عبر الإنترنت',
-                                  coach: 'مدرب',
-                                  page: 'صفحة',
-                                }[item.type] || 'نتيجة',
-                            })}
-                          </small>
+                          <Highlight text={pick(item.label)} query={query} />
+                        </span>
+                        <small>
+                          {pick({
+                            en:
+                              {
+                                product: 'Product',
+                                category: 'Category',
+                                program: 'Program',
+                                event: 'Event',
+                                training: 'Online Training',
+                                coach: 'Coach',
+                                page: 'Page',
+                              }[item.type] || 'Result',
+                            ar:
+                              {
+                                product: 'منتج',
+                                category: 'فئة',
+                                program: 'برنامج',
+                                event: 'فعالية',
+                                training: 'تدريب عبر الإنترنت',
+                                coach: 'مدرب',
+                                page: 'صفحة',
+                              }[item.type] || 'نتيجة',
+                          })}
+                        </small>
                       </li>
                     ))}
                   </ul>
