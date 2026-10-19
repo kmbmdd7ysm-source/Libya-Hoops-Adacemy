@@ -198,22 +198,40 @@ export const eventCategories = [
   { slug: 'special', name: { en: 'Special Sessions', ar: 'جلسات خاصة' } },
 ];
 
-export const getEvent = (slug) => events.find((e) => e.slug === slug);
-export const isEventEnded = (e) =>
-  !e.comingSoon && (e.status === 'ended' || new Date(e.endDate) < new Date(new Date().toDateString()));
-export const canRegister = (e) =>
-  e.status === 'open' &&
-  e.remaining > 0 &&
-  new Date(e.registrationDeadline) >= new Date(new Date().toDateString());
-export const upcomingEvents = () =>
-  events
-    .filter((e) => !isEventEnded(e))
-    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-export const pastEvents = () =>
-  events.filter(isEventEnded).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-export const featuredEvents = () => upcomingEvents().filter((e) => e.featured);
+// These five historic source records were supplied as EDITABLE DEMO DATA.
+// None has evidence of a real announced or completed academy event; do NOT
+// publish them, invent new dates, or sell registrations from these records.
+// A real record may go live ONLY with explicit verified: true, actual dates,
+// signed-off details and approved visual assets.
+export const publishedEvents = () => events.filter((e) => e.verified === true);
+export const getEvent = (slug) => publishedEvents().find((e) => e.slug === slug);
+
+const startOfTodayTripoli = () => new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Africa/Tripoli', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(new Date()).split('/').join('-');
+
+export const isEventEnded = (event, today = startOfTodayTripoli()) =>
+  event.status === 'ended' || event.status === 'closed' ||
+  (Boolean(event.endDate) && event.endDate < today);
+export const canRegister = (event, today = startOfTodayTripoli()) =>
+  event.verified === true &&
+  event.status === 'open' &&
+  !event.comingSoon &&
+  event.remaining > 0 &&
+  event.startDate >= today &&
+  event.registrationDeadline >= today;
+export const upcomingEvents = (today = startOfTodayTripoli()) =>
+  publishedEvents()
+    .filter((event) => !isEventEnded(event, today) && event.startDate >= today)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+export const pastEvents = (today = startOfTodayTripoli()) =>
+  publishedEvents()
+    .filter((event) => isEventEnded(event, today))
+    .sort((a, b) => b.startDate.localeCompare(a.startDate));
+export const featuredEvents = (today = startOfTodayTripoli()) =>
+  upcomingEvents(today).filter((event) => event.featured);
 export const relatedEvents = (event, limit = 3) =>
   (event?.related || [])
-    .map((s) => events.find((e) => e.id === s))
+    .map((id) => publishedEvents().find((other) => other.id === id))
     .filter(Boolean)
     .slice(0, limit);
