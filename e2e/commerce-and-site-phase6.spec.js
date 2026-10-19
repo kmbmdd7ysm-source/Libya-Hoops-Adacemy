@@ -5,7 +5,8 @@ test('digital training checkout never presents physical cash-on-delivery as paym
   await expect(page.locator('.purchase-primary')).toBeVisible();
   await page.locator('.purchase-primary').click();
   await expect(page.locator('.cart-drawer.open')).toBeVisible();
-  await page.goto('/checkout');
+  await page.locator('.cart-drawer.open').getByRole('button', { name: /checkout|الدفع|إتمام الشراء/i }).click();
+  await expect(page).toHaveURL(/\/checkout$/);
   const guest = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
   if (await guest.isVisible().catch(() => false)) await guest.click();
   const methods = page.locator('.payment-methods');
