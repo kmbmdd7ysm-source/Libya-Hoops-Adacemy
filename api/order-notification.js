@@ -22,7 +22,7 @@ function normalizeLines(syncPayload) {
   return syncPayload.items.map((item) => {
     const sku = clean(item?.sku).toUpperCase();
     const quantity = Number(item?.quantity);
-    if (!sku || !Number.isInteger(quantity) || quantity < 1) {
+    if (!/^[A-Z0-9][A-Z0-9._:-]{0,79}$/.test(sku) || !Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
       throw new Error('invalid_order_line');
     }
     return { sku, quantity };
@@ -37,6 +37,21 @@ async function syncCenterVision(syncPayload, input) {
   const phone = clean(input.customerPhone);
   const shippingAddress = parseObject(syncPayload?.shipping) || {};
   const lines = normalizeLines(syncPayload);
+  // COD sync is currently a physical-goods SKU endpoint. Never mislabel a
+  // digital training subscription or event as a shippable paid order.
+  if (syncPayload.items.length > 25 ||
+    syncPayload.items.some((item) =>
+      item?.type && item.type !== 'product' ||
+      item?.fulfillmentType && item.fulfillmentType !== 'physical'
+    )) {
+    throw new Error('unsupported_cod_fulfillment');
+  }
+  if (clean(input.paymentMethod).toLowerCase() !== 'cash on delivery' ||
+      clean(syncPayload.paymentMethod || 'cash_on_delivery').toLowerCase() !== 'cash_on_delivery') {
+    throw new Error('invalid_cod_payment_method');
+  }
+  const deliveryCountry = clean(shippingAddress.country || shippingAddress.countryCode).toUpperCase();
+  if (deliveryCountry !== 'LY') throw new Error('unsupported_cod_country');
 
   if (!/^[0-9a-f-]{36}$/i.test(idempotencyKey)) throw new Error('invalid_idempotency_key');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('invalid_customer_email');
@@ -145,7 +160,8 @@ export default async function handler(req, res) {
       ok: false,
       error: 'order_sync_failed',
       stage,
-      detail,
+      // Provider and infrastructure diagnostics remain in server logs. Do not
+      // expose downstream response bodies or internal service endpoints.
       retryable: true,
     });
   }
