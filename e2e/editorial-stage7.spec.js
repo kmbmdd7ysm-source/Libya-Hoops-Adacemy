@@ -71,3 +71,16 @@ test('no unverified events or fabricated coach profiles are promoted', async ({ 
   await expect(page.locator('.academy-about-story')).toBeVisible();
   await expect(page.locator('.prose-grid')).toHaveCount(2);
 });
+
+test('first-time PWA activation never interrupts a visitor with an automatic reload', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const count = Number(sessionStorage.getItem('lha-boot-count') || 0);
+    sessionStorage.setItem('lha-boot-count', String(count + 1));
+  });
+  await page.goto('/');
+  await expect(page.locator('.site-header')).toHaveAttribute('data-hydrated', 'true');
+  await page.waitForTimeout(1400);
+  expect(await page.evaluate(() => sessionStorage.getItem('lha-boot-count'))).toBe('1');
+});
