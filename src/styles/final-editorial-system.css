@@ -843,6 +843,31 @@ html[lang^='ar'] .home-v2-hero .hero-title {
 html[lang^='ar'] .section-label {
   letter-spacing: 0 !important;
 }
+/* Search must remain a white high-contrast surface, not a dark overlay
+   obscuring text or control states. */
+.search-overlay,
+.search-overlay .search-overlay-inner {
+  background: #fff !important;
+  color: #111 !important;
+  backdrop-filter: none !important;
+}
+.search-overlay .search-mobile-head { background: #fff !important; color: #111; }
+.search-overlay .search-input-wrap {
+  background: #f3f3f3 !important;
+  color: #111 !important;
+}
+.search-overlay .search-input-wrap input { color: #111; }
+.search-overlay .search-input-wrap input::placeholder { color: #525252; opacity: 1; }
+.search-overlay .search-screen-content { background: #fff; color: #111; }
+.search-overlay .search-screen-content h2,
+.search-overlay .search-cancel,
+.search-overlay .search-suggestions li small { color: #444 !important; }
+.search-overlay .search-chip-grid > button {
+  background: #f3f3f3 !important;
+  color: #111 !important;
+  border: 1px solid #d1d1d1 !important;
+}
+.search-overlay .search-chip-grid > button:hover { background: #dedede !important; }
 @media (max-width: 1200px) {
   .home-v2-hero .hero-title {
     font-size: clamp(4.1rem, 8.2vw, 8rem) !important;
