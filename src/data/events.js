@@ -206,9 +206,13 @@ export const eventCategories = [
 export const publishedEvents = () => events.filter((e) => e.verified === true);
 export const getEvent = (slug) => publishedEvents().find((e) => e.slug === slug);
 
-const startOfTodayTripoli = () => new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Africa/Tripoli', year: 'numeric', month: '2-digit', day: '2-digit',
-}).format(new Date()).split('/').join('-');
+const startOfTodayTripoli = () => {
+  const date = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Africa/Tripoli', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).formatToParts(new Date());
+  const part = (name) => date.find((value) => value.type === name)?.value || '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
+};
 
 export const isEventEnded = (event, today = startOfTodayTripoli()) =>
   event.status === 'ended' || event.status === 'closed' ||
