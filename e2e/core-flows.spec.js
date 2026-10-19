@@ -12,7 +12,8 @@ async function chooseCurrency(page, currency) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.clear());
+  // Playwright isolates storage per test. Do not clear on every navigation/reload,
+  // or persistence tests will invalidate their own state.
   await page.goto('/');
   await dismissCookie(page);
 });
@@ -45,8 +46,10 @@ test('homepage, currency persistence, RTL, deep links and 404', async ({ page })
 test('shop, wishlist, comparison, cart and checkout country/cash flows', async ({ page }) => {
   await page.goto('/shop');
   await dismissCookie(page);
-  const card = page.locator('.product-card').first();
+  // The first catalog item may be a Coming Soon item without Quick Add.
+  const card = page.locator('.product-card').filter({ has: page.locator('.quick-add') }).first();
   await expect(card).toBeVisible();
+  const addedProductName = (await card.locator('.product-card-name').textContent())?.trim();
   await card.locator('.wishlist-btn').click();
   await expect(card.locator('.wishlist-btn')).toHaveAttribute('aria-pressed', 'true');
   await card.locator('.compare-btn').click();
@@ -58,8 +61,11 @@ test('shop, wishlist, comparison, cart and checkout country/cash flows', async (
     if (await close.isVisible().catch(() => false)) await close.click();
   }
   await page.goto('/cart');
-  await expect(page.locator('main')).toContainText(/Core Logo Tee|تيشيرت الشعار الأساسي/i);
+  expect(addedProductName).toBeTruthy();
+  await expect(page.locator('main')).toContainText(addedProductName);
   await page.goto('/checkout');
+  const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
+  if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
   await expect(
     page.locator('input[name="country"], button[aria-haspopup="listbox"]').first(),
   ).toBeVisible();
@@ -115,6 +121,8 @@ test('physical product keeps its variant through cart drawer checkout', async ({
   await drawer.getByRole('button', { name: /checkout|الدفع|إتمام الشراء/i }).click();
   await expect(page).toHaveURL(/\/checkout$/);
   await expect(page.locator('main')).toBeVisible();
+  const guestChoice = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
+  if (await guestChoice.isVisible().catch(() => false)) await guestChoice.click();
   if (sizeText) await expect(page.locator('main')).toContainText(sizeText.split(':').pop().trim());
   await expect(
     page.locator('input[name="country"], button[aria-haspopup="listbox"]').first(),
