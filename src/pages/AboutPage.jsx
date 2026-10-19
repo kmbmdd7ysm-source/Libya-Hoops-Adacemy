@@ -65,8 +65,14 @@ export default function AboutPage() {
       <section className="section academy-about-story" aria-labelledby="academy-about-cta-title">
         <div className="container academy-about-story-grid">
           <div className="academy-about-story-image">
-            <img src="/images/programs/youth-development.webp" alt="" width="1312" height="816"
-              loading="lazy" decoding="async" />
+            <img
+              src="/images/programs/youth-development.webp"
+              alt=""
+              width="1312"
+              height="816"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
           <div className="academy-about-story-copy">
             <p className="section-label">{t.about.label}</p>
