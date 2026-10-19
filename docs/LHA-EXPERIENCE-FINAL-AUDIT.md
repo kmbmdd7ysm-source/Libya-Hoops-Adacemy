@@ -46,3 +46,9 @@ Keep operational work from stage 6 separate from visible art direction and conte
 - Verified: focused browser smoke across 390 and 1440 width EN/AR plus saved source code validators, 10/10 PASS. Production pages opened read-only after READY.
 - Still required: authorized signed-in test account lifecycle (profile/addresses/order history/settings), email confirmation flow, final line-by-line Arabic/English content QA and screen-reader/touch/Lighthouse evidence. Stage 6 commercial integrations remain open.
 - Only **Phase 9** remains in the original nine-stage design roadmap; the broader operational backlog is separate.
+
+## Phase 9 production visual update — Oct 19, 2026
+- The black/white editorial system now applies across public site shell, home, merch/shop, training, details, account/help, forms and footer. Hero is image-led and split on desktop, image-first on phones; real apparel tiles enlarged; Arabic/English copy shortened.
+- Production READY, live public pages smoke tested, Lighthouse mobile 93 / desktop 75 performance, accessibility/best-practices/SEO 100 both; stage 9 E2E 10/10, chosen combined regression 22/22 and axe 11/11.
+- Known backlog kept visible: desktop LCP performance, 33 legacy unit suite fails reproduced on old main unchanged, actual authenticated and payment/digital/stock/carrier integrations, full manual authorized photo and every-word proofing.
+- Events navigation labels made neutral until actual dates are verified. No fake camp/staff records added.

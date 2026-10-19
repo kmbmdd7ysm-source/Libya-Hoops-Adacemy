@@ -1,7 +1,7 @@
 # LHA 2.0 — Phase 9: Full-Site Editorial Visual Relaunch
 
 **Date:** 2026-10-19
-**Scope status:** New site-wide visual system implemented and verified on isolated branch; confirm public Vercel production deployment separately.
+**Scope status:** Site-wide visual redesign released and **Vercel production READY**; operational acceptance and 33 legacy failed unit tests remain open.
 **Original design requirement:** visually transform the entire site, not only its homepage. Simple, luxurious black/white basketball experience; short text, dominant authentic photography, purposeful hierarchy, consistent icons, Arabic and English, and clear separation of clothing, accessories, on-court coaching and online training.
 
 ## Implemented
@@ -35,3 +35,9 @@
 ## Project persistence
 
 Continue from `docs/LHA-NEXT-LEVEL-HANDOFF.md` and `docs/LHA-EXPERIENCE-FINAL-AUDIT.md`. The original nine-stage design roadmap reaches its **visual-relaunch implementation** at Phase 9, but real product readiness still depends on the outstanding tests and verified backends above.
+
+## Confirmed public deployment
+- Main source released as `21bbcd5608bfc78b94b53b470f66bb8b93a7d022`, production deployment READY at https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/CFRcujBZvgZyw3n5rDSVEc1tXrRc
+- Official public URL https://www.libyahoopsacademy.com/ read-only smoke loaded home, shop, clothing, online training, events, account and support; new `BUILT TO HOOP.` home hero text is visible, with actual bundled media source.
+- Navigation labels for events were simplified from 'Upcoming Events' and 'الفعاليات القادمة' to neutral 'Events' and 'الفعاليات' because there is currently no verified upcoming academy event schedule. This is a copy correction, not a new event announcement.
+- Reminder: no live payment, customer PII mutation or digital delivery transaction was done during production smoke.
