@@ -37,6 +37,16 @@ export default function TrainingCard({ program, eager = false }) {
           {program.duration && <li>{pick(program.duration)}</li>}
           {program.sessions && <li>{program.sessions} {t.training.sessions}</li>}
         </ul>
+        {program.available !== false && program.purchaseOptions?.length > 0 && (
+          <ul className="training-card-plans" aria-label={pick({ en: 'Available durations and prices', ar: 'المدد والأسعار المتاحة' })}>
+            {program.purchaseOptions.map((option) => (
+              <li key={option.id}>
+                <span>{pick(option.duration || option.label)}</span>
+                <Price amount={option.price} size="sm" />
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="training-card-foot">
           {program.available === false ? (
             <span className="status-pill">{t.training.comingSoon}</span>
