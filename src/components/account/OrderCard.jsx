@@ -19,7 +19,7 @@ export default function OrderCard({ order, compact = false }) {
         </div>
         {order.syncState === 'local-only' && (
           <span className="status-badge status-neutral">
-            {pick({ en: 'Local order', ar: 'طلب محلي' })}
+            {pick({ en: 'Pending store confirmation', ar: 'بانتظار تأكيد المتجر' })}
           </span>
         )}
       </div>
