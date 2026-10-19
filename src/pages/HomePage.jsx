@@ -14,8 +14,8 @@ const pathways = [
     image: '/images/programs/elite-development.webp',
     title: { en: 'On-Court Training', ar: 'التدريب في الملعب' },
     description: {
-      en: 'Develop your fundamentals, decision-making and performance through academy programs.',
-      ar: 'طوّر أساسياتك وقراراتك وأداءك من خلال برامج الأكاديمية.',
+      en: 'Train smarter. Play stronger.'
+      ar: 'تدرّب بذكاء. العب بقوة.'
     },
     action: { en: 'Explore Programs', ar: 'اكتشف البرامج' },
   },
@@ -108,15 +108,15 @@ export default function HomePage() {
         <div className="container">
           <div className="home-v2-paths-head">
             <div>
-              <p className="section-label">{pick({ en: 'START HERE', ar: 'ابدأ من هنا' })}</p>
+              <p className="section-label">{pick({ en: 'CHOOSE YOUR GAME', ar: 'اختار طريقك' })}</p>
               <h2 id="home-paths-title" className="section-title">
-                {pick({ en: 'YOUR GAME. YOUR PATH.', ar: 'لعبتك. طريقك.' })}
+                {pick({ en: 'FIND YOUR EDGE.', ar: 'طوّر مستواك.' })}
               </h2>
             </div>
             <p>
               {pick({
-                en: 'On the court, at home, and in the everyday moments that make a player.',
-                ar: 'في الملعب، وفي البيت، وفي التفاصيل اليومية اللي تصنع اللاعب.',
+                en: 'Three ways to grow. One game.'
+                ar: 'ثلاث طرق للتطور. لعبة واحدة.'
               })}
             </p>
           </div>
