@@ -1,3 +1,36 @@
+import { suppliedTrainingCatalog } from './suppliedTrainingCatalog';
+
+// Source-file catalog is intentionally not purchasable until pricing, delivery files
+// and commercial redistribution permissions are confirmed.
+export const suppliedTrainingPrograms = suppliedTrainingCatalog.map((item) => ({
+  id: `source-${item.id}`,
+  slug: `source-${item.id}`,
+  category: 'source-program',
+  title: item.title,
+  description: item.caption,
+  marketingCaption: item.caption,
+  available: false,
+  sourceDocument: item.source,
+  price: null,
+  coverImage: null,
+  level: { en: 'See program details', ar: 'اطّلع على تفاصيل البرنامج' },
+  duration: item.weeks
+    ? { en: `${item.weeks} weeks`, ar: `${item.weeks} أسبوعاً` }
+    : { en: 'See source program', ar: 'حسب البرنامج الأصلي' },
+  includedResources: {
+    en: ['Training structure based on the supplied source file'],
+    ar: ['هيكل التدريب مبني على الملف الأصلي المرفق'],
+  },
+  curriculum: item.sections
+    ? item.sections.map((section) => ({
+        title: { en: section, ar: section },
+        lessons: { en: [], ar: [] },
+      }))
+    : [],
+  deliveryType: { en: 'Digital training file — pending release', ar: 'ملف تدريب رقمي — بانتظار الإتاحة' },
+  related: [],
+}));
+
 // ============================================================================
 // ONLINE TRAINING (digital programs)  —  EDITABLE DEMO DATA.
 // These are purchasable digital items and can be added to the same cart.
@@ -307,7 +340,7 @@ export const trainingCategories = [
   { slug: 'strength-conditioning', name: { en: 'Strength & Conditioning', ar: 'القوة واللياقة' } },
 ];
 
-export const getTraining = (slug) => onlineTraining.find((t) => t.slug === slug);
+export const getTraining = (slug) => suppliedTrainingPrograms.find((t) => t.slug === slug) || onlineTraining.find((t) => t.slug === slug);
 export const featuredTraining = () => onlineTraining.filter((t) => t.featured);
 export const relatedTraining = (program, limit = 3) =>
   (program?.related || [])
