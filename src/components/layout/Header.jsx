@@ -278,6 +278,7 @@ export default function Header() {
         className={`mobile-menu${mobileOpen ? ' open' : ''}`}
         aria-label={t.a11y.mobileNav}
         aria-hidden={!mobileOpen}
+        {...(!mobileOpen ? { inert: '' } : {})}
       >
         <div className="mobile-menu-head">
           <Link to="/" className="brand" onClick={close} aria-label={SITE.name}>
