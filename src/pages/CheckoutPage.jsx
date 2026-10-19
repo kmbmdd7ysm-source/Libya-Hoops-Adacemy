@@ -328,8 +328,9 @@ export default function CheckoutPage() {
             displayCurrency: currency,
             paymentMethod: 'cash_on_delivery',
             paymentStatus: 'pending',
-            orderStatus: shipping.countryCode === 'LY' ? 'confirmed' : 'received',
-            fulfillmentStatus: shipping.countryCode === 'LY' ? 'in_delivery_process' : 'unfulfilled',
+            // A saved draft is not a Center Vision acceptance or dispatched parcel.
+            orderStatus: 'pending',
+            fulfillmentStatus: 'unfulfilled',
             orderNumber,
             createdAt: new Date().toISOString(),
             idempotencyKey: idempotencyRef.current,
