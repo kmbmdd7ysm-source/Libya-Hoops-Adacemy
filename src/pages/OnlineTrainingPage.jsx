@@ -4,7 +4,7 @@ import PageHero from '../components/common/PageHero';
 import Breadcrumbs from '../components/common/Breadcrumbs';
 import TrainingCard from '../components/training/TrainingCard';
 import EmptyState from '../components/common/EmptyState';
-import { onlineTraining } from '../data/onlineTraining';
+import { suppliedTrainingPrograms } from '../data/onlineTraining';
 
 export default function OnlineTrainingPage() {
   const { t } = useLanguage();
@@ -19,9 +19,9 @@ export default function OnlineTrainingPage() {
 
       <section className="section">
         <div className="container">
-          {onlineTraining.length > 0 ? (
+          {suppliedTrainingPrograms.length > 0 ? (
             <div className="card-grid card-grid--3">
-              {onlineTraining.map((p) => (
+              {suppliedTrainingPrograms.map((p) => (
                 <TrainingCard key={p.id} program={p} />
               ))}
             </div>
