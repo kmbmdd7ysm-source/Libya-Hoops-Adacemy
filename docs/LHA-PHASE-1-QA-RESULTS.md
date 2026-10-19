@@ -54,5 +54,19 @@
 - Triage Prettier debt and apply reviewed formatting without overwhelming unrelated changes.
 - Confirm verified production smoke and complete handoff updates. Keep Phase 1 marked **IN PROGRESS**, not complete, until gates are green.
 
+## Additional live-production browser smoke (2026-10-18)
+A separate **read-only browser run of the actual public production website** successfully:
+- Loaded homepage, shop, product details, cart and checkout route without observed JavaScript/navigation crashes.
+- Switched Arabic and English in both directions without observed errors.
+- Opened **LHA Win Tee** product page, chose white / XL, clicked **Add to Bag**, observed populated cart drawer and cart page.
+- Switched USD to LYD, saw $20 represented as LYD 180 in UI; requires separate confirmation of intended pricing/rounding policy.
+- Observed checkout guest/sign-in/create-account choices but **did not enter personal data or submit a real order/payment**. Authenticated checkout, guest form submission, payments and final order persistence remain UNVERIFIED.
+- Saw 5 supplied training source drafts labelled Coming Soon, not available for purchase.
+- This public-site smoke is valuable but **does not cancel the two focused local Playwright failures**; selectors/test assumptions vs actual behavior need reconciliation.
+- Browser run id: `fe910527-fee7-4582-8ef1-ed7014073cdf`, accessible at https://agent.tinyfish.ai/runs/fe910527-fee7-4582-8ef1-ed7014073cdf
+
+## Additional environment fix (2026-10-18)
+- Set Vercel `libyahoopsacademy` project `nodeVersion` to `22.x` to match `package.json` engines; independently read back the project and confirmed `22.x`. This is a production project configuration adjustment, not a new app feature. Existing production deployment remained READY.
+
 ## Change-safety policy
 No destructive database mutations, no fabricated inventory/registration dates/training session counts, no automatic public sale of draft licensed content, no uncontrolled major version upgrades, no real purchases during smoke testing.
