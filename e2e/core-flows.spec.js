@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { getProduct } from '../src/data/products.js';
 
 async function dismissCookie(page) {
   const reject = page.getByRole('button', { name: /reject|رفض/i });
@@ -111,6 +112,22 @@ test('favorite state is immediate, persistent and reversible', async ({ page }) 
 });
 
 test('physical product keeps its variant through cart drawer checkout', async ({ page }) => {
+  // Stub only this browser session's trusted warehouse response. Never create
+  // actual orders or imply any live product has this inventory.
+  const testItem = getProduct('hoopers-long-sleeve-performance');
+  await page.route('**/api/center-vision-inventory', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        authority: 'center-vision',
+        variants: testItem.variants.map((variant) => ({
+          sku: variant.sku,
+          available: ['L', 'XL', 'XXL'].includes(variant.size) ? 3 : 0,
+        })),
+      }),
+    }),
+  );
   await page.goto('/products/hoopers-long-sleeve-performance');
   await dismissCookie(page);
   const availableSize = page.locator('.size-pill:not(:disabled)').first();
@@ -175,7 +192,8 @@ test.describe('final mobile hardening', () => {
       await expect(dialog).toBeHidden();
       await expect(page).toHaveURL(/\/$/);
 
-      await page.locator('footer').scrollIntoViewIfNeeded();
+      await page.locator('.deferred-footer').scrollIntoViewIfNeeded();
+      await expect(page.locator('footer')).toBeVisible({ timeout: 12000 });
       await expect(page.locator('footer .footer-brand-wordmark')).toHaveCount(1);
       await expect(page.locator('footer .footer-brand-mark')).toHaveCount(0);
       expect(
