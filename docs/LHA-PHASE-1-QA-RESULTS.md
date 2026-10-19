@@ -95,3 +95,9 @@ No destructive database mutations, no fabricated inventory/registration dates/tr
 5. Finish Phase 1 only after production and regression gates are documented green.
 
 **Design invariant for stages 2–9: primary palette BLACK + WHITE, neutrals only, no strange or bright decorative colors, bilingual Arabic/English, mobile first.**
+
+## Additional security closure work (2026-10-18)
+- Upgraded and pinned React Router DOM to **7.18.4**, with corresponding atomic `package-lock.json` updates, commit `8d518c364e7e9493f0b8676ee0cdeeb7c9f71b83`. Confirmed Vercel **production READY**. Separate sandbox: `npm audit --omit=dev` **zero vulnerabilities**, Vite build PASS, ESLint PASS, TypeScript PASS, selected 4 desktop Playwright smoke tests PASS. Whole Vitest suite still 260 pass / 33 fail: no claim of complete QA.
+- Supabase LHA project `yyzvpkythdlqkemyzsky`: executed restricted GRANT migration `restrict_internal_trigger_function_execution`: REVOKE EXECUTE from PUBLIC, anon, authenticated on internal SECURITY DEFINER trigger functions `public.handle_new_user()` and `public.rls_auto_enable()`. Verified Supabase security advisor no longer reports these callable by anonymous/authenticated users. Trigger execution roles retained.
+- Supabase security advisor still reports **Leaked Password Protection Disabled**, requiring Supabase Auth settings review: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.
+- Phase 1 remains NOT COMPLETE: 33 failing unit tests, cloud-address write/default consistency, comprehensive responsive/accessibility checks, checkout end-to-end payment/order confirmation unverified, formatting debt. Do not misrepresent completion.
