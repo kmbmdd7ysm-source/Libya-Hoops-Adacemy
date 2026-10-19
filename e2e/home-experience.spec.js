@@ -38,7 +38,9 @@ for (const width of widths) {
   }
 }
 
-test('home shows verified offers, no empty coaching or expired event placeholders', async ({ page }) => {
+test('home shows verified offers, no empty coaching or expired event placeholders', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.locator('.home-deferred-anchor').scrollIntoViewIfNeeded();
   await expect(page.locator('.home-v2-deferred')).toBeVisible();
