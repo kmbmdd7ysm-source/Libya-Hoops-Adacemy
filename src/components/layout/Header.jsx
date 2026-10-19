@@ -122,7 +122,6 @@ export default function Header() {
                     aria-haspopup="true"
                     aria-expanded={megaOpen}
                     aria-controls="shop-mega-menu"
-                    onFocus={() => setMegaOpen(true)}
                     onKeyDown={(event) => {
                       if (event.key === 'Escape') setMegaOpen(false);
                       if (event.key === 'ArrowDown') {
