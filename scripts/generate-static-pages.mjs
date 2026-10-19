@@ -17,7 +17,7 @@ import { SITE } from '../src/config.js';
 import { products } from '../src/data/products.js';
 import { programs } from '../src/data/programs.js';
 import { onlineTraining } from '../src/data/onlineTraining.js';
-import { events } from '../src/data/events.js';
+import { publishedEvents } from '../src/data/events.js';
 import { legal } from '../src/data/legal.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -120,7 +120,7 @@ const routes = [
   {
     path: '/coaches',
     title: 'Coaches',
-    description: 'Meet the coaching staff behind Libya Hoops Academy.',
+    description: 'Explore coaching principles and basketball development at Libya Hoops Academy.',
   },
   { path: '/contact', title: 'Contact', description: 'Get in touch with Libya Hoops Academy.' },
   {
@@ -178,7 +178,7 @@ for (const t of onlineTraining)
     description: en(t.description),
     image: t.coverImage,
   });
-for (const e of events)
+for (const e of publishedEvents())
   routes.push({
     path: `/events/${e.slug}`,
     title: en(e.title),
