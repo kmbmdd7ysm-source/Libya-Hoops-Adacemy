@@ -82,6 +82,11 @@ export default function CinematicHero() {
         )}
       </div>
 
+      <div className="hero-editorial-rail" aria-hidden="true">
+        <span>01 / 03</span>
+        <span>{pick({ en: 'TRAIN. EVOLVE. REPEAT.', ar: 'تدرّب. تطوّر. كرّر.' })}</span>
+      </div>
+
       <div className="container hero-inner">
         <p className="hero-kicker">
           {pick({ en: 'LIBYA HOOPS ACADEMY', ar: 'ليبيا هوبس أكاديمي' })}
@@ -90,24 +95,24 @@ export default function CinematicHero() {
           {pick({
             en: (
               <>
-                <span>OWN THE</span>
+                <span>BUILT TO</span>
                 <br />
-                <span className="outline">GAME.</span>
+                <span className="outline">HOOP.</span>
               </>
             ),
             ar: (
               <>
-                <span>امتلك</span>
+                <span>طوّر</span>
                 <br />
-                <span className="outline">اللعبة.</span>
+                <span className="outline">لعبتك.</span>
               </>
             ),
           })}
         </h1>
         <p className="hero-text">
           {pick({
-            en: 'Build your game with purpose. Train on court, develop anywhere, and carry the culture beyond the lines.',
-            ar: 'طوّر مستواك بهدف. تدرّب في الملعب، وطوّر أداءك من أي مكان، وخلي شغفك باللعبة جزء من يومك.',
+            en: 'Real work. Real growth. On court and beyond.',
+            ar: 'تدريب يصنع الفرق. في الملعب وخارجه.',
           })}
         </p>
         <div className="hero-actions home-v2-hero-actions">
@@ -117,8 +122,8 @@ export default function CinematicHero() {
           <Link to="/online-training" className="btn-secondary block">
             {pick({ en: 'Online Training', ar: 'التدريب أونلاين' })}
           </Link>
-          <Link to="/shop" className="home-v2-hero-shop">
-            {pick({ en: 'Explore the Store', ar: 'تسوّق منتجات الأكاديمية' })}
+          <Link to="/shop/clothing" className="home-v2-hero-shop">
+            {pick({ en: 'Shop the Collection', ar: 'تسوّق المجموعة' })}
             <span aria-hidden="true">↗</span>
           </Link>
         </div>
