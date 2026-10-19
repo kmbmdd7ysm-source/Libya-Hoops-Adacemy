@@ -149,6 +149,51 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="home-v2-gear-feature section" aria-labelledby="home-gear-feature-title">
+        <div className="container">
+          <div className="home-v2-gear-feature-head">
+            <div>
+              <p className="section-label">{pick({ en: 'BEYOND THE COURT', ar: 'أكثر من مجرد ملعب' })}</p>
+              <h2 id="home-gear-feature-title" className="section-title">
+                {pick({ en: 'WEAR THE WORK.', ar: 'خلي شغفك يبان.' })}
+              </h2>
+            </div>
+            <p>
+              {pick({
+                en: 'Training and academy gear are different sides of the same game. Explore what is ready to wear and preview the accessories collection.',
+                ar: 'التدريب وملابس الأكاديمية جزء من نفس الشغف. اكتشف الملابس المتاحة، وشوف مجموعة الإكسسوارات قيد التجهيز.',
+              })}
+            </p>
+          </div>
+          <div className="home-v2-gear-editorial">
+            <Link to="/shop/clothing" className="home-v2-gear-tile home-v2-gear-tile--clothing">
+              <img src="/images/categories/clothing-hero-player.webp"
+                alt={pick({ en: 'Academy basketball apparel collection', ar: 'مجموعة ملابس ليبيا هوبس أكاديمي' })}
+                width="1312" height="820" loading="lazy" decoding="async" />
+              <span className="home-v2-gear-tile-shade" aria-hidden="true" />
+              <span className="home-v2-gear-tile-content">
+                <span className="home-v2-gear-tile-kicker">{pick({ en: 'AVAILABLE APPAREL', ar: 'ملابس متاحة للطلب' })}</span>
+                <strong>{pick({ en: 'ACADEMY APPAREL', ar: 'ملابس الأكاديمية' })}</strong>
+                <span>{pick({ en: 'T-shirts, shorts and performance layers', ar: 'تيشيرتات وشورتات وملابس رياضية' })}</span>
+                <span className="home-v2-gear-tile-link">{pick({ en: 'Shop clothing', ar: 'تسوّق الملابس' })} ↗</span>
+              </span>
+            </Link>
+            <Link to="/shop/accessories" className="home-v2-gear-tile home-v2-gear-tile--accessories">
+              <img src="/images/categories/accessories-hero-player.webp"
+                alt={pick({ en: 'Academy accessories collection preview', ar: 'معاينة مجموعة إكسسوارات الأكاديمية' })}
+                width="1312" height="820" loading="lazy" decoding="async" />
+              <span className="home-v2-gear-tile-shade" aria-hidden="true" />
+              <span className="home-v2-gear-tile-content">
+                <span className="home-v2-gear-tile-kicker">{pick({ en: 'COLLECTION PREVIEW', ar: 'معاينة المجموعة' })}</span>
+                <strong>{pick({ en: 'ACCESSORIES', ar: 'الإكسسوارات' })}</strong>
+                <span>{pick({ en: 'Browse bags and essentials; availability varies', ar: 'استكشف الحقائب والمستلزمات؛ التوفر حسب المنتج' })}</span>
+                <span className="home-v2-gear-tile-link">{pick({ en: 'View accessories', ar: 'شوف الإكسسوارات' })} ↗</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <DeferredHomeContent />
     </>
   );
