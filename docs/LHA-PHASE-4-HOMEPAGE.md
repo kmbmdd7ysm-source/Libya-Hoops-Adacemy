@@ -1,7 +1,7 @@
 # LHA 2.0 — Phase 4: Homepage Experience
 
 **Date:** October 18, 2026  
-**Status:** Developed on isolated branch, tested; production deployment verification required after merge.
+**Status:** COMPLETE within Phase 4 scope; production deployment independently confirmed READY.
 
 ## Design and content rules
 - Academy-first storytelling; black, white and grayscale UI only.
@@ -42,3 +42,15 @@
 
 ## Next step
 Merge tested branch `lha-phase4-home-20261018` to `main`; independently verify Vercel production READY, then mark this stage delivered in the master handoff and proceed to Stage 5.
+
+## Production release, after final merchandising correction
+- First homepage redesign merged from branch `lha-phase4-home-20261018` to `main` (commit `928472dc62fe87ad9bf2636d9a04ec60974d7a9e`), deployed Production READY.
+- Live homepage smoke discovered that all eight featured items in source data were not yet available for sale. That meant the first hero store shelf promoted only `Coming Soon` stock.
+- **Corrected without altering SKU, stock or prices:** homepage now filters its merchandising sources to products with `available !== false`, no `comingSoon`, `availability === 'in-stock'`, and verified positive price. Picks ready featured items first, otherwise ready new arrivals, otherwise any ready products. No change to catalogue selection elsewhere.
+- Source records contain 14 in-stock and sale-ready items; the first four displayed after correction are LHA Win Tee ($20), LHA Troops Tee ($20), LHA Hoopers Tee ($20), LHA Hoopers Long Sleeve ($22). Prices are read from the source.
+- Added regression `e2e/home-experience.spec.js` checks for four Quick Add affordances and zero Coming Soon status chips in the homepage shelf.
+- Fresh polish sandbox build/lint/typecheck PASS, focused Playwright **14/14 PASS**. A separate browser scroll diagnostic on program, online training and merchandise cards found image fallback count 0 and actual image `naturalWidth` 960, 960 and 900 pixels respectively.
+- The external non-scrolling content extractor still surfaced six `Media coming soon` strings on deferred cards, but an on-scroll browser test demonstrated loaded, non-fallback images. This is not evidence of broken assets for actual scrolled visitors; any crawler-level discrepancy should be revisited during SEO/a11y phase 9.
+- Exact corrected production commit `029b46b8fcace0892ae36fadb458c732198add5e`, Vercel deployment `dpl_vL6XunaRBPZ3XZpfiyp9xK6Kmrit` **READY**. Live public homepage independently fetched: hero and all three routes present; merchandise section now contains four priced products and **zero `Coming Soon`** marketing cards.
+- Live production: https://www.libyahoopsacademy.com/
+- Production deployment: https://vercel.com/kmbmdd7ysm-sources-projects/libyahoopsacademy/vL6XunaRBPZ3XZpfiyp9xK6Kmrit
