@@ -1,0 +1,204 @@
+/* LHA 2.0 • Monochrome design system.
+   Final shared cascade layer across every route; photography, logos and
+   real product variant swatches retain their original information. */
+:root {
+  color-scheme: light;
+  --bg: #fff;
+  --surface: #f6f6f6;
+  --surface-2: #eee;
+  --cream: #f6f6f6;
+  --paper: #fff;
+  --paper-2: #f6f6f6;
+  --ink: #0a0a0a;
+  --ink-2: #161616;
+  --ink-3: #303030;
+  --black: #0a0a0a;
+  --white: #fff;
+  --text: #0a0a0a;
+  --muted: #515151;
+  --muted-2: #666;
+  --line: #dedede;
+  --border: #dedede;
+  --border-strong: #b8b8b8;
+  --accent: #0a0a0a;
+  --accent-ink: #0a0a0a;
+  --ok: #303030;
+  --warn: #303030;
+
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 24px;
+  --ds-space-6: 32px;
+  --ds-space-7: 48px;
+  --ds-space-8: 64px;
+  --radius: 6px;
+  --radius-lg: 12px;
+  --ds-radius-card: 12px;
+  --ds-radius-control: 6px;
+  --ds-ring: 0 0 0 3px rgba(10, 10, 10, 0.18);
+  --shadow-sm: 0 1px 3px rgba(10, 10, 10, 0.04);
+  --shadow: 0 8px 24px rgba(10, 10, 10, 0.055);
+  --shadow-lg: 0 18px 50px rgba(10, 10, 10, 0.11);
+  --font-body: 'Inter', 'Noto Kufi Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Archivo', 'Inter', 'Noto Kufi Arabic', system-ui, sans-serif;
+}
+html {
+  color-scheme: light;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+::selection {
+  background: var(--black);
+  color: var(--white);
+}
+:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 3px;
+}
+.section--muted {
+  background: var(--surface);
+}
+:is(.section-title, .display-title, .page-hero h1, .detail-title) {
+  text-wrap: balance;
+}
+.section-title {
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+:is(.lead, .section-subtitle) {
+  line-height: 1.65;
+}
+.section-label {
+  letter-spacing: 0.15em;
+}
+
+/* Buttons, inputs and selections: a single tactile grammar. */
+:is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add) {
+  border-radius: var(--ds-radius-control);
+  min-height: 44px;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+:is(
+  .btn-primary,
+  .purchase-primary,
+  .quick-add,
+  .btn-secondary,
+  .btn-ghost,
+  input,
+  textarea,
+  select,
+  button,
+  [role='radio'],
+  [role='combobox']
+):focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 3px;
+}
+:is(input, select, textarea):not([type='checkbox']):not([type='radio']):not([type='hidden']) {
+  border-radius: var(--ds-radius-control);
+}
+:is(input, select, textarea, button, [role='button']):disabled {
+  cursor: not-allowed;
+}
+
+/* Cards share a disciplined surface without modifying images or grid columns. */
+:is(.product-card, .training-card, .program-card, .event-card, .coach-card, .category-card) {
+  border-radius: var(--ds-radius-card);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+:is(
+  .product-card,
+  .training-card,
+  .program-card,
+  .event-card,
+  .coach-card,
+  .category-card
+):focus-within {
+  box-shadow: var(--ds-ring);
+}
+
+/* Status is communicated with readable text and boundaries, not a hue alone. */
+:is(
+  .badge--limited,
+  .badge--sale,
+  .badge--sold,
+  .badge--new,
+  .badge--best,
+  .badge--free,
+  .status-pill,
+  .notice--success,
+  .notice--warning,
+  .notice--error,
+  .form-error
+) {
+  border-color: var(--border-strong);
+}
+:is(
+  .badge--limited,
+  .badge--sale,
+  .badge--sold,
+  .badge--new,
+  .badge--free,
+  .notice--success,
+  .notice--warning,
+  .notice--error
+) {
+  background-color: var(--surface);
+  color: var(--text);
+}
+:is(.notice--success, .notice--warning, .notice--error) {
+  border-inline-start: 3px solid var(--black);
+}
+.badge--featured {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+.form-error {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Language-aware typography. Retain layout direction and text meaning. */
+html[lang^='ar']
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    .display-title,
+    .section-title,
+    .page-hero h1,
+    .section-label,
+    .btn-primary,
+    .btn-secondary,
+    .btn-ghost,
+    .badge,
+    .status-pill
+  ) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+html[lang^='ar'] :is(p, .lead, .section-subtitle) {
+  line-height: 1.8;
+}
+html[lang^='ar'] :is(h1, h2, h3, h4, h5, .display-title, .section-title) {
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add) {
+    transition-duration: 0.01ms;
+  }
+}

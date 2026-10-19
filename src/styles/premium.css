@@ -17,8 +17,8 @@
   --ink: #080808;
   --ink-2: #151515;
   --ink-3: #242424;
-  --paper: #fbfbf9;
-  --paper-2: #f1f0eb;
+  --paper: #fafafa;
+  --paper-2: #eeeeee;
   --motion-fast: 180ms;
   --motion-med: 420ms;
   --motion-slow: 850ms;
@@ -467,7 +467,7 @@ body {
   --surface-0: #050505;
   --surface-1: #111;
   --surface-2: #1b1b1b;
-  --paper: #f7f7f5;
+  --paper: #f6f6f6;
   --ink: #090909;
 }
 .route-shell {
@@ -762,7 +762,7 @@ body {
   position: sticky;
   left: 0;
   z-index: 2;
-  background: #f4f4f1;
+  background: #f2f2f2;
   min-width: 150px;
 }
 .compare-table img {
@@ -787,7 +787,7 @@ body {
   height: 34px;
 }
 .compare-table tr.is-different td {
-  background: #fffbea;
+  background: #fafafa;
 }
 .pwa-toast {
   position: fixed;
@@ -853,7 +853,7 @@ body {
 }
 .form-notice {
   padding: 14px;
-  background: #f0eee7;
+  background: #eeeeee;
   border-left: 4px solid #111;
 }
 .offline-page {
@@ -1147,7 +1147,7 @@ body {
 }
 .field-error {
   display: block;
-  color: #a40000;
+  color: #222222;
   font-size: 0.82rem;
   margin-top: 6px;
 }

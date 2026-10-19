@@ -13,6 +13,7 @@ import App from './App';
 import './styles/global.css';
 import './styles/premium.css';
 import './styles/account-sync.css';
+import './styles/design-system.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
