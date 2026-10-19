@@ -31,7 +31,10 @@ export default function FaqPage() {
 
       <section className="section">
         <div className="container">
-          <nav className="faq-jump-nav" aria-label={pick({ en: 'FAQ categories', ar: 'تصنيفات الأسئلة الشائعة' })}>
+          <nav
+            className="faq-jump-nav"
+            aria-label={pick({ en: 'FAQ categories', ar: 'تصنيفات الأسئلة الشائعة' })}
+          >
             {faqCategories.map((cat) => (
               <a key={cat.key} href={`#faq-${cat.key}`}>
                 {pick(cat.title)}

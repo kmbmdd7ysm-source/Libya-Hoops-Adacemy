@@ -188,12 +188,20 @@ export default function HelpPage() {
       />
       <section className="section help-page">
         <div className="container narrow">
-          <div className="help-featured-links" aria-label={pick({ en: 'Quick help', ar: 'مساعدة سريعة' })}>
+          <div
+            className="help-featured-links"
+            aria-label={pick({ en: 'Quick help', ar: 'مساعدة سريعة' })}
+          >
             <Link to="/order-tracking" className="help-featured-link">
               <Icon name="orders" size={22} />
               <span>
                 <strong>{pick({ en: 'Track an order', ar: 'تتبع طلب' })}</strong>
-                <small>{pick({ en: 'Look up your current order status', ar: 'اعرف الحالة الحالية لطلبك' })}</small>
+                <small>
+                  {pick({
+                    en: 'Look up your current order status',
+                    ar: 'اعرف الحالة الحالية لطلبك',
+                  })}
+                </small>
               </span>
               <Icon name="chevron" size={18} />
             </Link>
@@ -201,7 +209,12 @@ export default function HelpPage() {
               <Icon name="user" size={22} />
               <span>
                 <strong>{pick({ en: 'My account', ar: 'حسابي' })}</strong>
-                <small>{pick({ en: 'Orders, details and saved addresses', ar: 'الطلبات والبيانات والعناوين المحفوظة' })}</small>
+                <small>
+                  {pick({
+                    en: 'Orders, details and saved addresses',
+                    ar: 'الطلبات والبيانات والعناوين المحفوظة',
+                  })}
+                </small>
               </span>
               <Icon name="chevron" size={18} />
             </Link>
@@ -209,7 +222,12 @@ export default function HelpPage() {
               <Icon name="help" size={22} />
               <span>
                 <strong>{pick({ en: 'Contact support', ar: 'تواصل مع الدعم' })}</strong>
-                <small>{pick({ en: 'Questions about training or shopping', ar: 'استفسارات التدريب والشراء' })}</small>
+                <small>
+                  {pick({
+                    en: 'Questions about training or shopping',
+                    ar: 'استفسارات التدريب والشراء',
+                  })}
+                </small>
               </span>
               <Icon name="chevron" size={18} />
             </Link>
@@ -225,7 +243,10 @@ export default function HelpPage() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 autoComplete="off"
-                placeholder={pick({ en: 'Search orders, delivery, returns or account help', ar: 'ابحث عن الطلبات أو التوصيل أو الإرجاع أو الحساب' })}
+                placeholder={pick({
+                  en: 'Search orders, delivery, returns or account help',
+                  ar: 'ابحث عن الطلبات أو التوصيل أو الإرجاع أو الحساب',
+                })}
                 aria-controls="help-topics"
               />
               {query && (
