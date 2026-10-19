@@ -1,11 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 test('digital training checkout never presents physical cash-on-delivery as payment', async ({ page }) => {
-  await page.goto('/online-training/bodyweight-work');
+  await page.goto('/online-training/bodyweight-work', { waitUntil: 'load' });
+  // Allow the prerendered detail page to hydrate before initiating cart navigation.
+  await page.waitForTimeout(650);
   await expect(page.locator('.purchase-primary')).toBeVisible();
   await page.locator('.purchase-primary').click();
   await expect(page.locator('.cart-drawer.open')).toBeVisible();
-  await page.locator('.cart-drawer.open').getByRole('button', { name: /checkout|الدفع|إتمام الشراء/i }).click();
+  await page.locator('.cart-drawer.open .cart-drawer-foot .btn-primary').click();
   await expect(page).toHaveURL(/\/checkout$/);
   const guest = page.getByRole('button', { name: /Checkout as Guest|الدفع كضيف/i });
   if (await guest.isVisible().catch(() => false)) await guest.click();
