@@ -1,0 +1,160 @@
+/* LHA 2.0 — precision pass for shared UI, on every route.
+ * Restrained monochrome typography, navigation, forms, cards and visual rhythm.
+ * Official logos, product colors and photographs remain untouched.
+ */
+:root {
+  --site-container: 1280px;
+  --site-space-section: clamp(60px, 7vw, 108px);
+  --site-interactive-height: 44px;
+  --site-radius: 4px;
+  --site-line: #dedede;
+}
+body { font-optical-sizing: auto; -webkit-font-smoothing: antialiased; }
+main, .container, .section-heading, .section-heading > * { min-inline-size: 0; }
+.container { max-inline-size: min(100%, var(--site-container)); }
+.section:not(.page-hero):not(.hero) {
+  padding-block: var(--site-space-section) !important;
+}
+.section-heading { margin-bottom: clamp(28px, 4vw, 48px) !important; }
+.section-heading .section-title {
+  max-width: 26ch !important;
+  line-height: 1.09 !important;
+  letter-spacing: -0.035em !important;
+  text-wrap: balance;
+}
+.section-label {
+  font-size: .75rem;
+  font-weight: 750;
+  letter-spacing: .11em !important;
+  margin-bottom: 16px;
+}
+.section-subtitle, .section-heading .section-sub, .page-description {
+  max-inline-size: 64ch;
+  line-height: 1.68;
+  color: #525252;
+}
+.page-hero {
+  background: #0b0b0b !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+.page-hero-inner {
+  padding-block: clamp(68px, 7.5vw, 120px) !important;
+}
+.page-hero h1, .page-hero .display-title {
+  max-inline-size: 22ch;
+  line-height: 1.05;
+  letter-spacing: -.038em;
+  overflow-wrap: break-word;
+}
+.page-hero .page-description { color: #e4e4e4; }
+.page-hero .court-lines { opacity: .25; }
+
+:is(.product-card, .program-card, .training-card, .event-card, .coach-card) {
+  border-color: var(--site-line) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,.025) !important;
+  transition: border-color .18s ease, box-shadow .18s ease !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+:is(.product-card, .program-card, .training-card, .event-card, .coach-card):hover {
+  transform: none !important;
+  border-color: #aaa !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,.055) !important;
+}
+:is(.product-card, .program-card, .training-card, .event-card, .coach-card):focus-within {
+  border-color: #555 !important;
+}
+:is(.product-card, .program-card, .training-card) :is(h2,h3,h4) {
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+:is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add, .lang-text-btn) {
+  min-height: var(--site-interactive-height);
+  border-radius: var(--site-radius) !important;
+  font-weight: 700;
+  letter-spacing: 0;
+  transition: background .18s ease, border-color .18s ease, color .18s ease !important;
+  transform: none !important;
+}
+:is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add, .lang-text-btn):hover {
+  transform: none !important;
+}
+:is(input:not([type='checkbox']):not([type='radio']), textarea, select) {
+  border-radius: var(--site-radius) !important;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+:is(.field, .form-block, .checkout-grid, .account-layout, .order-card) {
+  min-inline-size: 0;
+}
+:is(.field, .form-block) label, .field > span {
+  line-height: 1.5;
+}
+:is(.field input, .field textarea, .field select):focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+.site-header .nav-link { font-weight: 650; letter-spacing: 0; }
+.site-header .brand-logo { transform: none !important; }
+.site-header .icon-btn {
+  min-width: var(--site-interactive-height);
+  min-height: var(--site-interactive-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: none !important;
+}
+.site-header .icon-btn svg { display: block; flex: 0 0 auto; }
+.site-header .header-actions { gap: clamp(2px, .5vw, 8px); }
+.site-footer {
+  background: #0a0a0a;
+  color: #e4e4e4;
+  border-top: 1px solid #242424;
+}
+.site-footer .footer-col a, .site-footer .footer-link-button {
+  line-height: 1.65;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.site-footer :is(a, button, input):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.site-footer .footer-newsletter-col { min-inline-size: 0; }
+.site-footer .newsletter-input-row { min-inline-size: 0; }
+.site-footer .newsletter-input-row input { min-width: 0; }
+.training-card-plans li, .cart-line, .order-card dl div {
+  min-inline-size: 0;
+}
+.training-card-plans li > :first-child { overflow-wrap: anywhere; }
+:where(.notice, .status-badge, .tag, .badge) { letter-spacing: 0; }
+html[lang^='ar'] :is(.section-title, .page-hero h1, .page-hero .display-title, .section-label) {
+  letter-spacing: 0 !important;
+  line-height: 1.38 !important;
+}
+html[lang^='ar'] :is(.btn-primary, .btn-secondary, .btn-ghost, .purchase-primary, .quick-add) {
+  letter-spacing: 0 !important;
+}
+@media(max-width:767px) {
+  :root { --site-space-section: clamp(54px, 12vw, 80px); }
+  .section-heading .section-title { max-width: 100% !important; font-size: clamp(1.85rem, 8vw, 3rem); }
+  .page-hero-inner { padding-block: 76px 66px !important; }
+  .page-hero h1, .page-hero .display-title { font-size: clamp(2.6rem, 10vw, 4.5rem); }
+  .site-header .header-inner { padding-inline: clamp(12px, 3vw, 22px); }
+  .site-header .icon-btn { min-width: 42px; min-height: 44px; }
+  .site-header .header-actions { gap: 0; }
+  .site-footer { padding-top: 55px; }
+  .site-footer .footer-top { row-gap: 38px; }
+  .site-footer .footer-col { min-width: 0; }
+  :is(.product-card, .training-card, .program-card) {
+    max-inline-size: 100%;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
