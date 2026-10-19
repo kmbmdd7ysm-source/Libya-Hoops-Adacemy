@@ -201,6 +201,20 @@ export default function TrainingDetailPage() {
       <section className="section">
         <div className="container detail-body">
           <div className="detail-lists">
+            {renderList(pick({ en: 'Program highlights', ar: 'مميزات البرنامج' }), program.programHighlights)}
+            {Array.isArray(program.phasePreview) && program.phasePreview.length > 0 && (
+              <div className="detail-list-block">
+                <h3>{pick({ en: 'Training phases', ar: 'مراحل التدريب' })}</h3>
+                <ul className="tick-list">
+                  {program.phasePreview.map((phase) => (
+                    <li key={phase.phase}>
+                      <strong>{pick({ en: 'Phase', ar: 'المرحلة' })} {phase.phase}: {pick(phase.title)}</strong>
+                      {' — '}{pick(phase.days)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {renderList(t.training.outcomes, program.outcomes)}
             {pick(program.forWho) && (
               <div className="detail-list-block">
